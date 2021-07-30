@@ -154,10 +154,11 @@ describe('routes', function () {
       expect(actualResult.body).to.have.property('message')
     })
 
-    test('get item metadata', async function () {
+    test.only('get item metadata', async function () {
       const lastToken = await getLastTokenIdRoute(app, authToken)
       const lastTokenId = lastToken.body.id
-      const { Hash: base58Metadata } = await addFileRoute('./test/data/test_file_01.txt')
+      const dir = await addFileRoute('./test/data/test_file_01.txt')
+      const { Hash: base58Metadata } = dir.find((r) => r.Name === '')
 
       const base64Metadata = `0x${bs58.decode(base58Metadata).toString('hex').slice(4)}`
 
@@ -168,6 +169,7 @@ describe('routes', function () {
       const res = await getItemMetadataRoute(app, authToken, { id: lastTokenId + 1 })
 
       expect(res.text.toString()).equal('This is the first test file...\n')
+      expect(res.header['content-disposition']).equal('attachment; filename="test_file_01.txt"')
     })
 
     test('get missing item metadata', async function () {

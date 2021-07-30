@@ -30,11 +30,17 @@ async function getAuthTokenRoute(app) {
 async function addFileRoute(file) {
   const form = new FormData()
   form.append('file', fs.createReadStream(file))
-  const body = await fetch(`http://${IPFS_HOST}:${IPFS_PORT}/api/v0/add?cid-version=0`, {
+  const body = await fetch(`http://${IPFS_HOST}:${IPFS_PORT}/api/v0/add?cid-version=0&wrap-with-directory=true`, {
     method: 'POST',
     body: form,
   })
-  return body.json()
+  const text = await body.text()
+  const json = text
+    .split('\n')
+    .filter((obj) => obj.length > 0)
+    .map((obj) => JSON.parse(obj))
+
+  return json
 }
 
 async function addItemRoute(app, authToken, inputs, outputs) {

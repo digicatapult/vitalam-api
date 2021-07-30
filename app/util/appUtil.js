@@ -66,7 +66,6 @@ async function addFile(file) {
 async function processMetadata(file) {
   if (file) {
     const responses = await addFile(file)
-    console.log({ responses })
 
     // directory has no Name
     const dir = responses.find((r) => r.Name === '')
@@ -89,10 +88,9 @@ const downloadFile = async (dirHash) => {
   const { fileHash, filename } = await new Promise((resolve, reject) =>
     pipeline
       .on('error', (err) => reject(err))
-      .on('data', (data) => {
-        console.log(JSON.stringify(data))
+      .on('data', (data) =>
         resolve({ fileHash: data.value.Objects[0].Links[0].Hash, filename: data.value.Objects[0].Links[0].Name })
-      })
+      )
   )
 
   // Return file

@@ -46,19 +46,31 @@ api.on('error', (err) => {
 
 async function addFile(file) {
   const form = new FormData()
-  form.append('file', fs.createReadStream(file))
-  const body = await fetch(`http://${IPFS_HOST}:${IPFS_PORT}/api/v0/add?cid-version=0`, {
+  form.append('file', fs.createReadStream(file.path), file.name)
+  const body = await fetch(`http://${IPFS_HOST}:${IPFS_PORT}/api/v0/add?cid-version=0&wrap-with-directory=true`, {
     method: 'POST',
     body: form,
   })
-  return body.json()
+
+  // Build string of objects into array
+  const text = await body.text()
+  const json = text
+    .split('\n')
+    .filter((obj) => obj.length > 0)
+    .map((obj) => JSON.parse(obj))
+
+  return json
 }
 
 async function processMetadata(file) {
   if (file) {
-    const response = await addFile(file)
-    if (response && response.Hash && response.Name && response.Size) {
-      const decoded = bs58.decode(response.Hash)
+    const responses = await addFile(file)
+    console.log({ responses })
+
+    // directory has no Name
+    const dir = responses.find((r) => r.Name === '')
+    if (dir && dir.Hash && dir.Size) {
+      const decoded = bs58.decode(dir.Hash)
       return `0x${decoded.toString('hex').slice(4)}`
     }
   }
@@ -67,8 +79,9 @@ async function processMetadata(file) {
 }
 
 const downloadFile = async (hash) => {
-  const url = `http://${IPFS_HOST}:${IPFS_PORT}/api/v0/cat?arg=${hash}`
+  const url = `http://${IPFS_HOST}:${IPFS_PORT}/api/v0/ls?arg=${hash}`
   const res = await fetch(url, { method: 'POST' })
+  console.log(res)
 
   if (!res.ok) {
     throw new Error(`Error fetching file from IPFS (${res.status}): ${await res.text()}`)
@@ -126,6 +139,7 @@ async function getItem(tokenId) {
 
     // TODO replace...
     response = JSON.parse(item)
+    console.log({ response })
   }
 
   return response
@@ -133,7 +147,9 @@ async function getItem(tokenId) {
 
 async function getMetadata(base64Hash) {
   // strip 0x and parse to base58
+  console.log({ base64Hash })
   const base58Hash = bs58.encode(Buffer.from(`1220${base64Hash.slice(2)}`, 'hex'))
+  console.log({ base58Hash })
   return downloadFile(base58Hash)
 }
 

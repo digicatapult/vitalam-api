@@ -127,7 +127,7 @@ router.post('/run-process', async (req, res) => {
           const outputs = await Promise.all(
             request.outputs.map(async (output) => ({
               owner: output.owner,
-              metadata: await processMetadata(files[output.metadataFile].path),
+              metadata: await processMetadata(files[output.metadataFile]),
             }))
           )
 

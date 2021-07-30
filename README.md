@@ -117,7 +117,8 @@ Gets the item identified by `id`. Item `id`s are returned by [POST /run-process]
     "id": 42, // Number
     "owner": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY", // String
     "creator": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY", // String
-    "block_number": 4321, // Number
+    "created_at": 4321, // Number
+    "destroyed_at": 321 || null, // Nullable<Number>
     "parents": [40, 41], // Array<Number>
     "children": [43, 44] || null // Nullable<Array<Number>>
 }

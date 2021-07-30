@@ -1,10 +1,24 @@
 const pino = require('pino')
-const { LOG_LEVEL } = require('./env')
+const env = require('./env')
 
-module.exports = pino(
+const logger = pino(
   {
     name: 'API',
-    level: LOG_LEVEL,
+    level: env.LOG_LEVEL,
+    redact: {
+      paths: ['USER_URI', '[*].USER_URI'],
+      censor: (args) => {
+        if (args === '' || args === null || args === undefined) {
+          return '[EMPTY]'
+        } else {
+          return '[REDACTED]'
+        }
+      },
+    },
   },
   process.stdout
 )
+
+logger.debug('Env: %j', env)
+
+module.exports = logger

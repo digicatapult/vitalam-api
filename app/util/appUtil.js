@@ -15,6 +15,7 @@ const metadata = {
   types: {
     Address: 'MultiAddress',
     LookupSource: 'MultiAddress',
+    PeerId: '(Vec<u8>)',
     TokenId: 'u128',
     TokenMetadata: 'Hash',
     Token: {

@@ -36,7 +36,8 @@
     "jwks-rsa": "^2.0.3",
     "node-fetch": "^2.6.1",
     "pino": "^6.11.3",
-    "pino-http": "^5.5.0"
+    "pino-http": "^5.5.0",
+    "stream-json": "^1.7.2"
   },
   "devDependencies": {
     "chai": "^4.3.4",

@@ -1,6 +1,7 @@
+const fs = require('fs')
+const StreamValues = require('stream-json/streamers/StreamValues')
 const BASE58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
 const bs58 = require('base-x')(BASE58)
-const fs = require('fs')
 
 const fetch = require('node-fetch')
 const FormData = require('form-data')
@@ -78,16 +79,28 @@ async function processMetadata(file) {
   return null
 }
 
-const downloadFile = async (hash) => {
-  const url = `http://${IPFS_HOST}:${IPFS_PORT}/api/v0/ls?arg=${hash}`
-  const res = await fetch(url, { method: 'POST' })
-  console.log(res)
+const downloadFile = async (dirHash) => {
+  const dirUrl = `http://${IPFS_HOST}:${IPFS_PORT}/api/v0/ls?arg=${dirHash}`
+  const dirRes = await fetch(dirUrl, { method: 'POST' })
+  if (!dirRes.ok) throw new Error(`Error fetching directory from IPFS (${dirRes.status}): ${await dirRes.text()}`)
 
-  if (!res.ok) {
-    throw new Error(`Error fetching file from IPFS (${res.status}): ${await res.text()}`)
-  }
+  // Parse stream of dir data to get the file hash
+  const pipeline = dirRes.body.pipe(StreamValues.withParser())
+  const { fileHash, filename } = await new Promise((resolve, reject) =>
+    pipeline
+      .on('error', (err) => reject(err))
+      .on('data', (data) => {
+        console.log(JSON.stringify(data))
+        resolve({ fileHash: data.value.Objects[0].Links[0].Hash, filename: data.value.Objects[0].Links[0].Name })
+      })
+  )
 
-  return res.body
+  // Return file
+  const fileUrl = `http://${IPFS_HOST}:${IPFS_PORT}/api/v0/cat?arg=${fileHash}`
+  const fileRes = await fetch(fileUrl, { method: 'POST' })
+  if (!fileRes.ok) throw new Error(`Error fetching file from IPFS (${fileRes.status}): ${await fileRes.text()}`)
+
+  return { file: fileRes.body, filename }
 }
 
 async function getLastTokenId() {
@@ -139,7 +152,6 @@ async function getItem(tokenId) {
 
     // TODO replace...
     response = JSON.parse(item)
-    console.log({ response })
   }
 
   return response
@@ -147,9 +159,7 @@ async function getItem(tokenId) {
 
 async function getMetadata(base64Hash) {
   // strip 0x and parse to base58
-  console.log({ base64Hash })
   const base58Hash = bs58.encode(Buffer.from(`1220${base64Hash.slice(2)}`, 'hex'))
-  console.log({ base58Hash })
   return downloadFile(base58Hash)
 }
 

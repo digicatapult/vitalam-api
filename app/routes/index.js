@@ -51,22 +51,18 @@ router.get('/item/:id/metadata', async (req, res) => {
     const { metadata: hash, id: getId } = await getItem(id)
     if (getId === id) {
       try {
-        const file = await getMetadata(hash)
+        const { file, filename } = await getMetadata(hash)
 
         await new Promise((resolve, reject) => {
           res.status(200)
           res.set({
             immutable: true,
             maxAge: 365 * 24 * 60 * 60 * 1000,
-            'Content-Disposition': 'attachment; filename="metadata"',
+            'Content-Disposition': `attachment; filename="${filename}"`,
           })
           file.pipe(res)
-          file.on('error', (err) => {
-            reject(err)
-          })
-          res.on('finish', () => {
-            resolve()
-          })
+          file.on('error', (err) => reject(err))
+          res.on('finish', () => resolve())
         })
         return
       } catch (err) {

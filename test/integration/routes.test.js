@@ -154,7 +154,7 @@ describe('routes', function () {
       expect(actualResult.body).to.have.property('message')
     })
 
-    test.only('get item metadata', async function () {
+    test('get item metadata', async function () {
       const lastToken = await getLastTokenIdRoute(app, authToken)
       const lastTokenId = lastToken.body.id
       const dir = await addFileRoute('./test/data/test_file_01.txt')

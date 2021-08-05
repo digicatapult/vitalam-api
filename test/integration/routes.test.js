@@ -155,7 +155,7 @@ describe('routes', function () {
       expect(actualResult.body).to.have.property('message')
     })
 
-    test.only('get item metadata', async function () {
+    test('get item metadata', async function () {
       const lastToken = await getLastTokenIdRoute(app, authToken)
       const lastTokenId = lastToken.body.id
       const dir = await addFileRoute('./test/data/test_file_01.txt')
@@ -173,7 +173,7 @@ describe('routes', function () {
       expect(res.header['content-disposition']).equal('attachment; filename="test_file_01.txt"')
     })
 
-    test.only('get legacy item metadata', async function () {
+    test('get legacy item metadata', async function () {
       const lastToken = await getLastTokenIdRoute(app, authToken)
       const lastTokenId = lastToken.body.id
       const { Hash: base58Metadata } = await addFileRouteLegacy('./test/data/test_file_01.txt')

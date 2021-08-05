@@ -13,6 +13,7 @@ const {
   getItemMetadataRoute,
   getLastTokenIdRoute,
   addFileRoute,
+  addFileRouteLegacy,
 } = require('../helper/routeHelper')
 const USER_ALICE_TOKEN = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY'
 const USER_BOB_TOKEN = '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'
@@ -154,7 +155,7 @@ describe('routes', function () {
       expect(actualResult.body).to.have.property('message')
     })
 
-    test('get item metadata', async function () {
+    test.only('get item metadata', async function () {
       const lastToken = await getLastTokenIdRoute(app, authToken)
       const lastTokenId = lastToken.body.id
       const dir = await addFileRoute('./test/data/test_file_01.txt')
@@ -170,6 +171,22 @@ describe('routes', function () {
 
       expect(res.text.toString()).equal('This is the first test file...\n')
       expect(res.header['content-disposition']).equal('attachment; filename="test_file_01.txt"')
+    })
+
+    test.only('get legacy item metadata', async function () {
+      const lastToken = await getLastTokenIdRoute(app, authToken)
+      const lastTokenId = lastToken.body.id
+      const { Hash: base58Metadata } = await addFileRouteLegacy('./test/data/test_file_01.txt')
+      const base64Metadata = `0x${bs58.decode(base58Metadata).toString('hex').slice(4)}`
+
+      const output = { owner: USER_ALICE_TOKEN, metadata: base64Metadata }
+
+      await runProcess([], [output])
+
+      const res = await getItemMetadataRoute(app, authToken, { id: lastTokenId + 1 })
+
+      expect(res.text.toString()).equal('This is the first test file...\n')
+      expect(res.header['content-disposition']).equal('attachment; filename="metadata"')
     })
 
     test('get missing item metadata', async function () {

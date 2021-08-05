@@ -89,9 +89,14 @@ const downloadFile = async (dirHash) => {
   const { fileHash, filename } = await new Promise((resolve, reject) =>
     pipeline
       .on('error', (err) => reject(err))
-      .on('data', (data) =>
-        resolve({ fileHash: data.value.Objects[0].Links[0].Hash, filename: data.value.Objects[0].Links[0].Name })
-      )
+      .on('data', (data) => {
+        if (data.value.Objects[0].Links.length > 0) {
+          resolve({ fileHash: data.value.Objects[0].Links[0].Hash, filename: data.value.Objects[0].Links[0].Name })
+        } else {
+          // no links means it's just a file (legacy), not a directory
+          resolve({ fileHash: dirHash, filename: 'metadata' })
+        }
+      })
   )
 
   // Return file

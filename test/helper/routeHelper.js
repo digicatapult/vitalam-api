@@ -43,6 +43,18 @@ async function addFileRoute(file) {
   return json
 }
 
+// Route for old method of uploading tokens without being wrapped in a directory
+async function addFileRouteLegacy(file) {
+  const form = new FormData()
+  form.append('file', fs.createReadStream(file))
+  const body = await fetch(`http://${IPFS_HOST}:${IPFS_PORT}/api/v0/add?cid-version=0`, {
+    method: 'POST',
+    body: form,
+  })
+
+  return body.json()
+}
+
 async function addItemRoute(app, authToken, inputs, outputs) {
   let req = request(app)
     .post('/run-process')
@@ -121,6 +133,7 @@ module.exports = {
   getAuthTokenRoute,
   addItemRoute,
   addFileRoute,
+  addFileRouteLegacy,
   getItemRoute,
   getItemMetadataRoute,
   getLastTokenIdRoute,

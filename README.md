@@ -126,7 +126,7 @@ Gets the item identified by `id`. Item `id`s are returned by [POST /run-process]
 
 ### GET /item/:id/metadata
 
-Gets the metadata entry associated with the item identified by `id`. Item `id`s are returned by [POST /run-process](#post-/run-process). This will return a file of the metadata entry the item was created with. The file will be returned with a `Content-Type` of `application/octet-stream`.
+Gets the metadata entry associated with the item identified by `id`. Item `id`s are returned by [POST /run-process](#post-/run-process). This will return a file of the metadata entry the item was created with. The file will be returned with a `Content-Type` of `application/octet-stream`. The original `filename` is returned in the `Content-Disposition` header.
 
 ### POST /run-process
 

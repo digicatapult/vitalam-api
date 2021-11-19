@@ -61,10 +61,9 @@ const getMetadataResponse = async (id, metadataKey, res) => {
     if (getId === id) {
       try {
         const buffer = Buffer.alloc(METADATA_KEY_LENGTH) // metadata keys are fixed length
-        const metadataKeyBuf = Buffer.from(metadataKey)
-        metadataKeyBuf.copy(buffer, 0)
-        const metadataKeyAsPaddedHex = `0x${buffer.toString('hex')}`
-        const hash = metadata[metadataKeyAsPaddedHex]
+        buffer.write(metadataKey)
+        const metadataKeyHex = `0x${buffer.toString('hex')}`
+        const hash = metadata[metadataKeyHex]
         if (!hash) {
           res.status(404).json({ message: `No metadata with key '${metadataKey}' for token with ID: ${id}` })
           return

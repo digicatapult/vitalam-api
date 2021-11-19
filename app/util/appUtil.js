@@ -18,7 +18,7 @@ const metadata = {
     LookupSource: 'MultiAddress',
     PeerId: '(Vec<u8>)',
     TokenId: 'u128',
-    TokenMetadataKey: '[u8; 32]',
+    TokenMetadataKey: `[u8; ${METADATA_KEY_LENGTH}]`,
     TokenMetadataValue: 'Hash',
     Token: {
       id: 'TokenId',

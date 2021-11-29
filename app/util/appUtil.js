@@ -25,7 +25,8 @@ const apiOptions = {
   types: {
     Address: 'MultiAddress',
     LookupSource: 'MultiAddress',
-    PeerId: '(Vec<u8>)',
+    PeerId: 'Vec<u8>',
+    Key: 'Vec<u8>',
     TokenId: 'u128',
     TokenMetadataKey: `[u8; ${METADATA_KEY_LENGTH}]`,
     TokenMetadataValue: 'MetadataValue',

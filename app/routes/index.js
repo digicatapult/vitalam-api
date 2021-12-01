@@ -5,6 +5,7 @@ const {
   getLastTokenId,
   getItem,
   runProcess,
+  processRoles,
   processMetadata,
   getFile,
   validateInputIds,
@@ -168,14 +169,14 @@ router.post('/run-process', async (req, res) => {
         logger.trace(`Request missing input and/or outputs`)
         res.status(400).json({ message: `Request missing input and/or outputs` })
         return
-      } else if (request.outputs && (await containsInvalidMembershipOwners(request.outputs))) {
-        logger.trace(`Request contains invalid owners that are not members of the membership list`)
-        res.status(400).json({ message: `Request contains invalid owners that are not members of the membership list` })
-        return
       }
+      //else if (request.outputs && (await containsInvalidMembershipOwners(request.outputs))) {
+      //   logger.trace(`Request contains invalid owners that are not members of the membership list`)
+      //   res.status(400).json({ message: `Request contains invalid owners that are not members of the membership list` })
+      //   return
+      // }
 
-      const inputsValid = await validateInputIds(request.inputs)
-      if (!inputsValid) {
+      if (!(await validateInputIds(request.inputs))) {
         logger.trace(`Some inputs were invalid`)
         res.status(400).json({ message: `Some inputs were invalid: ${JSON.stringify(request.inputs)}` })
         return
@@ -183,17 +184,22 @@ router.post('/run-process', async (req, res) => {
 
       const outputs = await Promise.all(
         request.outputs.map(async (output) => {
+          //catch legacy owner
+          if (output.owner) {
+            output.roles = { Admin: output.owner }
+          }
           //catch legacy single metadataFile
           if (output.metadataFile) {
             output.metadata = { [LEGACY_METADATA_KEY]: { type: 'FILE', value: output.metadataFile } }
           }
+
           try {
             return {
-              owner: output.owner,
+              roles: await processRoles(output.roles),
               metadata: await processMetadata(output.metadata, files),
             }
           } catch (err) {
-            logger.trace(`Invalid metadata: ${err.message}`)
+            logger.trace(`Invalid outputs: ${err.message}`)
             res.status(400).json({ message: err.message })
             return
           }

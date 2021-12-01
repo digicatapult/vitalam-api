@@ -123,7 +123,7 @@ Gets the item identified by `id`. Item `id`s are returned by [POST /run-process]
 ```js
 {
     "id": 42, // Number
-    "owner": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY", // String
+    "roles": {"Admin": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"}, // Object
     "creator": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY", // String
     "created_at": 4321, // Number
     "destroyed_at": 321 || null, // Nullable<Number>
@@ -145,18 +145,29 @@ This endpoint governs the creation and destruction of all tokens in the system. 
 {
   "inputs": [40, 41] // Array<Number>,
   "outputs": [{ // Array<Output>
-    "owner": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
+    "roles": {
+      "Admin": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
+      "Supplier": "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty",
+      ..."some_other_role_key": "some_account_id"
+    }
     "metadata": {
       "some_file": { "type": "FILE", "value": "some_file.txt"},
       "some_literal": {"type": "LITERAL", "value":"some_value"},
-      ..."metadataKeyN": {"type": "LITERAL", "value", "some_other_value"}
+      ..."metadataKeyN": {"type": "LITERAL", "value", "some_other_value"
+    }
   }]
 }
 ```
 
-The `inputs` field is an array of token `id`s that identifies the tokens to be consumed by running this process. To create tokens without destroying any inputs simply pass an empty array.
+The `inputs` field is an array of token `id`s that identifies the tokens to be consumed by running this process. To create tokens without destroying any inputs simply pass an empty array. To destroy a token, the `AccountId` from the `USER_URI` of the sender must match the `AccountId` associated with the default (`Admin`) role for that token.
 
-The `outputs` field is an array of objects that describe tokens to be created by running this process. To destroy tokens without creating any new ones simply pass an empty array. Each output must set the address of the `owner` of the new token. Each output must also reference a `metadata` object containing a (key, value) pair for each metadata item associated with the new token. The following metadata value types are accepted:
+The `outputs` field is an array of objects that describe tokens to be created by running this process. To destroy tokens without creating any new ones simply pass an empty array. Each output must reference a `roles` object containing a (key, value) pair for each role associated with the new token. The value is the `AccountId` for the role. At minimum, a token requires the default `Admin` role to be set. The following role keys are accepted:
+
+```json
+["Admin", "ManufacturingEngineer", "ProcurementBuyer", "ProcurementPlanner", "Supplier"]
+```
+
+Each output must also reference a `metadata` object containing a (key, value) pair for each metadata item associated with the new token. The following metadata value types are accepted:
 
 ```json
 ["FILE", "LITERAL", "NONE"]
@@ -192,10 +203,10 @@ Gets the metadata file matching the `LEGACY_METADATA_KEY` env for the item ident
 
 Each element returned represents a member and their corresponding address in the following format:
 
-```js
+```json
 [
-    {
-        "address": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"
-    }
+  {
+    "address": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"
+  }
 ]
 ```

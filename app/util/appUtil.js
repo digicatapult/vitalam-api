@@ -28,11 +28,12 @@ const apiOptions = {
     PeerId: 'Vec<u8>',
     Key: 'Vec<u8>',
     TokenId: 'u128',
+    RoleKey: 'Role',
     TokenMetadataKey: `[u8; ${METADATA_KEY_LENGTH}]`,
     TokenMetadataValue: 'MetadataValue',
     Token: {
       id: 'TokenId',
-      owner: 'AccountId',
+      roles: 'BTreeMap<RoleKey, AccountId>',
       creator: 'AccountId',
       created_at: 'BlockNumber',
       destroyed_at: 'Option<BlockNumber>',
@@ -46,6 +47,10 @@ const apiOptions = {
         Literal: `[u8; ${METADATA_VALUE_LITERAL_LENGTH}]`,
         None: null,
       },
+    },
+    Role: {
+      // order must match node as values are referenced by index. First entry is default.
+      _enum: ['Admin', 'ManufacturingEngineer', 'ProcurementBuyer', 'ProcurementPlanner', 'Supplier'],
     },
   },
 }
@@ -89,6 +94,24 @@ function formatHash(filestoreResponse) {
     const decoded = bs58.decode(dir.Hash)
     return `0x${decoded.toString('hex').slice(4)}`
   }
+}
+
+const processRoles = async (roles) => {
+  const defaultRole = apiOptions.types.Role._enum[0]
+  if (!roles[defaultRole]) {
+    throw new Error(`Roles must include default ${defaultRole} role. Roles: ${JSON.stringify(roles)}`)
+  }
+
+  if (await containsInvalidMembershipRoles(roles)) {
+    logger.trace(`Request contains roles with account IDs not in the membership list`)
+    throw new Error(`Request contains roles with account IDs not in the membership list`)
+  }
+
+  return new Map(
+    Object.entries(roles).map(([key, value]) => {
+      return [roleEnumAsIndex(key), value]
+    })
+  )
 }
 
 async function processMetadata(metadata, files) {
@@ -195,6 +218,20 @@ async function getLastTokenId() {
   return lastTokenId ? parseInt(lastTokenId, 10) : 0
 }
 
+async function containsInvalidMembershipRoles(roles) {
+  const membershipMembers = await getMembers()
+
+  const accountIds = Object.values(roles)
+  const validMembers = accountIds.reduce((acc, accountId) => {
+    if (membershipMembers.includes(accountId)) {
+      acc.push(accountId)
+      return acc
+    }
+  }, [])
+
+  return !validMembers || validMembers.length !== accountIds.length
+}
+
 async function containsInvalidMembershipOwners(outputs) {
   const membershipMembers = await getMembers()
 
@@ -229,8 +266,7 @@ async function runProcess(inputs, outputs) {
     const keyring = new Keyring({ type: 'sr25519' })
     const alice = keyring.addFromUri(USER_URI)
 
-    // [owner: 'OWNER_ID', metadata: METADATA_OBJ] -> ['OWNER_ID', METADATA_OBJ]
-    const outputsAsPair = outputs.map(({ owner, metadata: md }) => [owner, md])
+    const outputsAsPair = outputs.map(({ roles, metadata: md }) => [roles, md])
     logger.debug('Running Transaction inputs: %j outputs: %j', inputs, outputsAsPair)
     return new Promise((resolve) => {
       let unsub = null
@@ -327,11 +363,22 @@ const validateTokenId = (tokenId) => {
   return id
 }
 
+const roleEnumAsIndex = (role) => {
+  const index = apiOptions.types.Role._enum.indexOf(role)
+
+  if (index === -1) {
+    throw new Error(`Invalid role: ${role}`)
+  }
+
+  return index
+}
+
 module.exports = {
   runProcess,
   getItemMetadataSingle,
   getItem,
   getLastTokenId,
+  processRoles,
   processMetadata,
   getFile,
   validateInputIds,
@@ -342,4 +389,5 @@ module.exports = {
   getMembers,
   containsInvalidMembershipOwners,
   membershipReducer,
+  roleEnumAsIndex,
 }

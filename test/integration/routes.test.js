@@ -37,6 +37,7 @@ const {
 
 const BASE58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
 const bs58 = require('base-x')(BASE58)
+const defaultRole = { Admin: USER_ALICE_TOKEN }
 
 describe('routes', function () {
   before(async () => {
@@ -121,7 +122,7 @@ describe('routes', function () {
     })
   })
 
-  describe('authenticated routes', function () {
+  describe.only('authenticated routes', function () {
     let app
     let jwksMock
     let authToken
@@ -142,7 +143,7 @@ describe('routes', function () {
     })
 
     test('add and get item - single metadataFile (legacy)', async function () {
-      const outputs = [{ owner: USER_ALICE_TOKEN, metadataFile: './test/data/test_file_01.txt' }]
+      const outputs = [{ roles: defaultRole, metadataFile: './test/data/test_file_01.txt' }]
       const runProcessResult = await postRunProcess(app, authToken, [], outputs)
       expect(runProcessResult.body).to.have.length(1)
       expect(runProcessResult.status).to.equal(200)
@@ -158,7 +159,7 @@ describe('routes', function () {
 
     test('add and get item - single metadata FILE', async function () {
       const outputs = [
-        { owner: USER_ALICE_TOKEN, metadata: { testFile: { type: 'FILE', value: './test/data/test_file_01.txt' } } },
+        { roles: defaultRole, metadata: { testFile: { type: 'FILE', value: './test/data/test_file_01.txt' } } },
       ]
       const runProcessResult = await postRunProcess(app, authToken, [], outputs)
       expect(runProcessResult.body).to.have.length(1)
@@ -173,7 +174,7 @@ describe('routes', function () {
     })
 
     test('add and get item - single metadata LITERAL', async function () {
-      const outputs = [{ owner: USER_ALICE_TOKEN, metadata: { testLiteral: { type: 'LITERAL', value: 'notAFile' } } }]
+      const outputs = [{ roles: defaultRole, metadata: { testLiteral: { type: 'LITERAL', value: 'notAFile' } } }]
       const runProcessResult = await postRunProcess(app, authToken, [], outputs)
       expect(runProcessResult.body).to.have.length(1)
       expect(runProcessResult.status).to.equal(200)
@@ -188,7 +189,7 @@ describe('routes', function () {
     })
 
     test('add and get item - single NONE', async function () {
-      const outputs = [{ owner: USER_ALICE_TOKEN, metadata: { testNone: { type: 'NONE' } } }]
+      const outputs = [{ roles: defaultRole, metadata: { testNone: { type: 'NONE' } } }]
       const runProcessResult = await postRunProcess(app, authToken, [], outputs)
       expect(runProcessResult.body).to.have.length(1)
       expect(runProcessResult.status).to.equal(200)
@@ -205,7 +206,7 @@ describe('routes', function () {
     test('add and get item metadata - FILE + LITERAL + NONE', async function () {
       const outputs = [
         {
-          owner: USER_ALICE_TOKEN,
+          roles: defaultRole,
           metadata: {
             testFile: { type: 'FILE', value: './test/data/test_file_01.txt' },
             testLiteral: { type: 'LITERAL', value: 'notAFile' },
@@ -252,7 +253,7 @@ describe('routes', function () {
     test('add and get item - multiple FILE', async function () {
       const outputs = [
         {
-          owner: USER_ALICE_TOKEN,
+          roles: defaultRole,
           metadata: {
             testFile1: { type: 'FILE', value: './test/data/test_file_01.txt' },
             testFile2: { type: 'FILE', value: './test/data/test_file_02.txt' },
@@ -275,7 +276,7 @@ describe('routes', function () {
     test('add and get item - multiple LITERAL', async function () {
       const outputs = [
         {
-          owner: USER_ALICE_TOKEN,
+          roles: defaultRole,
           metadata: {
             testLiteral1: { type: 'LITERAL', value: 'test1' },
             testLiteral2: { type: 'LITERAL', value: 'test2' },
@@ -297,7 +298,7 @@ describe('routes', function () {
 
     test('add item - missing FILE attachments', async function () {
       const outputs = [
-        { owner: USER_ALICE_TOKEN, metadata: { testFile1: { type: 'FILE', value: './test/data/test_file_01.txt' } } },
+        { roles: defaultRole, metadata: { testFile1: { type: 'FILE', value: './test/data/test_file_01.txt' } } },
       ]
 
       const runProcessResult = await postRunProcessNoFileAttach(app, authToken, [], outputs)
@@ -307,7 +308,7 @@ describe('routes', function () {
 
     test('add item - metadataKey too long', async function () {
       const metadataKey = 'a'.repeat(METADATA_KEY_LENGTH + 1)
-      const outputs = [{ owner: USER_ALICE_TOKEN, metadata: { [metadataKey]: { type: 'LITERAL', value: 'test' } } }]
+      const outputs = [{ roles: defaultRole, metadata: { [metadataKey]: { type: 'LITERAL', value: 'test' } } }]
       const runProcessResult = await postRunProcess(app, authToken, [], outputs)
       expect(runProcessResult.body.message).to.contain('too long')
       expect(runProcessResult.status).to.equal(400)
@@ -315,28 +316,28 @@ describe('routes', function () {
 
     test('add item - metadataKey too long (multibyte character)', async function () {
       const metadataKey = '£'.repeat(METADATA_KEY_LENGTH / 2 + 1)
-      const outputs = [{ owner: USER_ALICE_TOKEN, metadata: { [metadataKey]: { type: 'LITERAL', value: 'test' } } }]
+      const outputs = [{ roles: defaultRole, metadata: { [metadataKey]: { type: 'LITERAL', value: 'test' } } }]
       const runProcessResult = await postRunProcess(app, authToken, [], outputs)
       expect(runProcessResult.body.message).to.contain('too long')
       expect(runProcessResult.status).to.equal(400)
     })
 
     test('add item - invalid metadata type', async function () {
-      const outputs = [{ owner: USER_ALICE_TOKEN, metadata: { testKey: { type: 'INVALID', value: 'test' } } }]
+      const outputs = [{ roles: defaultRole, metadata: { testKey: { type: 'INVALID', value: 'test' } } }]
       const runProcessResult = await postRunProcess(app, authToken, [], outputs)
       expect(runProcessResult.body.message).to.contain('invalid type')
       expect(runProcessResult.status).to.equal(400)
     })
 
     test('add item - metadata FILE without value field', async function () {
-      const outputs = [{ owner: USER_ALICE_TOKEN, metadata: { testKey: { type: 'FILE' } } }]
+      const outputs = [{ roles: defaultRole, metadata: { testKey: { type: 'FILE' } } }]
       const runProcessResult = await postRunProcess(app, authToken, [], outputs)
       expect(runProcessResult.body.message).to.contain('value')
       expect(runProcessResult.status).to.equal(400)
     })
 
     test('add item - metadata LITERAL without value field', async function () {
-      const outputs = [{ owner: USER_ALICE_TOKEN, metadata: { testKey: { type: 'LITERAL' } } }]
+      const outputs = [{ roles: defaultRole, metadata: { testKey: { type: 'LITERAL' } } }]
       const runProcessResult = await postRunProcess(app, authToken, [], outputs)
       expect(runProcessResult.body.message).to.contain('value')
       expect(runProcessResult.status).to.equal(400)
@@ -344,7 +345,7 @@ describe('routes', function () {
 
     test('add item - metadata LITERAL value too long', async function () {
       const literalValue = 'a'.repeat(METADATA_VALUE_LITERAL_LENGTH + 1)
-      const outputs = [{ owner: USER_ALICE_TOKEN, metadata: { testKey: { type: 'LITERAL', value: literalValue } } }]
+      const outputs = [{ roles: defaultRole, metadata: { testKey: { type: 'LITERAL', value: literalValue } } }]
       const runProcessResult = await postRunProcess(app, authToken, [], outputs)
       expect(runProcessResult.body.message).to.contain('too long')
       expect(runProcessResult.status).to.equal(400)
@@ -352,7 +353,7 @@ describe('routes', function () {
 
     test('add item - metadata LITERAL value too long (multibyte character)', async function () {
       const literalValue = '£'.repeat(METADATA_VALUE_LITERAL_LENGTH / 2 + 1)
-      const outputs = [{ owner: USER_ALICE_TOKEN, metadata: { testKey: { type: 'LITERAL', value: literalValue } } }]
+      const outputs = [{ roles: defaultRole, metadata: { testKey: { type: 'LITERAL', value: literalValue } } }]
       const runProcessResult = await postRunProcess(app, authToken, [], outputs)
       expect(runProcessResult.body.message).to.contain('too long')
       expect(runProcessResult.status).to.equal(400)
@@ -363,7 +364,7 @@ describe('routes', function () {
       for (let i = 0; i < MAX_METADATA_COUNT + 1; i++) {
         tooMany[`${i}`] = { type: 'NONE' }
       }
-      const outputs = [{ owner: USER_ALICE_TOKEN, metadata: tooMany }]
+      const outputs = [{ roles: defaultRole, metadata: tooMany }]
 
       const runProcessResult = await postRunProcess(app, authToken, [], outputs)
       expect(runProcessResult.body.message).to.contain('too many')
@@ -374,7 +375,7 @@ describe('routes', function () {
     test('add item - non-ascending keys', async function () {
       const outputs = [
         {
-          owner: USER_ALICE_TOKEN,
+          roles: defaultRole,
           metadata: {
             3: { type: 'NONE' },
             2: { type: 'NONE' },
@@ -419,7 +420,7 @@ describe('routes', function () {
       const base64Metadata = `0x${bs58.decode(base58Metadata).toString('hex').slice(4)}`
 
       const key = utf8ToUint8Array('testFile', METADATA_KEY_LENGTH)
-      const output = { owner: USER_ALICE_TOKEN, metadata: new Map([[key, { File: base64Metadata }]]) }
+      const output = { roles: new Map([[0, USER_ALICE_TOKEN]]), metadata: new Map([[key, { File: base64Metadata }]]) }
 
       await runProcess([], [output])
 
@@ -438,7 +439,7 @@ describe('routes', function () {
       const base64Metadata = `0x${bs58.decode(base58Metadata).toString('hex').slice(4)}`
 
       const key = utf8ToUint8Array('testFile', METADATA_KEY_LENGTH)
-      const output = { owner: USER_ALICE_TOKEN, metadata: new Map([[key, { File: base64Metadata }]]) }
+      const output = { roles: new Map([[0, USER_ALICE_TOKEN]]), metadata: new Map([[key, { File: base64Metadata }]]) }
 
       await runProcess([], [output])
 
@@ -484,7 +485,7 @@ describe('routes', function () {
 
       let expectedResult = [lastTokenId + 1]
 
-      const outputs = [{ owner: USER_BOB_TOKEN, metadataFile: './test/data/test_file_04.txt' }]
+      const outputs = [{ roles: defaultRole, metadataFile: './test/data/test_file_04.txt' }]
       const actualResult = await postRunProcess(app, authToken, [], outputs)
 
       expect(actualResult.status).to.equal(200)
@@ -495,7 +496,7 @@ describe('routes', function () {
       expectedResult = {
         id: lastTokenId + 1,
         creator: USER_ALICE_TOKEN,
-        owner: USER_BOB_TOKEN,
+        roles: { Admin: USER_ALICE_TOKEN },
         parents: [],
         children: null,
         metadata: [LEGACY_METADATA_KEY],
@@ -515,7 +516,7 @@ describe('routes', function () {
       let expectedResult = [lastTokenId + 1]
 
       const outputs = [
-        { owner: USER_BOB_TOKEN, metadata: { testFile: { type: 'FILE', value: './test/data/test_file_01.txt' } } },
+        { roles: defaultRole, metadata: { testFile: { type: 'FILE', value: './test/data/test_file_01.txt' } } },
       ]
       const actualResult = await postRunProcess(app, authToken, [], outputs)
 
@@ -527,7 +528,7 @@ describe('routes', function () {
       expectedResult = {
         id: lastTokenId + 1,
         creator: USER_ALICE_TOKEN,
-        owner: USER_BOB_TOKEN,
+        roles: { Admin: USER_ALICE_TOKEN },
         parents: [],
         children: null,
         metadata: ['testFile'],
@@ -553,14 +554,17 @@ describe('routes', function () {
         [],
         [
           {
-            owner: USER_ALICE_TOKEN,
+            roles: defaultRole,
             metadata: { testFile: { type: 'FILE', value: './test/data/test_file_01.txt' } },
           },
         ]
       )
 
       const outputs = [
-        { owner: USER_BOB_TOKEN, metadata: { testFile: { type: 'FILE', value: './test/data/test_file_04.txt' } } },
+        {
+          roles: { Admin: USER_BOB_TOKEN },
+          metadata: { testFile: { type: 'FILE', value: './test/data/test_file_04.txt' } },
+        },
       ]
       const actualResult = await postRunProcess(app, authToken, [lastTokenId + 1], outputs)
 
@@ -572,7 +576,7 @@ describe('routes', function () {
       expectedResult = {
         id: lastTokenId + 1,
         creator: USER_ALICE_TOKEN,
-        owner: USER_ALICE_TOKEN,
+        roles: USER_ALICE_TOKEN,
         parents: [],
         children: [lastTokenId + 2],
         metadata: ['testFile'],
@@ -585,7 +589,7 @@ describe('routes', function () {
       expectedResult = {
         id: lastTokenId + 2,
         creator: USER_ALICE_TOKEN,
-        owner: USER_BOB_TOKEN,
+        roles: USER_BOB_TOKEN,
         parents: [lastTokenId + 1],
         children: null,
         metadata: ['testFile'],
@@ -608,7 +612,7 @@ describe('routes', function () {
     })
 
     test('run-process with invalid member', async function () {
-      let expectedResult = { message: 'Request contains invalid owners that are not members of the membership list' }
+      let expectedResult = { message: 'Request contains roles with account IDs not in the membership list' }
 
       const actualResult = await postRunProcess(
         app,
@@ -616,12 +620,11 @@ describe('routes', function () {
         [],
         [
           {
-            owner: USER_CHARLIE_TOKEN,
-            metadata: { testFile: './test/data/test_file_01.txt' },
+            roles: { Admin: USER_CHARLIE_TOKEN },
+            metadata: { testFile: { type: 'FILE', value: './test/data/test_file_01.txt' } },
           },
         ]
       )
-
       expect(actualResult.status).to.equal(400)
       expect(actualResult.body).to.deep.equal(expectedResult)
     })
@@ -630,24 +633,23 @@ describe('routes', function () {
       const lastToken = await getLastTokenIdRoute(app, authToken)
       const lastTokenId = lastToken.body.id
 
-      let expectedResult = { message: 'Request contains invalid owners that are not members of the membership list' }
+      let expectedResult = { message: 'Request contains roles with account IDs not in the membership list' }
 
-      await postRunProcess(
+      const a = await postRunProcess(
         app,
         authToken,
         [],
         [
           {
-            owner: USER_ALICE_TOKEN,
-            metadata: { testFile: './test/data/test_file_01.txt' },
+            roles: defaultRole,
+            metadata: { testFile: { type: 'FILE', value: './test/data/test_file_01.txt' } },
           },
         ]
       )
-
       const outputs = [
         {
-          owner: USER_CHARLIE_TOKEN,
-          metadata: { testFile: './test/data/test_file_04.txt' },
+          roles: { Admin: USER_CHARLIE_TOKEN },
+          metadata: { testFile: { type: 'FILE', value: './test/data/test_file_04.txt' } },
         },
       ]
       const actualResult = await postRunProcess(app, authToken, [lastTokenId + 1], outputs)

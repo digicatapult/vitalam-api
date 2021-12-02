@@ -14,8 +14,8 @@ const {
   getItemMetadataSingle,
   hexToUtf8,
   getMembers,
-  containsInvalidMembershipOwners,
   membershipReducer,
+  defaultRoleName,
 } = require('../util/appUtil')
 const logger = require('../logger')
 const { LEGACY_METADATA_KEY } = require('../env')
@@ -170,11 +170,6 @@ router.post('/run-process', async (req, res) => {
         res.status(400).json({ message: `Request missing input and/or outputs` })
         return
       }
-      //else if (request.outputs && (await containsInvalidMembershipOwners(request.outputs))) {
-      //   logger.trace(`Request contains invalid owners that are not members of the membership list`)
-      //   res.status(400).json({ message: `Request contains invalid owners that are not members of the membership list` })
-      //   return
-      // }
 
       if (!(await validateInputIds(request.inputs))) {
         logger.trace(`Some inputs were invalid`)
@@ -186,7 +181,7 @@ router.post('/run-process', async (req, res) => {
         request.outputs.map(async (output) => {
           //catch legacy owner
           if (output.owner) {
-            output.roles = { Admin: output.owner }
+            output.roles = { [defaultRoleName]: output.owner }
           }
           //catch legacy single metadataFile
           if (output.metadataFile) {
@@ -205,16 +200,18 @@ router.post('/run-process', async (req, res) => {
           }
         })
       )
-      const result = await runProcess(request.inputs, outputs)
 
-      if (result) {
-        res.status(200).json(result)
-      } else {
-        logger.error(`Unexpected error running process ${result}`)
+      let result
+      try {
+        result = await runProcess(request.inputs, outputs)
+      } catch (err) {
+        logger.error(`Unexpected error running process: ${err}`)
         res.status(500).json({
           message: `Unexpected error processing items`,
         })
       }
+
+      res.status(200).json(result)
     } catch (err) {
       logger.error(`Error running process. Error was ${err.message || JSON.stringify(err)}`)
       if (!res.headersSent) {

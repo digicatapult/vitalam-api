@@ -24,7 +24,7 @@ const USER_BOB_TOKEN = '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'
 const BOB_STASH = '5HpG9w8EBLe5XCrbczpwq5TSXvedjrBGCwqxK1iQ7qUsSWFc'
 const USER_CHARLIE_TOKEN = '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y'
 const { assertItem } = require('../helper/appHelper')
-const { runProcess, utf8ToUint8Array } = require('../../app/util/appUtil')
+const { runProcess, utf8ToUint8Array, defaultRoleName } = require('../../app/util/appUtil')
 const {
   AUTH_TOKEN_URL,
   AUTH_ISSUER,
@@ -37,7 +37,7 @@ const {
 
 const BASE58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
 const bs58 = require('base-x')(BASE58)
-const defaultRole = { Admin: USER_ALICE_TOKEN }
+const defaultRole = { [defaultRoleName]: USER_ALICE_TOKEN }
 
 describe('routes', function () {
   before(async () => {
@@ -348,7 +348,7 @@ describe('routes', function () {
         expectedResult = {
           id: lastTokenId + 1,
           creator: USER_ALICE_TOKEN,
-          roles: { Admin: USER_ALICE_TOKEN },
+          roles: { [defaultRoleName]: USER_ALICE_TOKEN },
           parents: [],
           children: null,
           metadata: ['testFile'],
@@ -382,7 +382,7 @@ describe('routes', function () {
 
         const outputs = [
           {
-            roles: { Admin: USER_BOB_TOKEN },
+            roles: { [defaultRoleName]: USER_BOB_TOKEN },
             metadata: { testFile: { type: 'FILE', value: './test/data/test_file_04.txt' } },
           },
         ]
@@ -561,7 +561,7 @@ describe('routes', function () {
           [],
           [
             {
-              roles: { Admin: USER_CHARLIE_TOKEN },
+              roles: { [defaultRoleName]: USER_CHARLIE_TOKEN },
               metadata: { testFile: { type: 'FILE', value: './test/data/test_file_01.txt' } },
             },
           ]
@@ -576,7 +576,7 @@ describe('routes', function () {
 
         let expectedResult = { message: 'Request contains roles with account IDs not in the membership list' }
 
-        const a = await postRunProcess(
+        await postRunProcess(
           app,
           authToken,
           [],
@@ -589,7 +589,7 @@ describe('routes', function () {
         )
         const outputs = [
           {
-            roles: { Admin: USER_CHARLIE_TOKEN },
+            roles: { [defaultRoleName]: USER_CHARLIE_TOKEN },
             metadata: { testFile: { type: 'FILE', value: './test/data/test_file_04.txt' } },
           },
         ]
@@ -598,31 +598,40 @@ describe('routes', function () {
         expect(actualResult.status).to.equal(400)
         expect(actualResult.body).to.deep.equal(expectedResult)
       })
+
+      test('failure to destroy token with member not having correct role', async function () {
+        const lastToken = await getLastTokenIdRoute(app, authToken)
+        const lastTokenId = lastToken.body.id
+        const outputs = [
+          {
+            roles: { [defaultRoleName]: USER_BOB_TOKEN, ManufacturingEngineer: USER_ALICE_TOKEN },
+            metadata: { testNone: { type: 'NONE' } },
+          },
+        ]
+        await postRunProcess(app, authToken, [], outputs)
+
+        const ignoredOutputs = [
+          {
+            roles: defaultRole,
+            metadata: { testNone: { type: 'NONE' } },
+          },
+        ]
+        const actualResult = await postRunProcess(app, authToken, [lastTokenId + 1], ignoredOutputs)
+
+        expect(actualResult.status).to.equal(400)
+        expect(actualResult.body).to.have.property('message')
+        expect(actualResult.body.message).to.contain(lastTokenId + 1)
+      })
     })
 
     describe('legacy', function () {
-      test('add and get item - single metadataFile (legacy)', async function () {
-        const outputs = [{ roles: defaultRole, metadataFile: './test/data/test_file_01.txt' }]
-        const runProcessResult = await postRunProcess(app, authToken, [], outputs)
-        expect(runProcessResult.body).to.have.length(1)
-        expect(runProcessResult.status).to.equal(200)
-
-        const lastToken = await getLastTokenIdRoute(app, authToken)
-        expect(lastToken.body).to.have.property('id')
-
-        const getItemResult = await getItemRoute(app, authToken, lastToken.body)
-        expect(getItemResult.status).to.equal(200)
-        expect(getItemResult.body.id).to.deep.equal(lastToken.body.id)
-        expect(getItemResult.body.metadata).to.deep.equal([LEGACY_METADATA_KEY])
-      })
-
-      test('run-process creating one token (legacy metadataFile)', async function () {
+      test('run-process creating one token - legacy metadataFile + owner in request and metadata route', async function () {
         const lastToken = await getLastTokenIdRoute(app, authToken)
         const lastTokenId = lastToken.body.id
 
         let expectedResult = [lastTokenId + 1]
 
-        const outputs = [{ roles: defaultRole, metadataFile: './test/data/test_file_04.txt' }]
+        const outputs = [{ owner: USER_ALICE_TOKEN, metadataFile: './test/data/test_file_04.txt' }]
         const actualResult = await postRunProcess(app, authToken, [], outputs)
 
         expect(actualResult.status).to.equal(200)
@@ -633,7 +642,7 @@ describe('routes', function () {
         expectedResult = {
           id: lastTokenId + 1,
           creator: USER_ALICE_TOKEN,
-          roles: { Admin: USER_ALICE_TOKEN },
+          roles: { [defaultRoleName]: USER_ALICE_TOKEN },
           parents: [],
           children: null,
           metadata: [LEGACY_METADATA_KEY],

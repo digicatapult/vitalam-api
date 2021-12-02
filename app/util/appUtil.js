@@ -54,6 +54,7 @@ const apiOptions = {
     },
   },
 }
+const defaultRoleName = apiOptions.types.Role._enum[0]
 
 const api = new ApiPromise(apiOptions)
 
@@ -97,9 +98,8 @@ function formatHash(filestoreResponse) {
 }
 
 const processRoles = async (roles) => {
-  const defaultRole = apiOptions.types.Role._enum[0]
-  if (!roles[defaultRole]) {
-    throw new Error(`Roles must include default ${defaultRole} role. Roles: ${JSON.stringify(roles)}`)
+  if (!roles[defaultRoleName]) {
+    throw new Error(`Roles must include default ${defaultRoleName} role. Roles: ${JSON.stringify(roles)}`)
   }
 
   if (await containsInvalidMembershipRoles(roles)) {
@@ -268,7 +268,7 @@ async function runProcess(inputs, outputs) {
 
     const outputsAsPair = outputs.map(({ roles, metadata: md }) => [roles, md])
     logger.debug('Running Transaction inputs: %j outputs: %j', inputs, outputsAsPair)
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       let unsub = null
       api.tx.simpleNftModule
         .runProcess(inputs, outputsAsPair)
@@ -276,6 +276,14 @@ async function runProcess(inputs, outputs) {
           logger.debug('result.status %s', JSON.stringify(result.status))
           logger.debug('result.status.isInBlock', result.status.isInBlock)
           if (result.status.isInBlock) {
+            const errors = result.events
+              .filter(({ event: { method } }) => method === 'ExtrinsicFailed')
+              .map(({ event: { data } }) => data[0])
+
+            if (errors.length > 0) {
+              reject('ExtrinsicFailed error in simpleNftModule')
+            }
+
             const tokens = result.events
               .filter(({ event: { method } }) => method === 'Minted')
               .map(({ event: { data } }) => data[0].toNumber())
@@ -286,6 +294,9 @@ async function runProcess(inputs, outputs) {
         })
         .then((res) => {
           unsub = res
+        })
+        .catch((err) => {
+          throw err
         })
     })
   }
@@ -340,12 +351,17 @@ const getReadableMetadataKeys = (metadata) => {
   })
 }
 
-const validateInputIds = async (ids) => {
-  return await ids.reduce(async (acc, inputId) => {
+const validateInputIds = async (accountIds) => {
+  await api.isReady
+  const keyring = new Keyring({ type: 'sr25519' })
+  const userId = keyring.addFromUri(USER_URI).address
+
+  return await accountIds.reduce(async (acc, id) => {
     const uptoNow = await acc
-    if (!uptoNow || !inputId || !Number.isInteger(inputId)) return false
-    const { id: echoId, children } = await getItem(inputId)
-    return children === null && echoId === inputId
+    if (!uptoNow || !id || !Number.isInteger(id)) return false
+    const { roles, id: echoId, children } = await getItem(id)
+    if (roles[defaultRoleName] !== userId) return false
+    return children === null && echoId === id
   }, Promise.resolve(true))
 }
 
@@ -389,5 +405,5 @@ module.exports = {
   getMembers,
   containsInvalidMembershipOwners,
   membershipReducer,
-  roleEnumAsIndex,
+  defaultRoleName,
 }

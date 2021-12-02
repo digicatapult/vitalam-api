@@ -15,7 +15,7 @@ const {
   hexToUtf8,
   getMembers,
   membershipReducer,
-  defaultRoleName,
+  rolesEnum,
 } = require('../util/appUtil')
 const logger = require('../logger')
 const { LEGACY_METADATA_KEY } = require('../env')
@@ -181,7 +181,7 @@ router.post('/run-process', async (req, res) => {
         request.outputs.map(async (output) => {
           //catch legacy owner
           if (output.owner) {
-            output.roles = { [defaultRoleName]: output.owner }
+            output.roles = { [rolesEnum[0]]: output.owner }
           }
           //catch legacy single metadataFile
           if (output.metadataFile) {

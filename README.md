@@ -153,7 +153,7 @@ This endpoint governs the creation and destruction of all tokens in the system. 
     "metadata": {
       "some_file": { "type": "FILE", "value": "some_file.txt"},
       "some_literal": {"type": "LITERAL", "value":"some_value"},
-      ..."metadataKeyN": {"type": "LITERAL", "value", "some_other_value"
+      ..."metadataKeyN": {"type": "LITERAL", "value", "some_other_value"}
     }
   }]
 }

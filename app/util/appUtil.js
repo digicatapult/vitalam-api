@@ -54,7 +54,7 @@ const apiOptions = {
     },
   },
 }
-const defaultRoleName = apiOptions.types.Role._enum[0]
+const rolesEnum = apiOptions.types.Role._enum
 
 const api = new ApiPromise(apiOptions)
 
@@ -98,8 +98,9 @@ function formatHash(filestoreResponse) {
 }
 
 const processRoles = async (roles) => {
-  if (!roles[defaultRoleName]) {
-    throw new Error(`Roles must include default ${defaultRoleName} role. Roles: ${JSON.stringify(roles)}`)
+  const defaultRole = rolesEnum[0]
+  if (!roles[defaultRole]) {
+    throw new Error(`Roles must include default ${defaultRole} role. Roles: ${JSON.stringify(roles)}`)
   }
 
   if (await containsInvalidMembershipRoles(roles)) {
@@ -359,8 +360,11 @@ const validateInputIds = async (accountIds) => {
   return await accountIds.reduce(async (acc, id) => {
     const uptoNow = await acc
     if (!uptoNow || !id || !Number.isInteger(id)) return false
+
     const { roles, id: echoId, children } = await getItem(id)
-    if (roles[defaultRoleName] !== userId) return false
+    const defaultRole = rolesEnum[0]
+    if (roles[defaultRole] !== userId) return false
+
     return children === null && echoId === id
   }, Promise.resolve(true))
 }
@@ -405,5 +409,5 @@ module.exports = {
   getMembers,
   containsInvalidMembershipOwners,
   membershipReducer,
-  defaultRoleName,
+  rolesEnum,
 }

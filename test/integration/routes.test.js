@@ -24,7 +24,7 @@ const USER_BOB_TOKEN = '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'
 const BOB_STASH = '5HpG9w8EBLe5XCrbczpwq5TSXvedjrBGCwqxK1iQ7qUsSWFc'
 const USER_CHARLIE_TOKEN = '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y'
 const { assertItem } = require('../helper/appHelper')
-const { runProcess, utf8ToUint8Array, defaultRoleName } = require('../../app/util/appUtil')
+const { runProcess, utf8ToUint8Array, rolesEnum } = require('../../app/util/appUtil')
 const {
   AUTH_TOKEN_URL,
   AUTH_ISSUER,
@@ -37,7 +37,7 @@ const {
 
 const BASE58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
 const bs58 = require('base-x')(BASE58)
-const defaultRole = { [defaultRoleName]: USER_ALICE_TOKEN }
+const defaultRole = { [rolesEnum[0]]: USER_ALICE_TOKEN }
 
 describe('routes', function () {
   before(async () => {
@@ -122,7 +122,7 @@ describe('routes', function () {
     })
   })
 
-  describe.only('authenticated routes', function () {
+  describe('authenticated routes', function () {
     let app
     let jwksMock
     let authToken
@@ -348,7 +348,7 @@ describe('routes', function () {
         expectedResult = {
           id: lastTokenId + 1,
           creator: USER_ALICE_TOKEN,
-          roles: { [defaultRoleName]: USER_ALICE_TOKEN },
+          roles: { [rolesEnum[0]]: USER_ALICE_TOKEN },
           parents: [],
           children: null,
           metadata: ['testFile'],
@@ -382,7 +382,7 @@ describe('routes', function () {
 
         const outputs = [
           {
-            roles: { [defaultRoleName]: USER_BOB_TOKEN },
+            roles: { [rolesEnum[0]]: USER_BOB_TOKEN },
             metadata: { testFile: { type: 'FILE', value: './test/data/test_file_04.txt' } },
           },
         ]
@@ -561,7 +561,7 @@ describe('routes', function () {
           [],
           [
             {
-              roles: { [defaultRoleName]: USER_CHARLIE_TOKEN },
+              roles: { [rolesEnum[0]]: USER_CHARLIE_TOKEN },
               metadata: { testFile: { type: 'FILE', value: './test/data/test_file_01.txt' } },
             },
           ]
@@ -589,7 +589,7 @@ describe('routes', function () {
         )
         const outputs = [
           {
-            roles: { [defaultRoleName]: USER_CHARLIE_TOKEN },
+            roles: { [rolesEnum[0]]: USER_CHARLIE_TOKEN },
             metadata: { testFile: { type: 'FILE', value: './test/data/test_file_04.txt' } },
           },
         ]
@@ -604,7 +604,7 @@ describe('routes', function () {
         const lastTokenId = lastToken.body.id
         const outputs = [
           {
-            roles: { [defaultRoleName]: USER_BOB_TOKEN, ManufacturingEngineer: USER_ALICE_TOKEN },
+            roles: { [rolesEnum[0]]: USER_BOB_TOKEN, [rolesEnum[1]]: USER_ALICE_TOKEN },
             metadata: { testNone: { type: 'NONE' } },
           },
         ]
@@ -616,11 +616,38 @@ describe('routes', function () {
             metadata: { testNone: { type: 'NONE' } },
           },
         ]
-        const actualResult = await postRunProcess(app, authToken, [lastTokenId + 1], ignoredOutputs)
+        const actualResult = await postRunProcess(app, authToken, [lastTokenId + 1], outputs)
 
         expect(actualResult.status).to.equal(400)
         expect(actualResult.body).to.have.property('message')
         expect(actualResult.body.message).to.contain(lastTokenId + 1)
+      })
+
+      test('failure to burn a token twice', async function () {
+        const lastToken = await getLastTokenIdRoute(app, authToken)
+        const lastTokenId = lastToken.body.id
+        const outputs = [
+          {
+            roles: defaultRole,
+            metadata: { testNone: { type: 'NONE' } },
+          },
+        ]
+        await postRunProcess(app, authToken, [], outputs)
+
+        const firstBurn = await postRunProcess(app, authToken, [lastTokenId + 1], outputs)
+        expect(firstBurn.status).to.equal(200)
+
+        const secondBurn = await postRunProcess(app, authToken, [lastTokenId + 1], outputs)
+        expect(secondBurn.status).to.equal(400)
+        expect(secondBurn.body).to.have.property('message')
+        expect(secondBurn.body.message).to.contain(lastTokenId + 1)
+      })
+
+      test('add item - no default role', async function () {
+        const outputs = [{ roles: { [rolesEnum[1]]: USER_ALICE_TOKEN }, metadata: { testNone: { type: 'NONE' } } }]
+        const runProcessResult = await postRunProcess(app, authToken, [], outputs)
+        expect(runProcessResult.status).to.equal(400)
+        expect(runProcessResult.body.message).to.contain('default')
       })
     })
 
@@ -642,7 +669,7 @@ describe('routes', function () {
         expectedResult = {
           id: lastTokenId + 1,
           creator: USER_ALICE_TOKEN,
-          roles: { [defaultRoleName]: USER_ALICE_TOKEN },
+          roles: { [rolesEnum[0]]: USER_ALICE_TOKEN },
           parents: [],
           children: null,
           metadata: [LEGACY_METADATA_KEY],

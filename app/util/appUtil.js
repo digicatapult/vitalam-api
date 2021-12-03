@@ -104,13 +104,12 @@ const processRoles = async (roles) => {
   }
 
   if (await containsInvalidMembershipRoles(roles)) {
-    logger.trace(`Request contains roles with account IDs not in the membership list`)
     throw new Error(`Request contains roles with account IDs not in the membership list`)
   }
 
   return new Map(
-    Object.entries(roles).map(([key, value]) => {
-      return [roleEnumAsIndex(key), value]
+    Object.entries(roles).map(([key, v]) => {
+      return [roleEnumAsIndex(key), v]
     })
   )
 }
@@ -231,19 +230,6 @@ async function containsInvalidMembershipRoles(roles) {
   }, [])
 
   return !validMembers || validMembers.length !== accountIds.length
-}
-
-async function containsInvalidMembershipOwners(outputs) {
-  const membershipMembers = await getMembers()
-
-  const validOwners = outputs.reduce((acc, { owner }) => {
-    if (membershipMembers.includes(owner)) {
-      acc.push(owner)
-      return acc
-    }
-  }, [])
-
-  return !validOwners || validOwners.length === 0 || validOwners.length !== outputs.length
 }
 
 function membershipReducer(members) {
@@ -384,7 +370,7 @@ const validateTokenId = (tokenId) => {
 }
 
 const roleEnumAsIndex = (role) => {
-  const index = apiOptions.types.Role._enum.indexOf(role)
+  const index = rolesEnum.indexOf(role)
 
   if (index === -1) {
     throw new Error(`Invalid role: ${role}`)
@@ -407,7 +393,6 @@ module.exports = {
   hexToUtf8,
   utf8ToUint8Array,
   getMembers,
-  containsInvalidMembershipOwners,
   membershipReducer,
   rolesEnum,
 }

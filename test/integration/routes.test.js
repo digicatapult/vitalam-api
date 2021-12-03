@@ -643,11 +643,30 @@ describe('routes', function () {
         expect(secondBurn.body.message).to.contain(lastTokenId + 1)
       })
 
+      test('add item - no roles', async function () {
+        const outputs = [{ metadata: { testNone: { type: 'NONE' } } }]
+        const runProcessResult = await postRunProcess(app, authToken, [], outputs)
+        expect(runProcessResult.status).to.equal(400)
+        expect(runProcessResult.body.message).to.contain('roles')
+      })
+
       test('add item - no default role', async function () {
         const outputs = [{ roles: { [rolesEnum[1]]: USER_ALICE_TOKEN }, metadata: { testNone: { type: 'NONE' } } }]
         const runProcessResult = await postRunProcess(app, authToken, [], outputs)
         expect(runProcessResult.status).to.equal(400)
         expect(runProcessResult.body.message).to.contain('default')
+      })
+
+      test('add item - invalid role', async function () {
+        const outputs = [
+          {
+            roles: { [rolesEnum[0]]: USER_ALICE_TOKEN, InvalidRole: USER_ALICE_TOKEN },
+            metadata: { testNone: { type: 'NONE' } },
+          },
+        ]
+        const runProcessResult = await postRunProcess(app, authToken, [], outputs)
+        expect(runProcessResult.status).to.equal(400)
+        expect(runProcessResult.body.message).to.contain('role')
       })
     })
 

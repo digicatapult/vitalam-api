@@ -188,6 +188,12 @@ router.post('/run-process', async (req, res) => {
             output.metadata = { [LEGACY_METADATA_KEY]: { type: 'FILE', value: output.metadataFile } }
           }
 
+          if (!output.roles || output.roles.length === 0) {
+            logger.trace(`Request missing roles`)
+            res.status(400).json({ message: `Request missing roles` })
+            return
+          }
+
           try {
             return {
               roles: await processRoles(output.roles),

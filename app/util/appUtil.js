@@ -2,11 +2,10 @@ const fs = require('fs')
 const StreamValues = require('stream-json/streamers/StreamValues')
 const BASE58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
 const bs58 = require('base-x')(BASE58)
-
 const fetch = require('node-fetch')
 const FormData = require('form-data')
 const { ApiPromise, WsProvider, Keyring } = require('@polkadot/api')
-
+const jwt = require('jsonwebtoken')
 const {
   API_HOST,
   API_PORT,
@@ -16,8 +15,12 @@ const {
   METADATA_KEY_LENGTH,
   METADATA_VALUE_LITERAL_LENGTH,
   MAX_METADATA_COUNT,
+  AUTH_AUDIENCE,
+  AUTH_JWKS_URI,
+  AUTH_ISSUER,
 } = require('../env')
 const logger = require('../logger')
+const jwksRsa = require('jwks-rsa')
 
 const provider = new WsProvider(`ws://${API_HOST}:${API_PORT}`)
 const apiOptions = {
@@ -242,9 +245,7 @@ function membershipReducer(members) {
 async function getMembers() {
   await api.isReady
 
-  const result = await api.query.membership.members()
-
-  return result
+  return api.query.membership.members()
 }
 
 async function runProcess(inputs, outputs) {
@@ -379,8 +380,111 @@ const roleEnumAsIndex = (role) => {
   return index
 }
 
+const getMetadataResponse = async (tokenId, metadataKey, res) => {
+  const id = validateTokenId(tokenId)
+
+  if (!id) {
+    logger.trace(`Invalid id: ${tokenId}`)
+    res.status(400).json({ message: `Invalid id: ${tokenId}` })
+    return
+  }
+
+  let metadataValue
+  try {
+    metadataValue = await getItemMetadataSingle(id, metadataKey)
+  } catch (err) {
+    logger.trace(`Invalid metadata request: ${err.message}`)
+    res.status(404).json({ message: err.message })
+    return
+  }
+
+  if (metadataValue.file) {
+    let file
+    try {
+      file = await getFile(metadataValue.file)
+    } catch (err) {
+      logger.warn(`Error fetching metadata file: ${metadataValue.file}. Error was ${err}`)
+      res.status(500).send(`Error fetching metadata file: ${metadataValue.file}`)
+      return
+    }
+
+    await new Promise((resolve, reject) => {
+      res.status(200)
+      res.set({
+        immutable: true,
+        maxAge: 365 * 24 * 60 * 60 * 1000,
+        'Content-Disposition': `attachment; filename="${file.filename}"`,
+      })
+      file.file.pipe(res)
+      file.file.on('error', (err) => reject(err))
+      res.on('finish', () => resolve())
+    })
+    return
+  }
+
+  if (metadataValue.literal) {
+    res.set('content-type', 'text/plain')
+    res.status(200).send(hexToUtf8(metadataValue.literal))
+    return
+  }
+
+  if ('none' in metadataValue) {
+    res.set('content-type', 'text/plain')
+    res.status(200).send('')
+    return
+  }
+
+  logger.warn(`Error fetching metadata: ${metadataKey}:${metadataValue}`)
+  res.status(500).send(`Error fetching metadata`)
+  return
+}
+
+const client = jwksRsa({
+  cache: true,
+  rateLimit: true,
+  jwksRequestsPerMinute: 5,
+  jwksUri: AUTH_JWKS_URI,
+})
+
+async function getKey(header, cb) {
+  client.getSigningKey(header.kid, (err, key) => {
+    if (err) {
+      logger.warn(`An error occurred getting jwks key ${err}`)
+      cb(err, null)
+    } else if (key) {
+      const signingKey = key.publicKey || key.rsaPublicKey
+      cb(null, signingKey)
+    }
+  })
+}
+
+const verifyJwks = async (authHeader) => {
+  const authToken = authHeader ? authHeader.replace('Bearer ', '') : ''
+
+  const verifyOptions = {
+    audience: AUTH_AUDIENCE,
+    issuer: [AUTH_ISSUER],
+    algorithms: ['RS256'],
+    header: authToken,
+  }
+
+  return new Promise((resolve, reject) => {
+    jwt.verify(authToken, getKey, verifyOptions, (err, decoded) => {
+      if (err) {
+        resolve(false)
+      } else if (decoded) {
+        resolve(true)
+      } else {
+        logger.warn(`Error verifying jwks`)
+        reject({ message: 'An error occurred during jwks verification' })
+      }
+    })
+  })
+}
+
 module.exports = {
   runProcess,
+  getMembers,
   getItemMetadataSingle,
   getItem,
   getLastTokenId,
@@ -392,7 +496,9 @@ module.exports = {
   getReadableMetadataKeys,
   hexToUtf8,
   utf8ToUint8Array,
-  getMembers,
   membershipReducer,
   rolesEnum,
+  containsInvalidMembershipRoles,
+  getMetadataResponse,
+  verifyJwks,
 }

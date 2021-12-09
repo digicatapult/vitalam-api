@@ -21,3 +21,5 @@ npm-debug.log*
 # Misc
 .DS_Store
 .env
+jmeter_tmp
+jmeter.log

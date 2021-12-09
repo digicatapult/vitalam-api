@@ -126,6 +126,7 @@ Gets the item identified by `id`. Item `id`s are returned by [POST /run-process]
 ```js
 {
     "id": 42, // Number
+    "original_id": 20, // Number
     "roles": {"Admin": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"}, // Object
     "creator": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY", // String
     "created_at": 4321, // Number
@@ -152,12 +153,13 @@ This endpoint governs the creation and destruction of all tokens in the system. 
       "Admin": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
       "Supplier": "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty",
       ..."some_other_role_key": "some_account_id"
-    }
+    },
     "metadata": {
       "some_file": { "type": "FILE", "value": "some_file.txt"},
       "some_literal": {"type": "LITERAL", "value":"some_value"},
       ..."metadataKeyN": {"type": "LITERAL", "value", "some_other_value"}
-    }
+    },
+    "parent_index": 0, // Number, optional
   }]
 }
 ```
@@ -177,6 +179,8 @@ Each output must also reference a `metadata` object containing a (key, value) pa
 ```
 
 The key identifies the metadata item, and the value is either a string value, or for files, a file path. Each file path must match a corresponding file attached to the request.
+
+The changing state of an asset is tracked through multiple tokens using `original_id`. To update the state of an asset, a new output for the asset can be uniquely assigned to the input token that represents the latest state of the asset, meaning the new token has the same `original_id` as the now burned input token. This is achieved with the optional `parent_index` field, which takes a value of a single integer representing the index of the `inputs` that this output will be assigned to. If no `parent_index` is given, the token represents a new asset, and the `original_id` matches the token `id`.
 
 The response of this API will be JSON (`Content-Type` `application/json`) of the following form
 

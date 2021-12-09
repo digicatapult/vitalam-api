@@ -232,7 +232,7 @@ async function containsInvalidMembershipRoles(roles) {
     }
   }, [])
 
-  return !validMembers || validMembers.length !== accountIds.length
+  return !validMembers || validMembers.length === 0 || validMembers.length !== accountIds.length
 }
 
 function membershipReducer(members) {

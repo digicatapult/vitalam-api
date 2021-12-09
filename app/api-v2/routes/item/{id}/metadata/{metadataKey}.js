@@ -40,7 +40,7 @@ module.exports = function () {
         content: {
           'text/plain': {
             schema: {
-              $ref: '#/components/schemas/Metadata',
+              $ref: '#/components/schemas/MetadataLiteral',
             },
           },
           'application/octet-stream': {

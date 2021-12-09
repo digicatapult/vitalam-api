@@ -27,6 +27,11 @@ const apiDoc = {
       },
     },
     schemas: {
+      AccountId: {
+        type: 'string',
+        description: 'SS58 Address',
+        example: '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY',
+      },
       AuthToken: {
         type: 'object',
         properties: {
@@ -51,9 +56,8 @@ const apiDoc = {
             description: 'id of the item',
             type: 'number',
           },
-          owner: {
-            description: 'owner token of the item',
-            type: 'string',
+          roles: {
+            $ref: '#/components/schemas/Roles',
           },
           creator: {
             description: 'creator token of the item',
@@ -74,7 +78,6 @@ const apiDoc = {
             items: {
               type: 'number',
             },
-            nullable: true,
           },
           children: {
             description: 'children of the item',
@@ -92,7 +95,7 @@ const apiDoc = {
             },
           },
         },
-        required: ['id', 'owner', 'creator', 'created_at', 'destroyed', 'parents', 'children', 'metadata'],
+        required: ['id', 'roles', 'creator', 'created_at', 'destroyed', 'parents', 'children', 'metadata'],
       },
       LastToken: {
         type: 'object',
@@ -115,6 +118,25 @@ const apiDoc = {
         required: ['address'],
       },
       Metadata: {
+        description: 'metadata to add when creating an item',
+        type: 'object',
+        additionalProperties: {
+          description: 'metadata item',
+          type: 'object',
+          properties: {
+            type: {
+              type: 'string',
+              enum: ['FILE', 'LITERAL', 'NONE'],
+            },
+            value: {
+              description:
+                'type FILE: value is filepath; type LITERAL: value is literal value; type NONE: no value is expected',
+              type: 'string',
+            },
+          },
+        },
+      },
+      MetadataLiteral: {
         description: 'value of the metadata',
         type: 'string',
       },
@@ -122,6 +144,19 @@ const apiDoc = {
         description: 'file of the metadata',
         type: 'string',
         format: 'binary',
+      },
+      Roles: {
+        description: 'roles of the item',
+        type: 'object',
+        properties: {
+          Admin: { $ref: '#/components/schemas/AccountId' },
+          ManufacturingEngineer: { $ref: '#/components/schemas/AccountId' },
+          ProcurementBuyer: { $ref: '#/components/schemas/AccountId' },
+          ProcurementPlanner: { $ref: '#/components/schemas/AccountId' },
+          Supplier: { $ref: '#/components/schemas/AccountId' },
+        },
+        additionalProperties: false,
+        required: ['Admin'],
       },
       RunProcessMintedToken: {
         description: 'minted token',
@@ -145,13 +180,11 @@ const apiDoc = {
         description: 'Output objects that describe tokens to be created by running this process',
         type: 'object',
         properties: {
-          owner: {
-            description: 'Owner of the run process',
-            type: 'string',
+          roles: {
+            $ref: '#/components/schemas/Roles',
           },
           metadata: {
-            description: 'Output metadata from the run process results',
-            type: 'object',
+            $ref: '#/components/schemas/Metadata',
           },
         },
       },

@@ -284,6 +284,7 @@ async function runProcess(inputs, outputs) {
           unsub = res
         })
         .catch((err) => {
+          logger.warn(`Error in run process transaction: ${err}`)
           throw err
         })
     })

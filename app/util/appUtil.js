@@ -1,4 +1,5 @@
 const fs = require('fs')
+const path = require('path')
 const StreamValues = require('stream-json/streamers/StreamValues')
 const BASE58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
 const bs58 = require('base-x')(BASE58)
@@ -36,6 +37,7 @@ const apiOptions = {
     TokenMetadataValue: 'MetadataValue',
     Token: {
       id: 'TokenId',
+      original_id: 'TokenId',
       roles: 'BTreeMap<RoleKey, AccountId>',
       creator: 'AccountId',
       created_at: 'BlockNumber',
@@ -73,9 +75,9 @@ api.on('error', (err) => {
   logger.error(`Error from substrate node connection. Error was ${err.message || JSON.stringify(err)}`)
 })
 
-async function addFile(file) {
+async function addFile(file, filePath) {
   const form = new FormData()
-  form.append('file', fs.createReadStream(file.path), file.name)
+  form.append('file', fs.createReadStream(filePath), file.originalname)
   const body = await fetch(`http://${IPFS_HOST}:${IPFS_PORT}/api/v0/add?cid-version=0&wrap-with-directory=true`, {
     method: 'POST',
     body: form,
@@ -167,10 +169,12 @@ const processFile = async (value, files) => {
   if (!value.value) throw new Error(`File metadata requires a value field`)
 
   const filePath = value.value
-  const file = files[filePath]
+  const file = files.find((f) => {
+    return f.originalname === path.basename(filePath)
+  })
   if (!file) throw new Error(`Error no attached file found for ${filePath}`)
 
-  const filestoreResponse = await addFile(file)
+  const filestoreResponse = await addFile(file, filePath)
   return { File: formatHash(filestoreResponse) }
 }
 
@@ -254,7 +258,7 @@ async function runProcess(inputs, outputs) {
     const keyring = new Keyring({ type: 'sr25519' })
     const alice = keyring.addFromUri(USER_URI)
 
-    const outputsAsPair = outputs.map(({ roles, metadata: md }) => [roles, md])
+    const outputsAsPair = outputs.map(({ roles, metadata: md, parent_index }) => [roles, md, parent_index])
     logger.debug('Running Transaction inputs: %j outputs: %j', inputs, outputsAsPair)
     return new Promise((resolve, reject) => {
       let unsub = null

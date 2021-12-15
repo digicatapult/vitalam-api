@@ -41,22 +41,26 @@ module.exports = function () {
 
   doc.POST.apiDoc = {
     summary: 'Post auth',
-    parameters: [
-      {
-        description: 'Client Id of the request',
-        in: 'body',
-        required: true,
-        name: 'client_id',
-        allowEmptyValue: true,
+    requestBody: {
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            properties: {
+              client_id: {
+                type: 'string',
+                description: 'Client ID of the request',
+              },
+              client_secret: {
+                type: 'string',
+                description: 'Client secret of the request',
+              },
+            },
+            required: ['client_id', 'client_secret'],
+          },
+        },
       },
-      {
-        description: 'Client Secret of the request',
-        in: 'body',
-        required: true,
-        name: 'client_secret',
-        allowEmptyValue: true,
-      },
-    ],
+    },
     responses: {
       200: {
         description: 'Return authentication token',

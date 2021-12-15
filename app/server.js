@@ -3,6 +3,7 @@ const cors = require('cors')
 const pinoHttp = require('pino-http')
 const { initialize } = require('express-openapi')
 const swaggerUi = require('swagger-ui-express')
+const multer = require('multer')
 const path = require('path')
 const bodyParser = require('body-parser')
 const compression = require('compression')
@@ -18,7 +19,8 @@ async function createHttpServer() {
 
   app.use(cors())
   app.use(compression())
-  app.use(bodyParser.json())
+  // app.use(bodyParser.json())
+  // app.use(bodyParser.urlencoded({ extended: true }))
 
   app.get('/health', async (req, res) => {
     res.status(200).send({ version: API_VERSION, status: 'ok' })
@@ -29,13 +31,20 @@ async function createHttpServer() {
     if (req.path !== '/health') {
       requestLogger(req, res)
     }
-
     next()
   })
 
   initialize({
     app,
     apiDoc: v2ApiDoc,
+    consumesMiddleware: {
+      'multipart/form-data': function (req, res, next) {
+        multer().any()(req, res, function (err) {
+          if (err) return next(err)
+          next()
+        })
+      },
+    },
     securityHandlers: {
       bearerAuth: (req) => {
         return verifyJwks(req.headers['authorization'])
@@ -63,7 +72,10 @@ async function createHttpServer() {
   // Sorry - app.use checks arity
   // eslint-disable-next-line no-unused-vars
   app.use((err, req, res, next) => {
-    if (err.status) {
+    if (err.errors) {
+      // openapi validation
+      res.status(err.status).send(err.errors)
+    } else if (err.status) {
       res.status(err.status).send({ error: err.status === 401 ? 'Unauthorised' : err.message })
     } else {
       logger.error('Fallback Error %j', err.stack)

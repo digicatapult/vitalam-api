@@ -19,8 +19,7 @@ async function createHttpServer() {
 
   app.use(cors())
   app.use(compression())
-  // app.use(bodyParser.json())
-  // app.use(bodyParser.urlencoded({ extended: true }))
+  app.use(bodyParser.json())
 
   app.get('/health', async (req, res) => {
     res.status(200).send({ version: API_VERSION, status: 'ok' })
@@ -31,6 +30,7 @@ async function createHttpServer() {
     if (req.path !== '/health') {
       requestLogger(req, res)
     }
+
     next()
   })
 

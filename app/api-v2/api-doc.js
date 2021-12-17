@@ -3,7 +3,7 @@ const { PORT, API_VERSION, API_MAJOR_VERSION } = require('../env')
 const apiDoc = {
   openapi: '3.0.3',
   info: {
-    title: 'ApiService',
+    title: 'VITALam API',
     version: API_VERSION,
   },
   servers: [

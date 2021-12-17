@@ -38,13 +38,14 @@ module.exports = function (apiService) {
           if (output.metadataFile) {
             output.metadata = { [LEGACY_METADATA_KEY]: { type: 'FILE', value: output.metadataFile } }
           }
+
           if (!output.roles || output.roles.length === 0) {
             logger.trace(`Request missing roles`)
             res.status(400).json({ message: `Request missing roles` })
             return
           }
 
-          if (output.parent_index) {
+          if (`parent_index` in output) {
             if (output.parent_index > request.inputs.length) {
               logger.trace(`Parent index out of range`)
               res.status(400).json({ message: `Parent index out of range` })

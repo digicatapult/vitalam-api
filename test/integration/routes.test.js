@@ -144,7 +144,6 @@ describe('routes', function () {
           { roles: defaultRole, metadata: { testFile: { type: 'FILE', value: './test/data/test_file_01.txt' } } },
         ]
         const runProcessResult = await postRunProcess(app, authToken, [], outputs)
-        console.log(runProcessResult.body)
         expect(runProcessResult.body).to.have.length(1)
         expect(runProcessResult.status).to.equal(200)
         const lastToken = await getLastTokenIdRoute(app, authToken)
@@ -168,12 +167,10 @@ describe('routes', function () {
         const outputs = [{ roles: defaultRole, metadata: {}, parent_index: 0 }]
         const secondToken = await postRunProcess(app, authToken, inputs, outputs)
 
-        console.log(secondToken.body)
         expect(secondToken.body).to.have.length(1)
         expect(secondToken.status).to.equal(200)
 
         const getItemResult = await getItemRoute(app, authToken, { id: firstTokenId + 1 })
-        console.log(getItemResult.body)
         expect(getItemResult.status).to.equal(200)
         expect(getItemResult.body.id).to.deep.equal(firstTokenId + 1)
         expect(getItemResult.body.original_id).to.deep.equal(firstTokenId)
@@ -540,8 +537,26 @@ describe('routes', function () {
         const outputs = [{ roles: defaultRole, metadata: {}, parent_index: 99 }]
         const secondToken = await postRunProcess(app, authToken, inputs, outputs)
 
-        console.log(secondToken.body)
         expect(secondToken.body.message).to.contain('out of range')
+        expect(secondToken.status).to.equal(400)
+      })
+
+      test('add multiple items with same parent', async function () {
+        // add parent to be consumed
+        const firstToken = await postRunProcess(app, authToken, [], [{ roles: defaultRole, metadata: {} }])
+        expect(firstToken.status).to.equal(200)
+        const lastToken = await getLastTokenIdRoute(app, authToken)
+        const firstTokenId = lastToken.body.id
+
+        // add new tokens with duplicate parent_index
+        const inputs = [firstTokenId]
+        const outputs = [
+          { roles: defaultRole, metadata: {}, parent_index: 0 },
+          { roles: defaultRole, metadata: {}, parent_index: 0 },
+        ]
+        const secondToken = await postRunProcess(app, authToken, inputs, outputs)
+
+        expect(secondToken.body.message).to.contain('parent')
         expect(secondToken.status).to.equal(400)
       })
 

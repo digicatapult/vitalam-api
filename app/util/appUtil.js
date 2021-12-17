@@ -258,12 +258,12 @@ async function runProcess(inputs, outputs) {
     const keyring = new Keyring({ type: 'sr25519' })
     const alice = keyring.addFromUri(USER_URI)
 
-    const outputsAsPair = outputs.map(({ roles, metadata: md, parent_index }) => [roles, md, parent_index])
-    logger.debug('Running Transaction inputs: %j outputs: %j', inputs, outputsAsPair)
+    const relevantOutputs = outputs.map(({ roles, metadata, parent_index }) => [roles, metadata, parent_index])
+    logger.debug('Running Transaction inputs: %j outputs: %j', inputs, relevantOutputs)
     return new Promise((resolve, reject) => {
       let unsub = null
       api.tx.simpleNftModule
-        .runProcess(inputs, outputsAsPair)
+        .runProcess(inputs, relevantOutputs)
         .signAndSend(alice, (result) => {
           logger.debug('result.status %s', JSON.stringify(result.status))
           logger.debug('result.status.isInBlock', result.status.isInBlock)
@@ -288,6 +288,7 @@ async function runProcess(inputs, outputs) {
           unsub = res
         })
         .catch((err) => {
+          logger.warn(`Error in run process transaction: ${err}`)
           throw err
         })
     })

@@ -46,6 +46,11 @@ const apiOptions = {
       parents: 'Vec<TokenId>',
       children: 'Option<Vec<TokenId>>',
     },
+    Output: {
+      roles: 'BTreeMap<RoleKey, AccountId>',
+      metadata: 'BTreeMap<TokenMetadataKey, TokenMetadataValue>',
+      parent_index: 'Option<u32>',
+    },
     MetadataValue: {
       _enum: {
         File: 'Hash',

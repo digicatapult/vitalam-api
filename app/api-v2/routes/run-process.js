@@ -105,18 +105,6 @@ module.exports = function (apiService) {
               request: {
                 type: 'string',
                 description: 'Inputs to be burned and outputs to be created within the system',
-                // properties: {
-                //   inputs: {
-                //     items: {
-                //       $ref: '#/components/schemas/Input',
-                //     },
-                //   },
-                //   outputs: {
-                //     items: {
-                //       $ref: '#/components/schemas/Output',
-                //     },
-                //   },
-                // },
               },
             },
             required: ['request'],

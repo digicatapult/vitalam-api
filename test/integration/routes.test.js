@@ -151,7 +151,7 @@ describe('routes', function () {
 
         const getItemResult = await getItemRoute(app, authToken, lastToken.body)
         expect(getItemResult.status).to.equal(200)
-        expect(getItemResult.body.id).to.deep.equal(lastToken.body.id)
+        expect(getItemResult.body.id).to.equal(lastToken.body.id)
         expect(getItemResult.body.metadata_keys).to.deep.equal(['testFile'])
       })
 
@@ -172,8 +172,8 @@ describe('routes', function () {
 
         const getItemResult = await getItemRoute(app, authToken, { id: firstTokenId + 1 })
         expect(getItemResult.status).to.equal(200)
-        expect(getItemResult.body.id).to.deep.equal(firstTokenId + 1)
-        expect(getItemResult.body.original_id).to.deep.equal(firstTokenId)
+        expect(getItemResult.body.id).to.equal(firstTokenId + 1)
+        expect(getItemResult.body.original_id).to.equal(firstTokenId)
       })
 
       test('add and get item - single metadata LITERAL', async function () {
@@ -187,7 +187,7 @@ describe('routes', function () {
 
         const getItemResult = await getItemRoute(app, authToken, lastToken.body)
         expect(getItemResult.status).to.equal(200)
-        expect(getItemResult.body.id).to.deep.equal(lastToken.body.id)
+        expect(getItemResult.body.id).to.equal(lastToken.body.id)
         expect(getItemResult.body.metadata_keys).to.deep.equal(['testLiteral'])
       })
 
@@ -202,7 +202,7 @@ describe('routes', function () {
 
         const getItemResult = await getItemRoute(app, authToken, lastToken.body)
         expect(getItemResult.status).to.equal(200)
-        expect(getItemResult.body.id).to.deep.equal(lastToken.body.id)
+        expect(getItemResult.body.id).to.equal(lastToken.body.id)
         expect(getItemResult.body.metadata_keys).to.deep.equal(['testNone'])
       })
 
@@ -226,7 +226,7 @@ describe('routes', function () {
 
         const getItemResult = await getItemRoute(app, authToken, lastToken.body)
         expect(getItemResult.status).to.equal(200)
-        expect(getItemResult.body.id).to.deep.equal(lastToken.body.id)
+        expect(getItemResult.body.id).to.equal(lastToken.body.id)
         expect(getItemResult.body.metadata_keys).to.deep.equal(['testFile', 'testLiteral', 'testNone'])
 
         const testFile = await getItemMetadataRoute(app, authToken, {
@@ -249,7 +249,7 @@ describe('routes', function () {
           metadataKey: 'testNone',
         })
 
-        expect(testNone.text).to.deep.equal('')
+        expect(testNone.text).to.equal('')
         expect(testNone.header['content-type']).equal('text/plain; charset=utf-8')
       })
 
@@ -272,7 +272,7 @@ describe('routes', function () {
 
         const getItemResult = await getItemRoute(app, authToken, lastToken.body)
         expect(getItemResult.status).to.equal(200)
-        expect(getItemResult.body.id).to.deep.equal(lastToken.body.id)
+        expect(getItemResult.body.id).to.equal(lastToken.body.id)
         expect(getItemResult.body.metadata_keys).to.deep.equal(['testFile1', 'testFile2'])
       })
 
@@ -295,7 +295,7 @@ describe('routes', function () {
 
         const getItemResult = await getItemRoute(app, authToken, lastToken.body)
         expect(getItemResult.status).to.equal(200)
-        expect(getItemResult.body.id).to.deep.equal(lastToken.body.id)
+        expect(getItemResult.body.id).to.equal(lastToken.body.id)
         expect(getItemResult.body.metadata_keys).to.deep.equal(['testLiteral1', 'testLiteral2'])
       })
 
@@ -321,7 +321,7 @@ describe('routes', function () {
 
         const getItemResult = await getItemRoute(app, authToken, lastToken.body)
         expect(getItemResult.status).to.equal(200)
-        expect(getItemResult.body.id).to.deep.equal(lastToken.body.id)
+        expect(getItemResult.body.id).to.equal(lastToken.body.id)
         expect(getItemResult.body.metadata_keys).to.deep.equal(['1', '2', '3'])
       })
 
@@ -537,7 +537,7 @@ describe('routes', function () {
         const outputs = [{ roles: defaultRole, metadata: {}, parent_index: 99 }]
         const secondToken = await postRunProcess(app, authToken, inputs, outputs)
 
-        expect(secondToken.body.message).to.contain('out of range')
+        expect(secondToken.body.message).to.equal('Parent index out of range')
         expect(secondToken.status).to.equal(400)
       })
 
@@ -556,7 +556,7 @@ describe('routes', function () {
         ]
         const secondToken = await postRunProcess(app, authToken, inputs, outputs)
 
-        expect(secondToken.body.message).to.contain('parent')
+        expect(secondToken.body.message).to.equal('Duplicate parent index used')
         expect(secondToken.status).to.equal(400)
       })
 

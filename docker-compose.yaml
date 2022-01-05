@@ -11,17 +11,12 @@ services:
     command: /bin/sh -c "
       ./vitalam-node 
       --base-path /data/ 
-      $$IDENTITY
-      $$WS
-      $$RPC
-      $$CORS"
+      --dev
+      --unsafe-ws-external
+      --unsafe-rpc-external
+      --rpc-cors all"
     ports:
       - 30333:30333
       - 9944:9944
       - 9933:9933
-    environment:
-      - IDENTITY=--dev
-      - WS=--unsafe-ws-external
-      - RPC=--unsafe-rpc-external
-      - CORS=--rpc-cors all
     restart: on-failure

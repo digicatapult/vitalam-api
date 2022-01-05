@@ -8,13 +8,20 @@ services:
       - 5001:5001
   vitalam-node:
     image: ghcr.io/digicatapult/vitalam-node:v2.5.0
+    command: /bin/sh -c "
+      ./vitalam-node 
+      --base-path /data/ 
+      $$IDENTITY
+      $$WS
+      $$RPC
+      $$CORS"
     ports:
       - 30333:30333
       - 9944:9944
       - 9933:9933
     environment:
-      - IDENTITY=dev
-      - WS=true
-      - RPC=true
-      - CORS=all
+      - IDENTITY=--dev
+      - WS=--unsafe-ws-external
+      - RPC=--unsafe-rpc-external
+      - CORS=--rpc-cors all
     restart: on-failure

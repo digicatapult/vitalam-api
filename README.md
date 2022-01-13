@@ -130,7 +130,7 @@ Gets the item identified by `id`. Item `id`s are returned by [POST /run-process]
     "roles": {"Admin": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"}, // Object
     "creator": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY", // String
     "created_at": 4321, // Number
-    "destroyed_at": 321 || null, // Nullable<Number>
+    "destroyed_at": 4999, || null, // Nullable<Number>
     "parents": [40, 41], // Array<Number>
     "children": [43, 44] || null // Nullable<Array<Number>>
     "metadata_keys": ["metadataKey1", ..."metadataKeyN"] // Array<String>
@@ -156,7 +156,8 @@ This endpoint governs the creation and destruction of all tokens in the system. 
     },
     "metadata": {
       "some_file": { "type": "FILE", "value": "some_file.txt"},
-      "some_literal": {"type": "LITERAL", "value":"some_value"},
+      "some_literal": {"type": "LITERAL", "value": "some_value"},
+      "some_token_id": {"type": "TOKEN_ID", "value": "42"},
       ..."metadataKeyN": {"type": "LITERAL", "value", "some_other_value"}
     },
     "parent_index": 0, // Number, optional
@@ -175,7 +176,7 @@ The `outputs` field is an array of objects that describe tokens to be created by
 Each output must also reference a `metadata` object containing a (key, value) pair for each metadata item associated with the new token. The following metadata value types are accepted:
 
 ```json
-["FILE", "LITERAL", "NONE"]
+["FILE", "LITERAL", "TOKEN_ID", "NONE"]
 ```
 
 The key identifies the metadata item, and the value is either a string value, or for files, a file path. Each file path must match a corresponding file attached to the request.

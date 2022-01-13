@@ -55,6 +55,7 @@ const apiOptions = {
       _enum: {
         File: 'Hash',
         Literal: `[u8; ${METADATA_VALUE_LITERAL_LENGTH}]`,
+        TokenId: 'TokenId',
         None: null,
       },
     },
@@ -135,7 +136,10 @@ async function processMetadata(metadata, files) {
         const keyAsUint8Array = utf8ToUint8Array(key, METADATA_KEY_LENGTH)
 
         const validMetadataValueTypes = Object.keys(apiOptions.types.MetadataValue._enum)
-        if (typeof value !== 'object' || !validMetadataValueTypes.some((type) => type.toUpperCase() === value.type)) {
+        if (
+          typeof value !== 'object' ||
+          !validMetadataValueTypes.some((type) => type.toLowerCase() === value.type.replace(/_/g, '').toLowerCase())
+        ) {
           throw new Error(
             `Error invalid type in ${key}:${JSON.stringify(value)}. Must be one of ${validMetadataValueTypes.map((t) =>
               t.toUpperCase()
@@ -146,6 +150,9 @@ async function processMetadata(metadata, files) {
         switch (value.type) {
           case 'LITERAL':
             value = processLiteral(value)
+            break
+          case 'TOKEN_ID':
+            value = processTokenId(value)
             break
           case 'FILE':
             value = await processFile(value, files)
@@ -168,6 +175,15 @@ const processLiteral = (value) => {
 
   const valueAsUint8Array = utf8ToUint8Array(literalValue, METADATA_VALUE_LITERAL_LENGTH)
   return { Literal: valueAsUint8Array }
+}
+
+const processTokenId = (value) => {
+  if (!value.value) throw new Error(`TokenId metadata requires a value field`)
+
+  const tokenId = validateTokenId(value.value)
+  if (!tokenId) throw new Error(`Invalid metadata tokenId`)
+
+  return { TokenId: tokenId }
 }
 
 const processFile = async (value, files) => {
@@ -436,6 +452,11 @@ const getMetadataResponse = async (tokenId, metadataKey, res) => {
     res.set('content-type', 'text/plain')
     res.status(200).send(hexToUtf8(metadataValue.literal))
     return
+  }
+
+  if (metadataValue.tokenId) {
+    res.set('content-type', 'text/plain')
+    res.status(200).send(metadataValue.tokenId.toString())
   }
 
   if ('none' in metadataValue) {

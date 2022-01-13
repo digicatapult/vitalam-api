@@ -191,6 +191,21 @@ describe('routes', function () {
         expect(getItemResult.body.metadata_keys).to.deep.equal(['testLiteral'])
       })
 
+      test('add and get item - single metadata TOKEN_ID', async function () {
+        const outputs = [{ roles: defaultRole, metadata: { testTokenId: { type: 'TOKEN_ID', value: '1' } } }]
+        const runProcessResult = await postRunProcess(app, authToken, [], outputs)
+        expect(runProcessResult.body).to.have.length(1)
+        expect(runProcessResult.status).to.equal(200)
+
+        const lastToken = await getLastTokenIdRoute(app, authToken)
+        expect(lastToken.body).to.have.property('id')
+
+        const getItemResult = await getItemRoute(app, authToken, lastToken.body)
+        expect(getItemResult.status).to.equal(200)
+        expect(getItemResult.body.id).to.equal(lastToken.body.id)
+        expect(getItemResult.body.metadata_keys).to.deep.equal(['testTokenId'])
+      })
+
       test('add and get item - single NONE', async function () {
         const outputs = [{ roles: defaultRole, metadata: { testNone: { type: 'NONE' } } }]
         const runProcessResult = await postRunProcess(app, authToken, [], outputs)
@@ -206,13 +221,14 @@ describe('routes', function () {
         expect(getItemResult.body.metadata_keys).to.deep.equal(['testNone'])
       })
 
-      test('add and get item metadata - FILE + LITERAL + NONE', async function () {
+      test('add and get item metadata - FILE + LITERAL + TOKEN_ID + NONE', async function () {
         const outputs = [
           {
             roles: defaultRole,
             metadata: {
               testFile: { type: 'FILE', value: './test/data/test_file_01.txt' },
               testLiteral: { type: 'LITERAL', value: 'notAFile' },
+              testTokenId: { type: 'TOKEN_ID', value: '42' },
               testNone: { type: 'NONE' },
             },
           },
@@ -227,7 +243,7 @@ describe('routes', function () {
         const getItemResult = await getItemRoute(app, authToken, lastToken.body)
         expect(getItemResult.status).to.equal(200)
         expect(getItemResult.body.id).to.equal(lastToken.body.id)
-        expect(getItemResult.body.metadata_keys).to.deep.equal(['testFile', 'testLiteral', 'testNone'])
+        expect(getItemResult.body.metadata_keys).to.deep.equal(['testFile', 'testLiteral', 'testNone', 'testTokenId'])
 
         const testFile = await getItemMetadataRoute(app, authToken, {
           id: lastToken.body.id,
@@ -243,6 +259,14 @@ describe('routes', function () {
 
         expect(testLiteral.text).equal('notAFile')
         expect(testLiteral.header['content-type']).equal('text/plain; charset=utf-8')
+
+        const testTokenId = await getItemMetadataRoute(app, authToken, {
+          id: lastToken.body.id,
+          metadataKey: 'testTokenId',
+        })
+
+        expect(testTokenId.text).equal('42')
+        expect(testTokenId.header['content-type']).equal('text/plain; charset=utf-8')
 
         const testNone = await getItemMetadataRoute(app, authToken, {
           id: lastToken.body.id,
@@ -297,6 +321,29 @@ describe('routes', function () {
         expect(getItemResult.status).to.equal(200)
         expect(getItemResult.body.id).to.equal(lastToken.body.id)
         expect(getItemResult.body.metadata_keys).to.deep.equal(['testLiteral1', 'testLiteral2'])
+      })
+
+      test('add and get item - multiple TOKEN_ID', async function () {
+        const outputs = [
+          {
+            roles: defaultRole,
+            metadata: {
+              testTokenId1: { type: 'TOKEN_ID', value: '42' },
+              testTokenId2: { type: 'TOKEN_ID', value: '43' },
+            },
+          },
+        ]
+        const runProcessResult = await postRunProcess(app, authToken, [], outputs)
+        expect(runProcessResult.body).to.have.length(1)
+        expect(runProcessResult.status).to.equal(200)
+
+        const lastToken = await getLastTokenIdRoute(app, authToken)
+        expect(lastToken.body).to.have.property('id')
+
+        const getItemResult = await getItemRoute(app, authToken, lastToken.body)
+        expect(getItemResult.status).to.equal(200)
+        expect(getItemResult.body.id).to.equal(lastToken.body.id)
+        expect(getItemResult.body.metadata_keys).to.deep.equal(['testTokenId1', 'testTokenId2'])
       })
 
       // covers bug in polkadotjs/api@<5.2.1 that caused an error when encoding a BTreeMap with non-ascending keys
@@ -497,6 +544,13 @@ describe('routes', function () {
         expect(runProcessResult.status).to.equal(400)
       })
 
+      test('add item - metadata TOKEN_ID without value field', async function () {
+        const outputs = [{ roles: defaultRole, metadata: { testKey: { type: 'TOKEN_ID' } } }]
+        const runProcessResult = await postRunProcess(app, authToken, [], outputs)
+        expect(runProcessResult.body.message).to.contain('value')
+        expect(runProcessResult.status).to.equal(400)
+      })
+
       test('add item - metadata LITERAL value too long', async function () {
         const literalValue = 'a'.repeat(METADATA_VALUE_LITERAL_LENGTH + 1)
         const outputs = [{ roles: defaultRole, metadata: { testKey: { type: 'LITERAL', value: literalValue } } }]
@@ -510,6 +564,14 @@ describe('routes', function () {
         const outputs = [{ roles: defaultRole, metadata: { testKey: { type: 'LITERAL', value: literalValue } } }]
         const runProcessResult = await postRunProcess(app, authToken, [], outputs)
         expect(runProcessResult.body.message).to.contain('too long')
+        expect(runProcessResult.status).to.equal(400)
+      })
+
+      test('add item - metadata TOKEN_ID value is invalid tokenId', async function () {
+        const invalidToken = 'notAToken'
+        const outputs = [{ roles: defaultRole, metadata: { testKey: { type: 'TOKEN_ID', value: invalidToken } } }]
+        const runProcessResult = await postRunProcess(app, authToken, [], outputs)
+        expect(runProcessResult.body.message).to.equal('Invalid metadata tokenId')
         expect(runProcessResult.status).to.equal(400)
       })
 

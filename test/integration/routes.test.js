@@ -533,21 +533,21 @@ describe('routes', function () {
       test('add item - metadata FILE without value field', async function () {
         const outputs = [{ roles: defaultRole, metadata: { testKey: { type: 'FILE' } } }]
         const runProcessResult = await postRunProcess(app, authToken, [], outputs)
-        expect(runProcessResult.body.message).to.contain('value')
+        expect(runProcessResult.body.message).to.equal('File metadata requires a value field')
         expect(runProcessResult.status).to.equal(400)
       })
 
       test('add item - metadata LITERAL without value field', async function () {
         const outputs = [{ roles: defaultRole, metadata: { testKey: { type: 'LITERAL' } } }]
         const runProcessResult = await postRunProcess(app, authToken, [], outputs)
-        expect(runProcessResult.body.message).to.contain('value')
+        expect(runProcessResult.body.message).to.equal('Literal metadata requires a value field')
         expect(runProcessResult.status).to.equal(400)
       })
 
       test('add item - metadata TOKEN_ID without value field', async function () {
         const outputs = [{ roles: defaultRole, metadata: { testKey: { type: 'TOKEN_ID' } } }]
         const runProcessResult = await postRunProcess(app, authToken, [], outputs)
-        expect(runProcessResult.body.message).to.contain('value')
+        expect(runProcessResult.body.message).to.equal('TokenId metadata requires a value field')
         expect(runProcessResult.status).to.equal(400)
       })
 

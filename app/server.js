@@ -34,12 +34,13 @@ async function createHttpServer() {
     next()
   })
 
+  const multerStorage = multer.diskStorage({})
   initialize({
     app,
     apiDoc: v2ApiDoc,
     consumesMiddleware: {
       'multipart/form-data': function (req, res, next) {
-        multer().any()(req, res, function (err) {
+        multer({ storage: multerStorage }).any()(req, res, function (err) {
           if (err) return next(err)
           next()
         })

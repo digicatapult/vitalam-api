@@ -80,9 +80,11 @@ api.on('error', (err) => {
   logger.error(`Error from substrate node connection. Error was ${err.message || JSON.stringify(err)}`)
 })
 
-async function addFile(file, filePath) {
+async function addFile(file) {
+  logger.debug('Uploading file %s', file.originalname)
+  logger.trace('Temporary file is stored at path: %s', file.path)
   const form = new FormData()
-  form.append('file', fs.createReadStream(filePath), file.originalname)
+  form.append('file', fs.createReadStream(file.path), file.originalname)
   const body = await fetch(`http://${IPFS_HOST}:${IPFS_PORT}/api/v0/add?cid-version=0&wrap-with-directory=true`, {
     method: 'POST',
     body: form,
@@ -95,7 +97,10 @@ async function addFile(file, filePath) {
     .filter((obj) => obj.length > 0)
     .map((obj) => JSON.parse(obj))
 
-  return json
+  const hash = formatHash(json)
+  logger.debug('Upload of file %s succeeded. Hash is %s', file.originalname, hash)
+
+  return hash
 }
 
 function formatHash(filestoreResponse) {
@@ -179,8 +184,8 @@ const processFile = async (value, files) => {
   })
   if (!file) throw new Error(`Error no attached file found for ${filePath}`)
 
-  const filestoreResponse = await addFile(file, filePath)
-  return { File: formatHash(filestoreResponse) }
+  const filestoreResponse = await addFile(file)
+  return { File: filestoreResponse }
 }
 
 const utf8ToUint8Array = (str, len) => {

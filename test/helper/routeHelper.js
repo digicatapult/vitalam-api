@@ -72,7 +72,7 @@ async function postRunProcess(app, authToken, inputs, outputs) {
   outputs.forEach((output) => {
     if (output.metadata) {
       for (const value of Object.values(output.metadata)) {
-        if (value.type === 'FILE') {
+        if (value !== null && value.type === 'FILE') {
           req.attach(value.value, value.value)
         }
       }

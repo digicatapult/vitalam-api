@@ -130,6 +130,7 @@ const processRoles = async (roles) => {
   )
 }
 
+const validMetadataValueTypes = new Set(['LITERAL', 'TOKEN_ID', 'FILE', 'NONE'])
 async function processMetadata(metadata, files) {
   const metadataItems = Object.entries(metadata)
   if (metadataItems.length > MAX_METADATA_COUNT)
@@ -140,15 +141,11 @@ async function processMetadata(metadata, files) {
       metadataItems.map(async ([key, value]) => {
         const keyAsUint8Array = utf8ToUint8Array(key, METADATA_KEY_LENGTH)
 
-        const validMetadataValueTypes = Object.keys(apiOptions.types.MetadataValue._enum)
-        if (
-          typeof value !== 'object' ||
-          !validMetadataValueTypes.some((type) => type.toLowerCase() === value.type.replace(/_/g, '').toLowerCase())
-        ) {
+        if (typeof value !== 'object' || value === null || !validMetadataValueTypes.has(value.type)) {
           throw new Error(
-            `Error invalid type in ${key}:${JSON.stringify(value)}. Must be one of ${validMetadataValueTypes.map((t) =>
-              t.toUpperCase()
-            )}`
+            `Error invalid type in ${key}:${JSON.stringify(value)}. Must be one of ${Array.from(
+              validMetadataValueTypes
+            ).join(', ')}`
           )
         }
 

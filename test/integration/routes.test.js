@@ -530,6 +530,13 @@ describe('routes', function () {
         expect(runProcessResult.status).to.equal(400)
       })
 
+      test('add item - null metadata', async function () {
+        const outputs = [{ roles: defaultRole, metadata: { testKey: null } }]
+        const runProcessResult = await postRunProcess(app, authToken, [], outputs)
+        expect(runProcessResult.body.message).to.contain('invalid type')
+        expect(runProcessResult.status).to.equal(400)
+      })
+
       test('add item - metadata FILE without value field', async function () {
         const outputs = [{ roles: defaultRole, metadata: { testKey: { type: 'FILE' } } }]
         const runProcessResult = await postRunProcess(app, authToken, [], outputs)

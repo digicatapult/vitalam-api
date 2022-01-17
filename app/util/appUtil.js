@@ -462,6 +462,7 @@ const getMetadataResponse = async (tokenId, metadataKey, res) => {
   if (metadataValue.tokenId) {
     res.set('content-type', 'text/plain')
     res.status(200).send(metadataValue.tokenId.toString())
+    return
   }
 
   if ('none' in metadataValue) {

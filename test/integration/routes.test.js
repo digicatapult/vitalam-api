@@ -629,6 +629,16 @@ describe('routes', function () {
         expect(secondToken.status).to.equal(400)
       })
 
+      test('add item with parent but no inputs', async function () {
+        // add new token with no inputs
+        const inputs = []
+        const outputs = [{ roles: defaultRole, metadata: {}, parent_index: 99 }]
+        const secondToken = await postRunProcess(app, authToken, inputs, outputs)
+
+        expect(secondToken.body.message).to.equal('Parent index out of range')
+        expect(secondToken.status).to.equal(400)
+      })
+
       test('get item - missing ID', async function () {
         const lastToken = await getLastTokenIdRoute(app, authToken)
         const lastTokenId = lastToken.body.id

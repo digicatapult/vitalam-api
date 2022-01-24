@@ -61,7 +61,7 @@ const apiOptions = {
     },
     Role: {
       // order must match node as values are referenced by index. First entry is default.
-      _enum: ['Admin', 'ManufacturingEngineer', 'ProcurementBuyer', 'ProcurementPlanner', 'Supplier'],
+      _enum: ['Owner', 'Customer', 'AdditiveManufacturer', 'Laboratory', 'Buyer', 'Supplier', 'Reviewer'],
     },
   },
 }

@@ -610,6 +610,38 @@ describe('routes', function () {
         expect(secondToken.status).to.equal(400)
       })
 
+      test('add item with parent_index < 0', async function () {
+        // add parent to be consumed
+        const firstToken = await postRunProcess(app, authToken, [], [{ roles: defaultRole, metadata: {} }])
+        expect(firstToken.status).to.equal(200)
+        const lastToken = await getLastTokenIdRoute(app, authToken)
+        const firstTokenId = lastToken.body.id
+
+        // add new token with out of range parent_index
+        const inputs = [firstTokenId]
+        const outputs = [{ roles: defaultRole, metadata: {}, parent_index: -1 }]
+        const secondToken = await postRunProcess(app, authToken, inputs, outputs)
+
+        expect(secondToken.body.message).to.equal('Parent index out of range')
+        expect(secondToken.status).to.equal(400)
+      })
+
+      test('add item with parent_index === inputs.length', async function () {
+        // add parent to be consumed
+        const firstToken = await postRunProcess(app, authToken, [], [{ roles: defaultRole, metadata: {} }])
+        expect(firstToken.status).to.equal(200)
+        const lastToken = await getLastTokenIdRoute(app, authToken)
+        const firstTokenId = lastToken.body.id
+
+        // add new token with out of range parent_index
+        const inputs = [firstTokenId]
+        const outputs = [{ roles: defaultRole, metadata: {}, parent_index: 1 }]
+        const secondToken = await postRunProcess(app, authToken, inputs, outputs)
+
+        expect(secondToken.body.message).to.equal('Parent index out of range')
+        expect(secondToken.status).to.equal(400)
+      })
+
       test('add multiple items with same parent', async function () {
         // add parent to be consumed
         const firstToken = await postRunProcess(app, authToken, [], [{ roles: defaultRole, metadata: {} }])
@@ -626,6 +658,16 @@ describe('routes', function () {
         const secondToken = await postRunProcess(app, authToken, inputs, outputs)
 
         expect(secondToken.body.message).to.equal('Duplicate parent index used')
+        expect(secondToken.status).to.equal(400)
+      })
+
+      test('add item with parent but no inputs', async function () {
+        // add new token with no inputs
+        const inputs = []
+        const outputs = [{ roles: defaultRole, metadata: {}, parent_index: 99 }]
+        const secondToken = await postRunProcess(app, authToken, inputs, outputs)
+
+        expect(secondToken.body.message).to.equal('Parent index out of range')
         expect(secondToken.status).to.equal(400)
       })
 

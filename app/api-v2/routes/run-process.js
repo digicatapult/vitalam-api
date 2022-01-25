@@ -46,7 +46,7 @@ module.exports = function (apiService) {
           }
 
           if (`parent_index` in output) {
-            if (output.parent_index > request.inputs.length) {
+            if (output.parent_index < 0 || !(output.parent_index < request.inputs.length)) {
               logger.trace(`Parent index out of range`)
               res.status(400).json({ message: `Parent index out of range` })
               return

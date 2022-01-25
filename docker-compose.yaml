@@ -8,13 +8,12 @@ services:
       - 5001:5001
   vitalam-node:
     image: ghcr.io/digicatapult/vitalam-node:v2.7.0
-    entrypoint: /bin/sh -c "
-      ./vitalam-node 
+    command: 
       --base-path /data/ 
       --dev
       --unsafe-ws-external
       --unsafe-rpc-external
-      --rpc-cors all"
+      --rpc-cors all
     ports:
       - 30333:30333
       - 9944:9944

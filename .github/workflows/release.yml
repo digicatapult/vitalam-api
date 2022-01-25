@@ -117,6 +117,19 @@ jobs:
           name: ${{ needs.get-version.outputs.version }}
           prerelease: ${{ needs.get-version.outputs.is_prerelease == 'true' }}
           generate_release_notes: true
+      - name: Delete release latest
+        if: ${{ needs.get-version.outputs.is_prerelease != 'true' }}
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const { owner, repo } = context.repo
+            try {
+              await github.rest.git.deleteRef({ owner, repo, ref: 'tags/latest' })
+            }
+            catch (err) {
+              if (err.status !== 422) throw err
+            } 
       - name: Build release latest
         if: ${{ needs.get-version.outputs.is_prerelease != 'true' }}
         uses: softprops/action-gh-release@v1
@@ -126,6 +139,19 @@ jobs:
           name: Latest ${{ needs.get-version.outputs.version }}
           prerelease: false
           generate_release_notes: true
+      - name: Delete release latest-dev
+        if: ${{ needs.get-version.outputs.is_prerelease == 'true' }}
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const { owner, repo } = context.repo
+            try {
+              await github.rest.git.deleteRef({ owner, repo, ref: 'tags/latest-dev' })
+            }
+            catch (err) {
+              if (err.status !== 422) throw err
+            }           
       - name: Build release latest-dev
         if: ${{ needs.get-version.outputs.is_prerelease == 'true' }}
         uses: softprops/action-gh-release@v1

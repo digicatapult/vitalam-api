@@ -251,6 +251,7 @@ describe('routes', function () {
         })
         expect(testFile.text.toString()).equal('This is the first test file...\n')
         expect(testFile.header['content-disposition']).equal('attachment; filename="test_file_01.txt"')
+        expect(testLiteral.header['content-type']).equal('application/octet-stream')
 
         const testLiteral = await getItemMetadataRoute(app, authToken, {
           id: lastToken.body.id,
@@ -391,6 +392,7 @@ describe('routes', function () {
 
         expect(res.text.toString()).equal('This is the first test file...\n')
         expect(res.header['content-disposition']).equal('attachment; filename="test_file_01.txt"')
+        expect(res.header['content-type']).equal('application/octet-stream')
       })
 
       test('run-process creating one token', async function () {
@@ -879,6 +881,7 @@ describe('routes', function () {
 
         expect(res.text.toString()).equal('This is the first test file...\n')
         expect(res.header['content-disposition']).equal('attachment; filename="metadata"')
+        expect(res.header['content-type']).equal('application/octet-stream')
       })
     })
   })

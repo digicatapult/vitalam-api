@@ -441,7 +441,9 @@ const getMetadataResponse = async (tokenId, metadataKey, res) => {
       res.set({
         immutable: true,
         maxAge: 365 * 24 * 60 * 60 * 1000,
-        'Content-Disposition': `attachment; filename="${file.filename}"`,
+        'content-disposition': `attachment; filename="${file.filename}"`,
+        'access-control-expose-headers': 'content-disposition',
+        'content-type': 'application/octet-stream',
       })
       file.file.pipe(res)
       file.file.on('error', (err) => reject(err))

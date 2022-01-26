@@ -59,19 +59,17 @@ module.exports = function (apiService) {
             parentIndices.add(output.parent_index)
           }
 
-          try {
-            return {
-              roles: await processRoles(output.roles),
-              metadata: await processMetadata(output.metadata, req.files),
-              parent_index: output.parent_index,
-            }
-          } catch (err) {
-            logger.trace(`Invalid outputs: ${err.message}`)
-            res.status(400).json({ message: err.message })
-            return
+          return {
+            roles: await processRoles(output.roles),
+            metadata: await processMetadata(output.metadata, req.files),
+            parent_index: output.parent_index,
           }
         })
-      )
+      ).catch((err) => {
+        logger.trace(`Invalid outputs: ${err.message}`)
+        res.status(400).json({ message: err.message })
+        return
+      })
 
       let result
       try {

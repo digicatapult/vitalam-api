@@ -249,9 +249,9 @@ describe('routes', function () {
           id: lastToken.body.id,
           metadataKey: 'testFile',
         })
-        expect(testFile.text.toString()).equal('This is the first test file...\n')
+        expect(testFile.body.toString('utf8')).equal('This is the first test file...\n')
         expect(testFile.header['content-disposition']).equal('attachment; filename="test_file_01.txt"')
-        expect(testLiteral.header['content-type']).equal('application/octet-stream')
+        expect(testFile.header['content-type']).equal('application/octet-stream')
 
         const testLiteral = await getItemMetadataRoute(app, authToken, {
           id: lastToken.body.id,
@@ -390,7 +390,7 @@ describe('routes', function () {
 
         const res = await getItemMetadataRoute(app, authToken, { id: lastTokenId + 1, metadataKey: 'testFile' })
 
-        expect(res.text.toString()).equal('This is the first test file...\n')
+        expect(res.body.toString('utf8')).equal('This is the first test file...\n')
         expect(res.header['content-disposition']).equal('attachment; filename="test_file_01.txt"')
         expect(res.header['content-type']).equal('application/octet-stream')
       })
@@ -425,7 +425,7 @@ describe('routes', function () {
           id: lastTokenId + 1,
           metadataKey: 'testFile',
         })
-        expect(itemMetadata.text.toString()).equal('This is the first test file...\n')
+        expect(itemMetadata.body.toString('utf8')).equal('This is the first test file...\n')
       })
 
       test('run-process destroying one token and creating one', async function () {
@@ -863,7 +863,7 @@ describe('routes', function () {
         const itemMetadata = await getItemMetadataRouteLegacy(app, authToken, {
           id: lastTokenId + 1,
         })
-        expect(itemMetadata.text.toString()).equal('This is the fourth test file...\n')
+        expect(itemMetadata.body.toString('utf8')).equal('This is the fourth test file...\n')
       })
 
       test('get item metadata - direct add file (addFileRouteLegacy)', async function () {
@@ -879,7 +879,7 @@ describe('routes', function () {
 
         const res = await getItemMetadataRoute(app, authToken, { id: lastTokenId + 1, metadataKey: 'testFile' })
 
-        expect(res.text.toString()).equal('This is the first test file...\n')
+        expect(res.body.toString('utf8')).equal('This is the first test file...\n')
         expect(res.header['content-disposition']).equal('attachment; filename="metadata"')
         expect(res.header['content-type']).equal('application/octet-stream')
       })

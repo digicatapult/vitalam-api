@@ -1,6 +1,6 @@
 {
   "name": "vitalam-api",
-  "version": "2.6.2",
+  "version": "2.6.3",
   "description": "VITALam API",
   "repository": {
     "type": "git",
@@ -10,6 +10,10 @@
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/digicatapult/vitalam-api/issues"
+  },
+  "engines": {
+    "node": "16.x.x",
+    "npm": "8.x.x"
   },
   "homepage": "https://github.com/digicatapult/vitalam-api#readme",
   "main": "./app/index.js",

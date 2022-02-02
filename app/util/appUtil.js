@@ -15,6 +15,7 @@ const {
   IPFS_PORT,
   METADATA_KEY_LENGTH,
   METADATA_VALUE_LITERAL_LENGTH,
+  PROCESS_IDENTIFIER_LENGTH,
   MAX_METADATA_COUNT,
   AUTH_AUDIENCE,
   AUTH_JWKS_URI,
@@ -46,7 +47,7 @@ const apiOptions = {
       parents: 'Vec<TokenId>',
       children: 'Option<Vec<TokenId>>',
     },
-    Output: {
+    ProcessIO: {
       roles: 'BTreeMap<RoleKey, AccountId>',
       metadata: 'BTreeMap<TokenMetadataKey, TokenMetadataValue>',
       parent_index: 'Option<u32>',
@@ -60,8 +61,23 @@ const apiOptions = {
       },
     },
     Role: {
-      // order must match node as values are referenced by index. First entry is default.
       _enum: ['Owner', 'Customer', 'AdditiveManufacturer', 'Laboratory', 'Buyer', 'Supplier', 'Reviewer'],
+    },
+    ProcessIdentifier: `[u8; ${PROCESS_IDENTIFIER_LENGTH}]`,
+    ProcessVersion: 'u32',
+    ProcessId: {
+      id: 'ProcessIdentifier',
+      version: 'ProcessVersion',
+    },
+    Process: {
+      status: 'ProcessStatus',
+      restrictions: 'Vec<Restriction>',
+    },
+    ProcessStatus: {
+      _enum: ['Disabled', 'Enabled'],
+    },
+    Restriction: {
+      _enum: ['None', 'SenderOwnsAllInputs'],
     },
   },
 }
@@ -275,7 +291,7 @@ async function getMembers() {
   return api.query.membership.members()
 }
 
-async function runProcess(inputs, outputs) {
+async function runProcess(process, inputs, outputs) {
   if (inputs && outputs) {
     await api.isReady
     const keyring = new Keyring({ type: 'sr25519' })
@@ -286,7 +302,7 @@ async function runProcess(inputs, outputs) {
     return new Promise((resolve, reject) => {
       let unsub = null
       api.tx.simpleNftModule
-        .runProcess(inputs, relevantOutputs)
+        .runProcess(process, inputs, relevantOutputs)
         .signAndSend(alice, (result) => {
           logger.debug('result.status %s', JSON.stringify(result.status))
           logger.debug('result.status.isInBlock', result.status.isInBlock)

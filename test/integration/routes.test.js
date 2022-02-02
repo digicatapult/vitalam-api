@@ -386,7 +386,7 @@ describe('routes', function () {
         const key = utf8ToUint8Array('testFile', METADATA_KEY_LENGTH)
         const output = { roles: new Map([[0, USER_ALICE_TOKEN]]), metadata: new Map([[key, { File: base64Metadata }]]) }
 
-        await runProcess([], [output])
+        await runProcess(null, [], [output])
 
         const actualResult = await getItemRoute(app, authToken, { id: lastToken.body.id + 1 })
 
@@ -877,7 +877,7 @@ describe('routes', function () {
         const key = utf8ToUint8Array('testFile', METADATA_KEY_LENGTH)
         const output = { roles: new Map([[0, USER_ALICE_TOKEN]]), metadata: new Map([[key, { File: base64Metadata }]]) }
 
-        await runProcess([], [output])
+        await runProcess(null, [], [output])
 
         const res = await getItemMetadataRoute(app, authToken, { id: lastTokenId + 1, metadataKey: 'testFile' })
 

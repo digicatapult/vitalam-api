@@ -17,8 +17,8 @@ async function findMembers() {
   return getMembersUtil()
 }
 
-async function runProcess(inputs, outputs) {
-  return runProcessUtil(inputs, outputs)
+async function runProcess(process, inputs, outputs) {
+  return runProcessUtil(process, inputs, outputs)
 }
 
 module.exports = {

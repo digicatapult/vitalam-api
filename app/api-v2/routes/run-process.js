@@ -1,6 +1,6 @@
 const logger = require('../../logger')
 const { validateInputIds, processRoles, processMetadata, rolesEnum } = require('../../util/appUtil')
-const { LEGACY_METADATA_KEY } = require('../../env')
+const { LEGACY_METADATA_KEY, PROCESS_IDENTIFIER_LENGTH } = require('../../env')
 
 module.exports = function (apiService) {
   const doc = {
@@ -28,57 +28,84 @@ module.exports = function (apiService) {
       }
 
       const parentIndices = new Set()
-      const outputs = await Promise.all(
-        request.outputs.map(async (output) => {
-          //catch legacy owner
-          if (output.owner) {
-            output.roles = { [rolesEnum[0]]: output.owner }
-          }
-          //catch legacy single metadataFile
-          if (output.metadataFile) {
-            output.metadata = { [LEGACY_METADATA_KEY]: { type: 'FILE', value: output.metadataFile } }
-          }
+      let outputs = null
+      try {
+        outputs = await Promise.all(
+          request.outputs.map(async (output) => {
+            //catch legacy owner
+            if (output.owner) {
+              output.roles = { [rolesEnum[0]]: output.owner }
+            }
+            //catch legacy single metadataFile
+            if (output.metadataFile) {
+              output.metadata = { [LEGACY_METADATA_KEY]: { type: 'FILE', value: output.metadataFile } }
+            }
 
-          if (!output.roles || output.roles.length === 0) {
-            logger.trace(`Request missing roles`)
-            res.status(400).json({ message: `Request missing roles` })
-            return
-          }
-
-          if (`parent_index` in output) {
-            if (output.parent_index < 0 || !(output.parent_index < request.inputs.length)) {
-              logger.trace(`Parent index out of range`)
-              res.status(400).json({ message: `Parent index out of range` })
+            if (!output.roles || output.roles.length === 0) {
+              logger.trace(`Request missing roles`)
+              res.status(400).json({ message: `Request missing roles` })
               return
             }
-            if (parentIndices.has(output.parent_index)) {
-              logger.trace(`Duplicate parent index used`)
-              res.status(400).json({ message: `Duplicate parent index used` })
-              return
-            }
-            parentIndices.add(output.parent_index)
-          }
 
-          return {
-            roles: await processRoles(output.roles),
-            metadata: await processMetadata(output.metadata, req.files),
-            parent_index: output.parent_index,
-          }
-        })
-      ).catch((err) => {
+            if (`parent_index` in output) {
+              if (output.parent_index < 0 || !(output.parent_index < request.inputs.length)) {
+                logger.trace(`Parent index out of range`)
+                res.status(400).json({ message: `Parent index out of range` })
+                return
+              }
+              if (parentIndices.has(output.parent_index)) {
+                logger.trace(`Duplicate parent index used`)
+                res.status(400).json({ message: `Duplicate parent index used` })
+                return
+              }
+              parentIndices.add(output.parent_index)
+            }
+
+            return {
+              roles: await processRoles(output.roles),
+              metadata: await processMetadata(output.metadata, req.files),
+              parent_index: output.parent_index,
+            }
+          })
+        )
+      } catch (err) {
         logger.trace(`Invalid outputs: ${err.message}`)
         res.status(400).json({ message: err.message })
         return
-      })
+      }
+
+      let process = null
+      if (request.process) {
+        const asBuffer = Buffer.from(`${request.process.id}`, 'utf8')
+        if (asBuffer.length > PROCESS_IDENTIFIER_LENGTH) {
+          const message = `Invalid process id: ${request.process.id}`
+          logger.trace(message)
+          res.status(400).json({ message })
+          return
+        }
+        const version = request.process.version
+        const validVersion = Number.isSafeInteger(version) && version < Math.pow(2, 32) && version > 0
+        if (!validVersion) {
+          const message = `Invalid process version: ${request.process.version}`
+          logger.trace(message)
+          res.status(400).json({ message })
+          return
+        }
+        process = {
+          name: asBuffer,
+          version: request.process.version,
+        }
+      }
 
       let result
       try {
-        result = await apiService.runProcess(request.inputs, outputs)
+        result = await apiService.runProcess(process, request.inputs, outputs)
       } catch (err) {
         logger.error(`Unexpected error running process: ${err}`)
         res.status(500).json({
           message: `Unexpected error processing items`,
         })
+        return
       }
 
       res.status(200).json(result)

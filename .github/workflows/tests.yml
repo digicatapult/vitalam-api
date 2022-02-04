@@ -1,11 +1,11 @@
-name: Release
+name: Lint and Test
 
 on:
   push:
-    branches: ['main']
+    branches-ignore: ['main']
 
 jobs:
-  preconditions:
+  repo_ids:
     runs-on: ubuntu-latest
     outputs:
       repo_name: ${{ steps.repo_ids.outputs.REPO_NAME }}
@@ -15,12 +15,6 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Check token
-        run: |
-          if [ -z "${{ secrets.GITHUB_TOKEN }}"]; then
-            echo "Must provide a GITHUB_TOKEN secret in order to run release workflow"
-            exit 1
-          fi
       - name: Get repository identifiers
         id: repo_ids
         run: |
@@ -31,7 +25,7 @@ jobs:
 
   helm-lint:
     runs-on: ubuntu-latest
-    needs: [preconditions]
+    needs: [repo_ids]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -47,11 +41,11 @@ jobs:
       - name: Set up chart-testing
         uses: helm/chart-testing-action@v2.0.1
       - name: Run chart-testing (lint)
-        run: ct lint --validate-maintainers false --charts helm/${{ needs.preconditions.outputs.repo_name }}/ --chart-repos vitalam-node=https://digicatapult.github.io/vitalam-node/, vitalam-ipfs=https://digicatapult.github.io/vitalam-ipfs/
+        run: ct lint --validate-maintainers false --charts helm/${{ needs.repo_ids.outputs.repo_name }}/ --chart-repos vitalam-node=https://digicatapult.github.io/vitalam-node/, vitalam-ipfs=https://digicatapult.github.io/vitalam-ipfs/
 
   helm-test:
     runs-on: ubuntu-latest
-    needs: [preconditions]
+    needs: [repo_ids]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -90,20 +84,19 @@ jobs:
           load: true
           file: ./Dockerfile
           tags: |
-            ${{ needs.preconditions.outputs.repo_name }}:latest
+            ${{ needs.repo_ids.outputs.repo_name }}:latest
           labels: |
-            org.opencontainers.image.title=${{ needs.preconditions.outputs.repo_name }}
+            org.opencontainers.image.title=${{ needs.repo_ids.outputs.repo_name }}
             org.opencontainers.image.description=${{ github.event.repository.description }}
             org.opencontainers.image.source=${{ github.event.repository.html_url }}
             org.opencontainers.image.url=${{ github.event.repository.html_url }}
             org.opencontainers.image.revision=${{ github.sha }}
       - name: Run chart-testing (install)
-        run: ct install  --charts helm/${{ needs.preconditions.outputs.repo_name }}/ --chart-repos vitalam-node=https://digicatapult.github.io/vitalam-node/, vitalam-ipfs=https://digicatapult.github.io/vitalam-ipfs/
+        run: ct install --charts helm/${{ needs.repo_ids.outputs.repo_name }}/ --chart-repos vitalam-node=https://digicatapult.github.io/vitalam-node/, vitalam-ipfs=https://digicatapult.github.io/vitalam-ipfs/
 
   lint:
     name: Run lint
     runs-on: ubuntu-latest
-    needs: [preconditions]
     steps:
       - uses: actions/checkout@master
       - uses: actions/setup-node@master
@@ -126,7 +119,6 @@ jobs:
   dependency-check:
     name: Run dependency check
     runs-on: ubuntu-latest
-    needs: [preconditions]
     steps:
       - uses: actions/checkout@master
       - uses: actions/setup-node@master
@@ -146,10 +138,10 @@ jobs:
         run: npm ci
       - name: Dependency Check
         run: npm run depcheck
+
   tests:
     name: Run tests
     runs-on: ubuntu-latest
-    needs: [preconditions]
     steps:
       - uses: actions/checkout@master
       - uses: actions/setup-node@master
@@ -175,14 +167,10 @@ jobs:
           time: '30s'
       - name: Run tests
         run: npm run test
+
   check-version:
     name: 'Check version'
     runs-on: ubuntu-latest
-    outputs:
-      is_new_version: ${{ steps.get_version.outputs.IS_NEW_VERSION }}
-      version: ${{ steps.get_version.outputs.VERSION }}
-      build_date: ${{ steps.get_version.outputs.BUILD_DATE }}
-      is_prerelease: ${{ steps.get_version.outputs.IS_PRERELEASE }}
 
     steps:
       - uses: actions/checkout@v2
@@ -193,98 +181,7 @@ jobs:
         id: get_version
         run: ./scripts/check-version.sh
         shell: bash
-      - name: Skipping release as version has not increased
-        if: steps.get_version.outputs.IS_NEW_VERSION != 'true'
+      - name: Error if version is not increased
         shell: bash
         run: |
-          echo "Skipping release as current version has already been published"
-
-  publish:
-    name: 'Publish package'
-    needs:
-      - preconditions
-      - helm-lint
-      - helm-test
-      - lint
-      - dependency-check
-      - tests
-      - check-version
-    runs-on: ubuntu-latest
-    if: ${{ needs.check-version.outputs.is_new_version == 'true' }}
-
-    steps:
-      - uses: actions/checkout@v2
-
-      # Docker build
-      - name: Setup QEMU
-        uses: docker/setup-qemu-action@v1
-        with:
-          platforms: all
-      - name: Setup Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v1
-        with:
-          buildkitd-flags: '--debug'
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: $GITHUB_ACTOR
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Publish multi-arch image
-        uses: docker/build-push-action@v2
-        with:
-          push: true
-          builder: ${{ steps.buildx.outputs.name }}
-          context: .
-          file: ./Dockerfile
-          platforms: linux/amd64
-          tags: |
-            ghcr.io/${{ needs.preconditions.outputs.org_name }}/${{ needs.preconditions.outputs.repo_name }}:${{ needs.check-version.outputs.version }}
-            ghcr.io/${{ needs.preconditions.outputs.org_name }}/${{ needs.preconditions.outputs.repo_name }}:latest
-          labels: |
-            org.opencontainers.image.title=${{ needs.preconditions.outputs.repo_name }}
-            org.opencontainers.image.description=${{ github.event.repository.description }}
-            org.opencontainers.image.source=${{ github.event.repository.html_url }}
-            org.opencontainers.image.url=${{ github.event.repository.html_url }}
-            org.opencontainers.image.revision=${{ github.sha }}
-            org.opencontainers.image.version=${{ needs.check-version.outputs.version }}
-            org.opencontainers.image.created=${{ needs.check-version.outputs.build_date }}
-
-      # Publish helm charts
-      - name: Publish Helm charts
-        uses: stefanprodan/helm-gh-pages@master
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          charts_dir: helm
-          helm_version: 3.8.0
-
-      # Build github release
-      - name: Build release version
-        uses: softprops/action-gh-release@v1
-        with:
-          token: '${{ secrets.GITHUB_TOKEN }}'
-          tag_name: ${{ needs.check-version.outputs.version }}
-          prerelease: false
-          name: ${{ needs.check-version.outputs.version }}
-          generate_release_notes: true
-      - name: Delete release latest
-        uses: actions/github-script@v5
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            const { owner, repo } = context.repo
-            try {
-              await github.rest.git.deleteRef({ owner, repo, ref: 'tags/latest' })
-            }
-            catch (err) {
-              if (err.status !== 422) throw err
-            }
-      - name: Build release latest
-        uses: softprops/action-gh-release@v1
-        with:
-          token: '${{ secrets.GITHUB_TOKEN }}'
-          tag_name: latest
-          prerelease: false
-          name: Latest ${{ needs.check-version.outputs.version }}
-          generate_release_notes: true
+          exit $([[ "${{steps.get_version.outputs.IS_NEW_VERSION}}" = "true" ]] && echo 0 || echo 1)

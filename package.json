@@ -21,7 +21,6 @@
     "test": "NODE_ENV=test mocha --config ./test/mocharc.js ./test",
     "test:integration": "NODE_ENV=test mocha --config ./test/mocharc.js ./test/integration",
     "lint": "eslint .",
-    "depcheck": "depcheck",
     "start": "NODE_ENV=production node app/index.js",
     "dev": "NODE_ENV=development nodemon app/index.js | pino-colada",
     "coverage": "LOG_LEVEL=fatal NODE_ENV=development nyc mocha --recursive ./test/integration --timeout 60000 --slow 20000 --exit"
@@ -49,7 +48,6 @@
   },
   "devDependencies": {
     "chai": "^4.3.4",
-    "depcheck": "^1.4.3",
     "eslint": "^7.29.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.0",

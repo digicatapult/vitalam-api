@@ -21,6 +21,7 @@ function check_versions_consistent () {
     echo "HELM_CHART_VERSION: $HELM_CHART_VERSION"
     echo "HELM_CHART_APP_VERSION: $HELM_CHART_APP_VERSION"
     exit 1
+  fi
 }
 
 check_versions_consistent

@@ -18,6 +18,8 @@ npm-debug.log*
 !.vscode/extensions.json
 .idea/
 
+helm/**/*.tgz
+
 # Misc
 .DS_Store
 .env

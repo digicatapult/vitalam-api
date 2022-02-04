@@ -1,0 +1,23 @@
+image:
+  repository: 'vitalam-api'
+  tag: 'latest'
+  PullPolicy: Never
+
+vitalamNode:
+  enabled: false
+
+vitalamIpfs:
+  enabled: true
+  vitalamNode:
+    enabled: true
+    node:
+      chain: dev
+      flags:
+      - "--rpc-external"
+      - "--alice"
+      - "--ws-external"
+      - "--rpc-methods=Unsafe"
+      - "--rpc-cors=all"
+      - "--unsafe-ws-external"
+      - "--unsafe-rpc-external"
+    

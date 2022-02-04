@@ -1,0 +1,34 @@
+# fullNameOverride:
+config:
+  port: 80
+  # externalNodeHost: "" # This overrides vitalamNode.enabled when setting the API_HOST envar
+  logLevel: info
+  accountKey: //Alice
+  # externalIpfsHost: "" # This overrides vitalamIpfs.enabled when setting the IPFS_HOST envar
+  # externalIpfsPort: 5001 # This overrides vitalamIpfs.enabled when setting the IPFS_PORT envar
+  enableLivenessProbe: true
+  auth:
+    jwksUri: https://vitalam.eu.auth0.com/.well-known/jwks.json
+    audience: vitalam-test
+    issuer: https://vitalam.eu.auth0.com/
+    tokenUrl: https://vitalam.eu.auth0.com/oauth/token
+
+ingress:
+  #annotations: {}
+  paths:
+    - /v2
+
+replicaCount: 1
+
+image:
+  repository: ghcr.io/digicatapult/vitalam-api
+  pullPolicy: IfNotPresent
+  tag: 'v2.6.3'
+
+vitalamNode:
+  enabled: false
+
+vitalamIpfs:
+  enabled: true
+  vitalamNode:
+    enabled: true

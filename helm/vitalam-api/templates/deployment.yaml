@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "vitalam-api.fullname" . }}
+  labels:
+    {{- include "vitalam-api.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      name: {{ include "vitalam-api.fullname" . }}
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+      labels:
+        name: {{ include "vitalam-api.fullname" . }}
+    spec:
+      {{- include "vitalam-api.imagePullSecrets" . | indent 6 }}
+      containers:
+        - name: {{ include "vitalam-api.fullname" . }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+          env:
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "vitalam-api.fullname" . }}-config
+                  key: port
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "vitalam-api.fullname" . }}-config
+                  key: logLevel
+            - name: API_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "vitalam-api.fullname" . }}-config
+                  key: nodeHost
+            - name: API_PORT
+              value: "9944"
+            - name: IPFS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "vitalam-api.fullname" . }}-config
+                  key: ipfsHost
+            - name: IPFS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "vitalam-api.fullname" . }}-config
+                  key: ipfsPort
+            - name: AUTH_JWKS_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "vitalam-api.fullname" . }}-config
+                  key: authJwksUri
+            - name: AUTH_AUDIENCE
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "vitalam-api.fullname" . }}-config
+                  key: authAudience
+            - name: AUTH_ISSUER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "vitalam-api.fullname" . }}-config
+                  key: authIssuer
+            - name: AUTH_TOKEN_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "vitalam-api.fullname" . }}-config
+                  key: authTokenUrl
+            - name: USER_URI
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "vitalam-api.fullname" . }}-secret
+                  key: accountKey
+          ports:
+            - containerPort: {{ .Values.config.port }}
+              name: http
+              protocol: TCP
+          {{- if .Values.config.enableLivenessProbe }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            failureThreshold: 5
+            timeoutSeconds: 3
+            periodSeconds: 10
+          {{- end }}

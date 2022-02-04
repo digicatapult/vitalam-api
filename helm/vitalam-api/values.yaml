@@ -14,7 +14,7 @@ config:
     tokenUrl: https://vitalam.eu.auth0.com/oauth/token
 
 ingress:
-  #annotations: {}
+  # annotations: {}
   paths:
     - /v2
 

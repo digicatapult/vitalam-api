@@ -20,4 +20,3 @@ vitalamIpfs:
       - "--rpc-cors=all"
       - "--unsafe-ws-external"
       - "--unsafe-rpc-external"
-    

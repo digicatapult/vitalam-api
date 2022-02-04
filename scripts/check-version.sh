@@ -4,15 +4,23 @@
 set -e
 
 function check_versions_consistent () {
-  local PACKAGE_VERSION=$(jq .version ./package.json | sed 's/"//g')
-  local PACKAGE_LOCK_VERSION=$(jq .version ./package-lock.json | sed 's/"//g')
-
-  if [ "$PACKAGE_VERSION" != "$PACKAGE_LOCK_VERSION" ]; then
+  local PACKAGE_VERSION=$(yq eval '.version' ./package.json)
+  local PACKAGE_LOCK_VERSION=$(yq eval '.version' ./package-lock.json)
+  local HELM_VALUES_TAG_VERSION=$(yq eval '.image.tag' ./helm/vitalam-api/values.yaml)
+  local HELM_CHART_VERSION=$(yq eval '.version' ./helm/vitalam-api/Chart.yaml)
+  local HELM_CHART_APP_VERSION=$(yq eval '.appVersion' ./helm/vitalam-api/Chart.yaml)
+  
+  if [ "$PACKAGE_VERSION" != "$PACKAGE_LOCK_VERSION" ] ||
+     [ "v$PACKAGE_VERSION" != "$HELM_VALUES_TAG_VERSION" ] ||
+     [ "$PACKAGE_VERSION" != "$HELM_CHART_VERSION" ] ||
+     [ "$PACKAGE_VERSION" != "$HELM_CHART_APP_VERSION" ]; then
     echo "Inconsistent versions detected"
     echo "PACKAGE_VERSION: $PACKAGE_VERSION"
     echo "PACKAGE_LOCK_VERSION: $PACKAGE_LOCK_VERSION"
+    echo "HELM_VALUES_TAG_VERSION: $HELM_VALUES_TAG_VERSION"
+    echo "HELM_CHART_VERSION: $HELM_CHART_VERSION"
+    echo "HELM_CHART_APP_VERSION: $HELM_CHART_APP_VERSION"
     exit 1
-  fi
 }
 
 check_versions_consistent
@@ -40,7 +48,7 @@ function check_version_greater () {
 # Get published git tags that match semver regex with a "v" prefix then remove the "v" character
 PUBLISHED_VERSIONS=$(git tag | grep "^v[0-9]\+\.[0-9]\+\.[0-9]\+\(\-[a-zA-Z-]\+\(\.[0-9]\+\)*\)\{0,1\}$" | sed 's/^v\(.*\)$/\1/')
 # Get the current version from node Cargo.toml
-CURRENT_VERSION=$(jq .version ./package.json | sed 's/"//g')
+CURRENT_VERSION=$(yq eval '.version' ./package.json)
 
 if check_version_greater "$CURRENT_VERSION" "$PUBLISHED_VERSIONS"; then
   echo "##[set-output name=VERSION;]v$CURRENT_VERSION"
@@ -48,8 +56,10 @@ if check_version_greater "$CURRENT_VERSION" "$PUBLISHED_VERSIONS"; then
   echo "##[set-output name=IS_NEW_VERSION;]true"
   if [[ $CURRENT_VERSION =~ [-] ]]; then
     echo "##[set-output name=IS_PRERELEASE;]true"
+    echo "##[set-output name=NPM_RELEASE_TAG;]next"
   else
     echo "##[set-output name=IS_PRERELEASE;]false"
+    echo "##[set-output name=NPM_RELEASE_TAG;]latest"
   fi
 else
   echo "##[set-output name=IS_NEW_VERSION;]false"

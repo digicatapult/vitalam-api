@@ -21,7 +21,9 @@ Create chart name and version as used by the chart label.
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" | lower }}
 {{- end }}
 
-
+{{/*
+Template to define the vitalam-node hostname.
+*/}}
 {{- define "vitalam-api.node-host" -}}
   {{- if .Values.config.externalNodeHost -}}
     {{- .Values.config.externalNodeHost -}}

@@ -21,6 +21,19 @@ Create chart name and version as used by the chart label.
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" | lower }}
 {{- end }}
 
+
+{{- define "vitalam-api.node-host" -}}
+  {{- if .Values.config.externalNodeHost -}}
+    {{- .Values.config.externalNodeHost -}}
+  {{- else if .Values.vitalamNode.enabled -}}
+    {{- template "vitalam-node.fullname" .Subcharts.vitalamNode -}}
+  {{- else if .Values.vitalamIpfs.vitalamNode.enabled -}}
+    {{- template "vitalam-ipfs-node.fullname" .Subcharts.vitalamIpfs -}}
+  {{- else }}
+    {{- fail "Must supply either externalNodeHost or enable vitalamNode or vitalamIpfs" -}}
+  {{- end -}}
+{{- end -}}
+
 {{/*
 Selector labels
 */}}

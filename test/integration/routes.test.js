@@ -154,11 +154,7 @@ describe('routes', function () {
         expect(getItemResult.status).to.equal(200)
         expect(getItemResult.body.id).to.equal(lastToken.body.id)
         expect(getItemResult.body.metadata_keys).to.deep.equal(['testFile'])
-
-        const timestamp = getItemResult.body.timestamp
-        expect(moment(timestamp, moment.ISO_8601, true).isValid()).to.be.true
-        let now = new Date().getTime()
-        expect(new Date(timestamp).getTime()).to.be.within(now - 6000, now)
+        expect(moment(getItemResult.body.timestamp, moment.ISO_8601, true).isValid()).to.be.true
       })
 
       test('add item that consumes a parent', async function () {

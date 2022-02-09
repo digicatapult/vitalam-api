@@ -17,6 +17,7 @@ module.exports = function (apiService) {
         const result = await apiService.findItemById(id)
 
         result.metadata_keys = getReadableMetadataKeys(result.metadata)
+        delete result.metadata // raw metadata is unreadable hashes
 
         if (result.id === id) {
           res.status(200).json(result)

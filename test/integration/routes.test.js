@@ -140,7 +140,7 @@ describe('routes', function () {
     })
 
     describe('happy path', function () {
-      test.only('add and get item - single metadata FILE', async function () {
+      test('add and get item - single metadata FILE', async function () {
         const outputs = [
           { roles: defaultRole, metadata: { testFile: { type: 'FILE', value: './test/data/test_file_01.txt' } } },
         ]

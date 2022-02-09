@@ -133,6 +133,7 @@ Gets the item identified by `id`. Item `id`s are returned by [POST /run-process]
     "destroyed_at": 4999, || null, // Nullable<Number>
     "parents": [40, 41], // Array<Number>
     "children": [43, 44] || null // Nullable<Array<Number>>
+    "timestamp": "2022-02-09T10:30:12.003Z" // Date (ISO)
     "metadata_keys": ["metadataKey1", ..."metadataKeyN"] // Array<String>
 }
 ```

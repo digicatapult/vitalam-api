@@ -339,7 +339,8 @@ async function getItem(tokenId) {
     await api.isReady
     const rawItem = await api.query.simpleNftModule.tokensById(tokenId)
     const item = rawItem.toJSON()
-    item.timestamp = getTimestamp(item.created_at)
+    item.timestamp = await getTimestamp(item.created_at)
+
     response = item
   }
 

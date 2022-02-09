@@ -1,8 +1,8 @@
 apiVersion: v2
 name: vitalam-api
-appVersion: '2.7.0'
+appVersion: '2.7.1'
 description: A Helm chart for vitalam-api
-version: '2.7.0'
+version: '2.7.1'
 type: application
 dependencies:
   - name: vitalam-node

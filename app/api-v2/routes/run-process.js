@@ -1,5 +1,5 @@
 const logger = require('../../logger')
-const { validateInputIds, processRoles, processMetadata, rolesEnum } = require('../../util/appUtil')
+const { validateInputIds, processRoles, processMetadata, rolesEnum, validateProcess } = require('../../util/appUtil')
 const { LEGACY_METADATA_KEY, PROCESS_IDENTIFIER_LENGTH } = require('../../env')
 
 module.exports = function (apiService) {
@@ -91,9 +91,12 @@ module.exports = function (apiService) {
           res.status(400).json({ message })
           return
         }
-        process = {
-          name: asBuffer,
-          version: request.process.version,
+
+        try {
+          process = await validateProcess(request.process.id, version)
+        } catch (err) {
+          res.status(400).json({ message: err.message })
+          return
         }
       }
 

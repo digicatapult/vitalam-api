@@ -5,97 +5,28 @@ const BASE58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
 const bs58 = require('base-x')(BASE58)
 const fetch = require('node-fetch')
 const FormData = require('form-data')
-const { ApiPromise, WsProvider, Keyring } = require('@polkadot/api')
+const jwksRsa = require('jwks-rsa')
+const { Keyring } = require('@polkadot/api')
 const jwt = require('jsonwebtoken')
 const {
-  API_HOST,
-  API_PORT,
   USER_URI,
   IPFS_HOST,
   IPFS_PORT,
   METADATA_KEY_LENGTH,
   METADATA_VALUE_LITERAL_LENGTH,
-  PROCESS_IDENTIFIER_LENGTH,
   MAX_METADATA_COUNT,
   AUTH_AUDIENCE,
   AUTH_JWKS_URI,
   AUTH_ISSUER,
+  PROCESS_IDENTIFIER_LENGTH,
 } = require('../env')
 const logger = require('../logger')
-const jwksRsa = require('jwks-rsa')
-
-const provider = new WsProvider(`ws://${API_HOST}:${API_PORT}`)
-const apiOptions = {
-  provider,
+const {
+  substrateApi: api,
   types: {
-    Address: 'MultiAddress',
-    LookupSource: 'MultiAddress',
-    PeerId: 'Vec<u8>',
-    Key: 'Vec<u8>',
-    TokenId: 'u128',
-    RoleKey: 'Role',
-    TokenMetadataKey: `[u8; ${METADATA_KEY_LENGTH}]`,
-    TokenMetadataValue: 'MetadataValue',
-    Token: {
-      id: 'TokenId',
-      original_id: 'TokenId',
-      roles: 'BTreeMap<RoleKey, AccountId>',
-      creator: 'AccountId',
-      created_at: 'BlockNumber',
-      destroyed_at: 'Option<BlockNumber>',
-      metadata: 'BTreeMap<TokenMetadataKey, TokenMetadataValue>',
-      parents: 'Vec<TokenId>',
-      children: 'Option<Vec<TokenId>>',
-    },
-    ProcessIO: {
-      roles: 'BTreeMap<RoleKey, AccountId>',
-      metadata: 'BTreeMap<TokenMetadataKey, TokenMetadataValue>',
-      parent_index: 'Option<u32>',
-    },
-    MetadataValue: {
-      _enum: {
-        File: 'Hash',
-        Literal: `[u8; ${METADATA_VALUE_LITERAL_LENGTH}]`,
-        TokenId: 'TokenId',
-        None: null,
-      },
-    },
-    Role: {
-      _enum: ['Owner', 'Customer', 'AdditiveManufacturer', 'Laboratory', 'Buyer', 'Supplier', 'Reviewer'],
-    },
-    ProcessIdentifier: `[u8; ${PROCESS_IDENTIFIER_LENGTH}]`,
-    ProcessVersion: 'u32',
-    ProcessId: {
-      id: 'ProcessIdentifier',
-      version: 'ProcessVersion',
-    },
-    Process: {
-      status: 'ProcessStatus',
-      restrictions: 'Vec<Restriction>',
-    },
-    ProcessStatus: {
-      _enum: ['Disabled', 'Enabled'],
-    },
-    Restriction: {
-      _enum: ['None', 'SenderOwnsAllInputs'],
-    },
+    Role: { _enum: rolesEnum },
   },
-}
-const rolesEnum = apiOptions.types.Role._enum
-
-const api = new ApiPromise(apiOptions)
-
-api.on('disconnected', () => {
-  logger.warn(`Disconnected from substrate node at ${API_HOST}:${API_PORT}`)
-})
-
-api.on('connected', () => {
-  logger.info(`Connected to substrate node at ${API_HOST}:${API_PORT}`)
-})
-
-api.on('error', (err) => {
-  logger.error(`Error from substrate node connection. Error was ${err.message || JSON.stringify(err)}`)
-})
+} = require('./substrateApi')
 
 async function addFile(file) {
   logger.debug('Uploading file %s', file.originalname)
@@ -215,6 +146,25 @@ const processFile = async (value, files) => {
 
   const filestoreResponse = await addFile(file)
   return { File: filestoreResponse }
+}
+
+const validateProcess = async (id, version) => {
+  await api.isReady
+
+  const processId = utf8ToHex(id, PROCESS_IDENTIFIER_LENGTH)
+  const process = await api.query.processValidation.processModel(processId, version)
+
+  // check if process is valid
+  if (!process) {
+    throw new Error(`Process ${id} version ${version} does not exist`)
+  } else if (!process.status.isEnabled) {
+    throw new Error(`Process ${id} version ${version} has been disabled`)
+  }
+
+  return {
+    id: processId,
+    version,
+  }
 }
 
 const utf8ToUint8Array = (str, len) => {
@@ -574,4 +524,5 @@ module.exports = {
   containsInvalidMembershipRoles,
   getMetadataResponse,
   verifyJwks,
+  validateProcess,
 }

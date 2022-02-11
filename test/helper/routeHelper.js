@@ -56,6 +56,10 @@ async function addFileRouteLegacy(file) {
 }
 
 async function postRunProcess(app, authToken, inputs, outputs) {
+  return postRunProcessWithProcess(app, authToken, null, inputs, outputs)
+}
+
+async function postRunProcessWithProcess(app, authToken, process, inputs, outputs) {
   let req = request(app)
     .post(`/${API_MAJOR_VERSION}/run-process`)
     .set('Accept', 'application/json')
@@ -64,6 +68,7 @@ async function postRunProcess(app, authToken, inputs, outputs) {
     .field(
       'request',
       JSON.stringify({
+        process,
         inputs,
         outputs,
       })
@@ -196,6 +201,7 @@ module.exports = {
   healthCheck,
   getAuthTokenRoute,
   postRunProcess,
+  postRunProcessWithProcess,
   postRunProcessNoFileAttach,
   addFileRoute,
   addFileRouteLegacy,

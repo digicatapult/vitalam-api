@@ -1,6 +1,5 @@
-/* eslint-disable */
 const createJWKSMock = require('mock-jwks').default
-const { describe, test, before } = require('mocha')
+const { describe, test, before, after, afterEach } = require('mocha')
 const { expect } = require('chai')
 const nock = require('nock')
 const moment = require('moment')
@@ -388,7 +387,7 @@ describe('routes', function () {
 
         await runProcess(null, [], [output])
 
-        const actualResult = await getItemRoute(app, authToken, { id: lastToken.body.id + 1 })
+        await getItemRoute(app, authToken, { id: lastToken.body.id + 1 })
 
         const res = await getItemMetadataRoute(app, authToken, { id: lastTokenId + 1, metadataKey: 'testFile' })
 
@@ -777,12 +776,6 @@ describe('routes', function () {
         ]
         await postRunProcess(app, authToken, [], outputs)
 
-        const ignoredOutputs = [
-          {
-            roles: defaultRole,
-            metadata: { testNone: { type: 'NONE' } },
-          },
-        ]
         const actualResult = await postRunProcess(app, authToken, [lastTokenId + 1], outputs)
 
         expect(actualResult.status).to.equal(400)

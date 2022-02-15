@@ -15,6 +15,7 @@ config:
 
 ingress:
   # annotations: {}
+  # className: ""
   paths:
     - /v2
 
@@ -23,7 +24,7 @@ replicaCount: 1
 image:
   repository: ghcr.io/digicatapult/vitalam-api
   pullPolicy: IfNotPresent
-  tag: 'v2.8.1'
+  tag: 'v2.8.2'
 
 vitalamNode:
   enabled: false

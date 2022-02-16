@@ -28,6 +28,7 @@ const vars = envalid.cleanEnv(process.env, {
   API_VERSION: envalid.str({ default: version }),
   API_MAJOR_VERSION: envalid.str({ default: 'v2' }),
   FILE_UPLOAD_MAX_SIZE: envalid.num({ default: 200 * 1024 * 1024 }),
+  PROCESS_IDENTIFIER_LENGTH: envalid.num({ default: 32 }),
 })
 
 module.exports = {

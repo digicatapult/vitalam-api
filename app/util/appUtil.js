@@ -19,6 +19,7 @@ const {
   AUTH_AUDIENCE,
   AUTH_JWKS_URI,
   AUTH_ISSUER,
+  PROCESS_IDENTIFIER_LENGTH,
 } = require('../env')
 const logger = require('../logger')
 const jwksRsa = require('jwks-rsa')
@@ -46,7 +47,7 @@ const apiOptions = {
       parents: 'Vec<TokenId>',
       children: 'Option<Vec<TokenId>>',
     },
-    Output: {
+    ProcessIO: {
       roles: 'BTreeMap<RoleKey, AccountId>',
       metadata: 'BTreeMap<TokenMetadataKey, TokenMetadataValue>',
       parent_index: 'Option<u32>',
@@ -56,13 +57,31 @@ const apiOptions = {
         File: 'Hash',
         Literal: `[u8; ${METADATA_VALUE_LITERAL_LENGTH}]`,
         TokenId: 'TokenId',
-        None: null,
+        None: 'null',
       },
     },
     Role: {
       // order must match node as values are referenced by index. First entry is default.
       _enum: ['Owner', 'Customer', 'AdditiveManufacturer', 'Laboratory', 'Buyer', 'Supplier', 'Reviewer'],
     },
+    ProcessIdentifier: `[u8; ${PROCESS_IDENTIFIER_LENGTH}]`,
+    ProcessVersion: 'u32',
+    ProcessId: {
+      id: 'ProcessIdentifier',
+      version: 'ProcessVersion',
+    },
+    Process: {
+      status: 'ProcessStatus',
+      restrictions: 'Vec<Restriction>',
+    },
+    ProcessStatus: {
+      _enum: ['Disabled', 'Enabled'],
+    },
+    Restriction: {
+      _enum: ['None', 'SenderOwnsAllInputs'],
+    },
+    IsNew: 'bool',
+    Restrictions: 'Vec<Restriction>',
   },
 }
 const rolesEnum = apiOptions.types.Role._enum

@@ -47,7 +47,7 @@ const apiOptions = {
       parents: 'Vec<TokenId>',
       children: 'Option<Vec<TokenId>>',
     },
-    ProcessIO: {
+    Output: {
       roles: 'BTreeMap<RoleKey, AccountId>',
       metadata: 'BTreeMap<TokenMetadataKey, TokenMetadataValue>',
       parent_index: 'Option<u32>',
@@ -57,7 +57,7 @@ const apiOptions = {
         File: 'Hash',
         Literal: `[u8; ${METADATA_VALUE_LITERAL_LENGTH}]`,
         TokenId: 'TokenId',
-        None: 'null',
+        None: null,
       },
     },
     Role: {

@@ -1,9 +1,9 @@
 dependencies:
 - name: vitalam-node
   repository: https://digicatapult.github.io/vitalam-node/
-  version: 0.23.5
+  version: 0.24.1
 - name: vitalam-ipfs
   repository: https://digicatapult.github.io/vitalam-ipfs/
-  version: 1.2.3
-digest: sha256:10e37ea698e3e4362c651a4654d00f4f8352062f6a20adc3154ffeadac6ac4ea
-generated: "2022-02-04T13:31:35.721791Z"
+  version: 1.2.6
+digest: sha256:b8905ee76b92652fa5679d9985733cd95c4e8bfca35fc4a94863a9ecd92f8894
+generated: "2022-02-15T11:16:14.467211Z"

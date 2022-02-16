@@ -72,6 +72,7 @@ The following environment variables are used by `vitalam-api` and can be configu
 | API_VERSION                   |    N     |                          -                          | API version                                                                                                  |
 | API_MAJOR_VERSION             |    N     |                          -                          | API major version                                                                                            |
 | FILE_UPLOAD_MAX_SIZE          |    N     |                          -                          | The Maximum file upload size (bytes)                                                                         |
+| PROCESS_IDENTIFIER_LENGTH     |    N     |                        `32`                         | Process ID Length                                                                                            |
 
 ## Running the API
 

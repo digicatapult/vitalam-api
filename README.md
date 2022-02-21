@@ -52,26 +52,26 @@ npm run test:integration
 
 The following environment variables are used by `vitalam-api` and can be configured. Entries marked as `required` are needed when running `vitalam-api` in production mode.
 
-| variable                      | required | default | description                                                                                                          |
-| :---------------------------- | :------: | :-----: | :------------------------------------------------------------------------------------------------------------------- |
-| PORT                          |    N     | `3001`  | The port for the API to listen on                                                                                    |
-| API_HOST                      |    Y     |    -    | The hostname of the `vitalam-node` the API should connect to                                                         |
-| API_PORT                      |    N     | `9944`  | The port of the `vitalam-node` the API should connect to                                                             |
-| LOG_LEVEL                     |    N     | `info`  | Logging level. Valid values are [`trace`, `debug`, `info`, `warn`, `error`, `fatal`]                                 |
-| USER_URI                      |    Y     |    -    | The Substrate `URI` representing the private key to use when making `vitalam-node` transactions                      |
-| IPFS_HOST                     |    Y     |    -    | Hostname of the `IPFS` node to use for metadata storage                                                              |
-| IPFS_PORT                     |    N     | `15001` | Port of the `IPFS` node to use for metadata storage                                                                  |
-| AUTH_JWKS_URI                 |    Y     |    -    | JSON Web Key Set containing public keys used by the Auth0 API e.g. `https://test.eu.auth0.com/.well-known/jwks.json` |
-| AUTH_AUDIENCE                 |    Y     |    -    | Identifier of the Auth0 API                                                                                          |
-| AUTH_ISSUER                   |    Y     |    -    | Domain of the Auth0 API e.g. `https://test.eu.auth0.com/`                                                            |
-| AUTH_TOKEN_URL                |    Y     |    -    | Auth0 API endpoint that issues an Authorisation (Bearer) access token e.g. `https://test.auth0.com/oauth/token`      |
-| LEGACY_METADATA_KEY           |    N     |   ''    | Key given to token metadata posted without a key (such as when posted using the legacy `metadataFile` field)         |
-| METADATA_KEY_LENGTH           |    N     |  `32`   | Fixed length of metadata keys                                                                                        |
-| METADATA_VALUE_LITERAL_LENGTH |    N     |  `32`   | Fixed length of metadata LITERAL values                                                                              |
-| MAX_METADATA_COUNT            |    N     |  `16`   | Maximum number of metadata items allowed per token                                                                   |
-| API_VERSION                   |    N     |    -    | API version                                                                                                          |
-| API_MAJOR_VERSION             |    N     |    -    | API major version                                                                                                    |
-| FILE_UPLOAD_MAX_SIZE          |    N     |    -    | The Maximum file upload size (bytes)                                                                                 |
+| variable                      | required |                       default                       | description                                                                                                  |
+| :---------------------------- | :------: | :-------------------------------------------------: | :----------------------------------------------------------------------------------------------------------- |
+| PORT                          |    N     |                       `3001`                        | The port for the API to listen on                                                                            |
+| API_HOST                      |    Y     |                          -                          | The hostname of the `vitalam-node` the API should connect to                                                 |
+| API_PORT                      |    N     |                       `9944`                        | The port of the `vitalam-node` the API should connect to                                                     |
+| LOG_LEVEL                     |    N     |                       `info`                        | Logging level. Valid values are [`trace`, `debug`, `info`, `warn`, `error`, `fatal`]                         |
+| USER_URI                      |    Y     |                          -                          | The Substrate `URI` representing the private key to use when making `vitalam-node` transactions              |
+| IPFS_HOST                     |    Y     |                          -                          | Hostname of the `IPFS` node to use for metadata storage                                                      |
+| IPFS_PORT                     |    N     |                       `15001`                       | Port of the `IPFS` node to use for metadata storage                                                          |
+| AUTH_JWKS_URI                 |    N     | `https://inteli.eu.auth0.com/.well-known/jwks.json` | JSON Web Key Set containing public keys used by the Auth0 API                                                |
+| AUTH_AUDIENCE                 |    N     |                    `inteli-dev`                     | Identifier of the Auth0 API                                                                                  |
+| AUTH_ISSUER                   |    N     |           `https://inteli.eu.auth0.com/`            | Domain of the Auth0 API `                                                                                    |
+| AUTH_TOKEN_URL                |    N     |      `https://inteli.eu.auth0.com/oauth/token`      | Auth0 API endpoint that issues an Authorisation (Bearer) access token                                        |
+| LEGACY_METADATA_KEY           |    N     |                         ''                          | Key given to token metadata posted without a key (such as when posted using the legacy `metadataFile` field) |
+| METADATA_KEY_LENGTH           |    N     |                        `32`                         | Fixed length of metadata keys                                                                                |
+| METADATA_VALUE_LITERAL_LENGTH |    N     |                        `32`                         | Fixed length of metadata LITERAL values                                                                      |
+| MAX_METADATA_COUNT            |    N     |                        `16`                         | Maximum number of metadata items allowed per token                                                           |
+| API_VERSION                   |    N     |                          -                          | API version                                                                                                  |
+| API_MAJOR_VERSION             |    N     |                          -                          | API major version                                                                                            |
+| FILE_UPLOAD_MAX_SIZE          |    N     |                          -                          | The Maximum file upload size (bytes)                                                                         |
 
 ## Running the API
 

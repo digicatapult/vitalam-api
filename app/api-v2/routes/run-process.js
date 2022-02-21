@@ -43,20 +43,17 @@ module.exports = function (apiService) {
 
             if (!output.roles || output.roles.length === 0) {
               logger.trace(`Request missing roles`)
-              res.status(400).json({ message: `Request missing roles` })
-              return
+              throw new Error(`Request missing roles`)
             }
 
             if (`parent_index` in output) {
               if (output.parent_index < 0 || !(output.parent_index < request.inputs.length)) {
                 logger.trace(`Parent index out of range`)
-                res.status(400).json({ message: `Parent index out of range` })
-                return
+                throw new Error(`Parent index out of range`)
               }
               if (parentIndices.has(output.parent_index)) {
                 logger.trace(`Duplicate parent index used`)
-                res.status(400).json({ message: `Duplicate parent index used` })
-                return
+                throw new Error(`Duplicate parent index used`)
               }
               parentIndices.add(output.parent_index)
             }

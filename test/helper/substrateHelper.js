@@ -4,7 +4,7 @@ const { substrateApi: api } = require('../../app/util/substrateApi')
 
 const { PROCESS_IDENTIFIER_LENGTH } = require('../../app/env')
 
-const withNewTestProcess = (context) => {
+const withNewTestProcess = (process) => {
   const processStr = 'test-process'
   const buffer = Buffer.alloc(PROCESS_IDENTIFIER_LENGTH)
   buffer.write(processStr)
@@ -16,7 +16,7 @@ const withNewTestProcess = (context) => {
     const keyring = new Keyring({ type: 'sr25519' })
     const sudo = keyring.addFromUri('//Alice')
 
-    const process = await new Promise((resolve) => {
+    const newProcess = await new Promise((resolve) => {
       let unsub = null
       api.tx.sudo
         .sudo(api.tx.processValidation.createProcess(processId, []))
@@ -25,21 +25,21 @@ const withNewTestProcess = (context) => {
             const { event } = result.events.find(({ event: { method } }) => method === 'ProcessCreated')
 
             const data = event.data
-            const process = {
+            const newProcess = {
               id: processStr,
               version: data[1].toNumber(),
             }
 
             unsub()
-            resolve(process)
+            resolve(newProcess)
           }
         })
         .then((res) => {
           unsub = res
         })
     })
-    processVersion = process.version
-    context.process = process
+    processVersion = newProcess.version
+    Object.assign(process, newProcess)
   })
 
   after(async function () {

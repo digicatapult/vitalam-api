@@ -153,9 +153,10 @@ const validateProcess = async (id, version) => {
 
   const processId = utf8ToHex(id, PROCESS_IDENTIFIER_LENGTH)
   const process = await api.query.processValidation.processModel(processId, version)
+  const processVersion = await api.query.processValidation.versionModel(processId)
 
   // check if process is valid
-  if (!process) {
+  if (processVersion < version) {
     throw new Error(`Process ${id} version ${version} does not exist`)
   } else if (!process.status.isEnabled) {
     throw new Error(`Process ${id} version ${version} has been disabled`)

@@ -9,6 +9,7 @@ const {
   healthCheck,
   getAuthTokenRoute,
   postRunProcess,
+  postRunProcessWithProcess,
   postRunProcessNoFileAttach,
   getItemRoute,
   getItemMetadataRoute,
@@ -18,6 +19,7 @@ const {
   addFileRouteLegacy,
   getMembersRoute,
 } = require('../helper/routeHelper')
+const { withNewTestProcess } = require('../helper/substrateHelper')
 const USER_ALICE_TOKEN = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY'
 const ALICE_STASH = '5GNJqTPyNqANBkUVMN1LPPrxXnFouWXoe2wNSmmEoLctxiZY'
 const USER_BOB_TOKEN = '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'
@@ -34,6 +36,7 @@ const {
   METADATA_VALUE_LITERAL_LENGTH,
   MAX_METADATA_COUNT,
   API_VERSION,
+  PROCESS_IDENTIFIER_LENGTH,
 } = require('../../app/env')
 
 const BASE58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
@@ -122,6 +125,7 @@ describe('routes', function () {
     let app
     let jwksMock
     let authToken
+    const process = {}
 
     before(async function () {
       app = await createHttpServer()
@@ -137,6 +141,8 @@ describe('routes', function () {
     after(async function () {
       await jwksMock.stop()
     })
+
+    withNewTestProcess(process)
 
     describe('happy path', function () {
       test('add and get item - single metadata FILE', async function () {
@@ -497,6 +503,24 @@ describe('routes', function () {
 
         expect(res.body).deep.equal(expectedResult)
       })
+
+      test('with named process', async function () {
+        const outputs = [
+          { roles: defaultRole, metadata: { testFile: { type: 'FILE', value: './test/data/test_file_01.txt' } } },
+        ]
+        const runProcessResult = await postRunProcessWithProcess(app, authToken, process, [], outputs)
+
+        expect(runProcessResult.status).to.equal(200)
+        expect(runProcessResult.body).to.have.length(1)
+
+        const tokenId = { id: runProcessResult.body[0] }
+
+        const getItemResult = await getItemRoute(app, authToken, tokenId)
+        expect(getItemResult.status).to.equal(200)
+        expect(getItemResult.body.id).to.equal(tokenId.id)
+        expect(getItemResult.body.metadata_keys).to.deep.equal(['testFile'])
+        expect(moment(getItemResult.body.timestamp, moment.ISO_8601, true).isValid()).to.be.true
+      })
     })
 
     describe('invalid requests', function () {
@@ -827,6 +851,129 @@ describe('routes', function () {
         const runProcessResult = await postRunProcess(app, authToken, [], outputs)
         expect(runProcessResult.status).to.equal(400)
         expect(runProcessResult.body.message).to.contain('role')
+      })
+
+      test("process version that doesn't exist", async function () {
+        const outputs = [
+          { roles: defaultRole, metadata: { testFile: { type: 'FILE', value: './test/data/test_file_01.txt' } } },
+        ]
+        const version = process.version + 1
+        const runProcessResult = await postRunProcessWithProcess(
+          app,
+          authToken,
+          {
+            id: process.id,
+            version,
+          },
+          [],
+          outputs
+        )
+
+        expect(runProcessResult.status).to.equal(400)
+        expect(runProcessResult.body.message).to.equal(`Process ${process.id} version ${version} does not exist`)
+      })
+
+      test("process name that doesn't exist", async function () {
+        const outputs = [
+          { roles: defaultRole, metadata: { testFile: { type: 'FILE', value: './test/data/test_file_01.txt' } } },
+        ]
+        const runProcessResult = await postRunProcessWithProcess(
+          app,
+          authToken,
+          {
+            id: 'not-a-process',
+            version: process.version,
+          },
+          [],
+          outputs
+        )
+
+        expect(runProcessResult.status).to.equal(400)
+        expect(runProcessResult.body.message).to.equal(
+          `Process not-a-process version ${process.version} does not exist`
+        )
+      })
+
+      test('process name that is too long', async function () {
+        const outputs = [
+          { roles: defaultRole, metadata: { testFile: { type: 'FILE', value: './test/data/test_file_01.txt' } } },
+        ]
+        const id = Array(PROCESS_IDENTIFIER_LENGTH + 1)
+          .fill('a')
+          .join('')
+        const runProcessResult = await postRunProcessWithProcess(
+          app,
+          authToken,
+          {
+            id,
+            version: process.version,
+          },
+          [],
+          outputs
+        )
+
+        expect(runProcessResult.status).to.equal(400)
+        expect(runProcessResult.body.message).to.equal(`Invalid process id: ${id}`)
+      })
+
+      test("process version that isn't a number", async function () {
+        const outputs = [
+          { roles: defaultRole, metadata: { testFile: { type: 'FILE', value: './test/data/test_file_01.txt' } } },
+        ]
+        const version = null
+        const runProcessResult = await postRunProcessWithProcess(
+          app,
+          authToken,
+          {
+            id: process.id,
+            version,
+          },
+          [],
+          outputs
+        )
+
+        expect(runProcessResult.status).to.equal(400)
+        expect(runProcessResult.body.message).to.equal(`Invalid process version: ${version}`)
+      })
+
+      test("process version that isn't an integer", async function () {
+        const outputs = [
+          { roles: defaultRole, metadata: { testFile: { type: 'FILE', value: './test/data/test_file_01.txt' } } },
+        ]
+        const version = 3.14
+        const runProcessResult = await postRunProcessWithProcess(
+          app,
+          authToken,
+          {
+            id: process.id,
+            version,
+          },
+          [],
+          outputs
+        )
+
+        expect(runProcessResult.status).to.equal(400)
+        expect(runProcessResult.body.message).to.equal(`Invalid process version: ${version}`)
+      })
+
+      test("process version that isn't a 32bit integer", async function () {
+        const outputs = [
+          { roles: defaultRole, metadata: { testFile: { type: 'FILE', value: './test/data/test_file_01.txt' } } },
+        ]
+        const version = Number.MAX_SAFE_INTEGER
+        const runProcessResult = await postRunProcessWithProcess(
+          app,
+          authToken,
+          {
+            id: process.id,
+            version,
+          },
+          [],
+          outputs
+        )
+
+        expect(runProcessResult.status).to.equal(400)
+        expect(runProcessResult.body.message).to.equal(`Invalid process version: ${version}`)
       })
     })
 

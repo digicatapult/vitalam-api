@@ -65,10 +65,14 @@ const apiOptions = {
         None: '()',
         SenderOwnsAllInputs: '()',
         FixedNumberOfInputs: 'FixedNumberOfInputsRestriction',
+        FixedNumberOfOutputs: 'FixedNumberOfOutputsRestriction',
       },
     },
     FixedNumberOfInputsRestriction: {
       num_inputs: 'u32',
+    },
+    FixedNumberOfOutputsRestriction: {
+      num_outputs: 'u32',
     },
     IsNew: 'bool',
     Restrictions: 'Vec<Restriction>',

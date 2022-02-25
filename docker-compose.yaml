@@ -7,7 +7,7 @@ services:
       - 8080:8080
       - 5001:5001
   vitalam-node:
-    image: ghcr.io/digicatapult/vitalam-node:v2.10.0
+    image: ghcr.io/digicatapult/vitalam-node:v2.11.0
     command:
       --base-path /data/
       --dev

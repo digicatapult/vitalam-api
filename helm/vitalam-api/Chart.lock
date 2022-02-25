@@ -4,6 +4,6 @@ dependencies:
   version: 0.24.1
 - name: vitalam-ipfs
   repository: https://digicatapult.github.io/vitalam-ipfs/
-  version: 1.2.10
-digest: sha256:e731ebcc90e7e99012ad8145307396621bc741e52a7f3304a679398762dc5325
-generated: "2022-02-25T11:35:18.337757Z"
+  version: 1.2.11
+digest: sha256:3fe224a5fa7a545a41c350f321ab50654a7e061d3e1add3dc465ae79843a0fae
+generated: "2022-02-25T15:28:49.451887Z"

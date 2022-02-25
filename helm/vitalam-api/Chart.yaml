@@ -1,8 +1,8 @@
 apiVersion: v2
 name: vitalam-api
-appVersion: '2.9.1'
+appVersion: '2.9.2'
 description: A Helm chart for vitalam-api
-version: '2.9.1'
+version: '2.9.2'
 type: application
 dependencies:
   - name: vitalam-node
@@ -11,7 +11,7 @@ dependencies:
     condition: vitalamNode.enabled
     alias: vitalamNode
   - name: vitalam-ipfs
-    version: '1.2.10'
+    version: '1.2.11'
     repository: https://digicatapult.github.io/vitalam-ipfs/
     condition: vitalamIpfs.enabled
     alias: vitalamIpfs

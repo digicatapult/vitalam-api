@@ -9,8 +9,8 @@ const bodyParser = require('body-parser')
 const compression = require('compression')
 const { PORT, API_VERSION, API_MAJOR_VERSION } = require('./env')
 const logger = require('./logger')
-const v2ApiDoc = require('./api-v2/api-doc')
-const v2ApiService = require('./api-v2/services/apiService')
+const apiDoc = require('./api-v3/api-doc')
+const apiService = require('./api-v3/services/apiService')
 const { verifyJwks } = require('./util/appUtil')
 
 async function createHttpServer() {
@@ -37,7 +37,7 @@ async function createHttpServer() {
   const multerStorage = multer.diskStorage({})
   initialize({
     app,
-    apiDoc: v2ApiDoc,
+    apiDoc: apiDoc,
     consumesMiddleware: {
       'multipart/form-data': function (req, res, next) {
         multer({ storage: multerStorage }).any()(req, res, function (err) {
@@ -52,7 +52,7 @@ async function createHttpServer() {
       },
     },
     dependencies: {
-      apiService: v2ApiService,
+      apiService: apiService,
     },
     paths: [path.resolve(__dirname, `api-${API_MAJOR_VERSION}/routes`)],
   })

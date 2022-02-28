@@ -17,14 +17,14 @@ ingress:
   # annotations: {}
   # className: ""
   paths:
-    - /v2
+    - /v3
 
 replicaCount: 1
 
 image:
   repository: ghcr.io/digicatapult/vitalam-api
   pullPolicy: IfNotPresent
-  tag: 'v2.9.2'
+  tag: 'v3.0.0'
 
 vitalamNode:
   enabled: false

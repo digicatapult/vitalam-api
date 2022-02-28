@@ -13,10 +13,8 @@ const {
   postRunProcessNoFileAttach,
   getItemRoute,
   getItemMetadataRoute,
-  getItemMetadataRouteLegacy,
   getLastTokenIdRoute,
   addFileRoute,
-  addFileRouteLegacy,
   getMembersRoute,
 } = require('../helper/routeHelper')
 const { withNewTestProcess } = require('../helper/substrateHelper')
@@ -31,7 +29,6 @@ const {
   AUTH_TOKEN_URL,
   AUTH_ISSUER,
   AUTH_AUDIENCE,
-  LEGACY_METADATA_KEY,
   METADATA_KEY_LENGTH,
   METADATA_VALUE_LITERAL_LENGTH,
   MAX_METADATA_COUNT,
@@ -974,56 +971,6 @@ describe('routes', function () {
 
         expect(runProcessResult.status).to.equal(400)
         expect(runProcessResult.body.message).to.equal(`Invalid process version: ${version}`)
-      })
-    })
-
-    describe('legacy', function () {
-      test('run-process creating one token - legacy metadataFile + owner in request and metadata route', async function () {
-        const lastToken = await getLastTokenIdRoute(app, authToken)
-        const lastTokenId = lastToken.body.id
-
-        let expectedResult = [lastTokenId + 1]
-
-        const outputs = [{ owner: USER_ALICE_TOKEN, metadataFile: './test/data/test_file_04.txt' }]
-        const actualResult = await postRunProcess(app, authToken, [], outputs)
-
-        expect(actualResult.status).to.equal(200)
-        expect(actualResult.body).to.deep.equal(expectedResult)
-
-        const item = await getItemRoute(app, authToken, { id: lastTokenId + 1 })
-
-        expectedResult = {
-          id: lastTokenId + 1,
-          creator: USER_ALICE_TOKEN,
-          roles: { [rolesEnum[0]]: USER_ALICE_TOKEN },
-          parents: [],
-          children: null,
-          metadata_keys: [LEGACY_METADATA_KEY],
-        }
-        assertItem(item.body, expectedResult)
-
-        const itemMetadata = await getItemMetadataRouteLegacy(app, authToken, {
-          id: lastTokenId + 1,
-        })
-        expect(itemMetadata.body.toString('utf8')).equal('This is the fourth test file...\n')
-      })
-
-      test('get item metadata - direct add file (addFileRouteLegacy)', async function () {
-        const lastToken = await getLastTokenIdRoute(app, authToken)
-        const lastTokenId = lastToken.body.id
-        const { Hash: base58Metadata } = await addFileRouteLegacy('./test/data/test_file_01.txt')
-        const base64Metadata = `0x${bs58.decode(base58Metadata).toString('hex').slice(4)}`
-
-        const key = utf8ToUint8Array('testFile', METADATA_KEY_LENGTH)
-        const output = { roles: new Map([[0, USER_ALICE_TOKEN]]), metadata: new Map([[key, { File: base64Metadata }]]) }
-
-        await runProcess(null, [], [output])
-
-        const res = await getItemMetadataRoute(app, authToken, { id: lastTokenId + 1, metadataKey: 'testFile' })
-
-        expect(res.body.toString('utf8')).equal('This is the first test file...\n')
-        expect(res.header['content-disposition']).equal('attachment; filename="metadata"')
-        expect(res.header['content-type']).equal('application/octet-stream')
       })
     })
   })

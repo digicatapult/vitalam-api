@@ -1,6 +1,6 @@
 const logger = require('../../logger')
-const { validateInputIds, processRoles, processMetadata, rolesEnum, validateProcess } = require('../../util/appUtil')
-const { LEGACY_METADATA_KEY, PROCESS_IDENTIFIER_LENGTH } = require('../../env')
+const { validateInputIds, processRoles, processMetadata, validateProcess } = require('../../util/appUtil')
+const { PROCESS_IDENTIFIER_LENGTH } = require('../../env')
 
 module.exports = function (apiService) {
   const doc = {
@@ -32,15 +32,6 @@ module.exports = function (apiService) {
       try {
         outputs = await Promise.all(
           request.outputs.map(async (output) => {
-            //catch legacy owner
-            if (output.owner) {
-              output.roles = { [rolesEnum[0]]: output.owner }
-            }
-            //catch legacy single metadataFile
-            if (output.metadataFile) {
-              output.metadata = { [LEGACY_METADATA_KEY]: { type: 'FILE', value: output.metadataFile } }
-            }
-
             if (!output.roles || output.roles.length === 0) {
               logger.trace(`Request missing roles`)
               throw new Error(`Request missing roles`)

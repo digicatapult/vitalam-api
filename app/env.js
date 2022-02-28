@@ -21,7 +21,6 @@ const vars = envalid.cleanEnv(process.env, {
   AUTH_AUDIENCE: envalid.str({ devDefault: 'inteli-dev' }),
   AUTH_ISSUER: envalid.url({ devDefault: 'https://inteli.eu.auth0.com/' }),
   AUTH_TOKEN_URL: envalid.url({ devDefault: 'https://inteli.eu.auth0.com/oauth/token' }),
-  LEGACY_METADATA_KEY: envalid.str({ default: '' }),
   METADATA_KEY_LENGTH: envalid.num({ default: 32 }),
   METADATA_VALUE_LITERAL_LENGTH: envalid.num({ default: 32 }),
   PROCESS_IDENTIFIER_LENGTH: envalid.num({ default: 32 }),

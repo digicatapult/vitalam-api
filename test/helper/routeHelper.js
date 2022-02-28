@@ -43,18 +43,6 @@ async function addFileRoute(file) {
   return json
 }
 
-// Route for old method of uploading tokens without being wrapped in a directory
-async function addFileRouteLegacy(file) {
-  const form = new FormData()
-  form.append('file', fs.createReadStream(file))
-  const body = await fetch(`http://${IPFS_HOST}:${IPFS_PORT}/api/v0/add?cid-version=0`, {
-    method: 'POST',
-    body: form,
-  })
-
-  return body.json()
-}
-
 async function postRunProcess(app, authToken, inputs, outputs) {
   return postRunProcessWithProcess(app, authToken, null, inputs, outputs)
 }
@@ -81,10 +69,6 @@ async function postRunProcessWithProcess(app, authToken, process, inputs, output
           req.attach(value.value, value.value)
         }
       }
-    }
-    // legacy
-    if (output.metadataFile) {
-      req.attach(output.metadataFile, output.metadataFile)
     }
   })
 
@@ -152,21 +136,6 @@ async function getItemMetadataRoute(app, authToken, { id, metadataKey }) {
     })
 }
 
-async function getItemMetadataRouteLegacy(app, authToken, { id }) {
-  return request(app)
-    .get(`/${API_MAJOR_VERSION}/item/${id}/metadata`)
-    .set('Accept', 'application/octet-stream')
-    .set('Content-Type', 'application/octet-stream')
-    .set('Authorization', `Bearer ${authToken}`)
-    .then((response) => {
-      return response
-    })
-    .catch((err) => {
-      console.error(`getItemErr ${err}`)
-      return err
-    })
-}
-
 async function getLastTokenIdRoute(app, authToken) {
   return request(app)
     .get(`/${API_MAJOR_VERSION}/last-token`)
@@ -204,10 +173,8 @@ module.exports = {
   postRunProcessWithProcess,
   postRunProcessNoFileAttach,
   addFileRoute,
-  addFileRouteLegacy,
   getItemRoute,
   getItemMetadataRoute,
-  getItemMetadataRouteLegacy,
   getLastTokenIdRoute,
   getMembersRoute,
 }

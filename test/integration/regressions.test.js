@@ -70,10 +70,6 @@ describe('Bug regression tests', function () {
             }
           }
         }
-        // legacy
-        if (output.metadataFile) {
-          req.attach(output.metadataFile, output.metadataFile)
-        }
       })
 
       const runProcessResult = await req

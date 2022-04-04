@@ -1,22 +1,22 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "vitalam-api.fullname" . }}-config
+  name: {{ include "dscp-api.fullname" . }}-config
   labels:
-    {{- include "vitalam-api.labels" . | nindent 4 }}
+    {{- include "dscp-api.labels" . | nindent 4 }}
 data:
   port: {{ .Values.config.port | quote }}
   logLevel: {{ .Values.config.logLevel }}
-  nodeHost: {{ include "vitalam-api.node-host" . }}
+  nodeHost: {{ include "dscp-api.node-host" . }}
   {{- if .Values.config.externalIpfsHost }}
   ipfsHost: {{ .Values.config.externalIpfsHost }}
-  {{- else if .Values.vitalamIpfs.enabled }}
-  ipfsHost: {{ template "vitalam-ipfs.fullname" .Subcharts.vitalamIpfs }}-api
+  {{- else if .Values.dscpIpfs.enabled }}
+  ipfsHost: {{ template "dscp-ipfs.fullname" .Subcharts.dscpIpfs }}-api
   {{- end }}
   {{- if .Values.config.externalIpfsPort }}
   ipfsPort: {{ .Values.config.externalIpfsPort | quote }}
-  {{- else if .Values.vitalamIpfs.enabled }}
-  ipfsPort: {{ template "vitalam-ipfs.ipfsApiPort" .Subcharts.vitalamIpfs }}
+  {{- else if .Values.dscpIpfs.enabled }}
+  ipfsPort: {{ template "dscp-ipfs.ipfsApiPort" .Subcharts.dscpIpfs }}
   {{- end }}
   authJwksUri: {{ .Values.config.auth.jwksUri }}
   authAudience: {{ .Values.config.auth.audience }}

@@ -41,7 +41,7 @@ jobs:
       - name: Set up chart-testing
         uses: helm/chart-testing-action@v2.0.1
       - name: Run chart-testing (lint)
-        run: ct lint --validate-maintainers false --charts helm/${{ needs.repo_ids.outputs.repo_name }}/ --chart-repos vitalam-node=https://digicatapult.github.io/vitalam-node/,vitalam-ipfs=https://digicatapult.github.io/vitalam-ipfs/
+        run: ct lint --validate-maintainers false --charts helm/${{ needs.repo_ids.outputs.repo_name }}/ --chart-repos dscp-node=https://digicatapult.github.io/dscp-node/,dscp-ipfs=https://digicatapult.github.io/dscp-ipfs/
 
   helm-test:
     runs-on: ubuntu-latest
@@ -92,7 +92,7 @@ jobs:
             org.opencontainers.image.url=${{ github.event.repository.html_url }}
             org.opencontainers.image.revision=${{ github.sha }}
       - name: Run chart-testing (install)
-        run: ct install --charts helm/${{ needs.repo_ids.outputs.repo_name }}/ --chart-repos vitalam-node=https://digicatapult.github.io/vitalam-node/,vitalam-ipfs=https://digicatapult.github.io/vitalam-ipfs/
+        run: ct install --charts helm/${{ needs.repo_ids.outputs.repo_name }}/ --chart-repos dscp-node=https://digicatapult.github.io/dscp-node/,dscp-ipfs=https://digicatapult.github.io/dscp-ipfs/
 
   lint:
     name: Run lint

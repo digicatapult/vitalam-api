@@ -1,8 +1,8 @@
-# VITALam API
+# DSCP API
 
 ## Description
 
-A `Node.js` API to support communication to the [Substrate-based](https://www.substrate.io/) [`vitalam-node`](https://github.com/digicatapult/vitalam-node) (via [`polkadot-js/api`](https://www.npmjs.com/package/@polkadot/api)) and an [`IPFS`](https://ipfs.io/) node.
+A `Node.js` API to support communication to the [Substrate-based](https://www.substrate.io/) [`dscp-node`](https://github.com/digicatapult/dscp-node) (via [`polkadot-js/api`](https://www.npmjs.com/package/@polkadot/api)) and an [`IPFS`](https://ipfs.io/) node.
 
 ## Getting started
 
@@ -12,15 +12,15 @@ First, ensure you're running the correct [version](.node-version) of `npm`, then
 npm install
 ```
 
-The API requires instances of [`vitalam-node`](https://github.com/digicatapult/vitalam-node) and [`IPFS`](https://ipfs.io/).
+The API requires instances of [`dscp-node`](https://github.com/digicatapult/dscp-node) and [`IPFS`](https://ipfs.io/).
 To bring them up locally:
 
-### `vitalam-node`
+### `dscp-node`
 
-Clone [vitalam-node](https://github.com/digicatapult/vitalam-node) and follow the README to setup and build a local node. Then run the following in its root directory:
+Clone [dscp-node](https://github.com/digicatapult/dscp-node) and follow the README to setup and build a local node. Then run the following in its root directory:
 
 ```
-./target/release/vitalam-node --dev
+./target/release/dscp-node --dev
 ```
 
 ### `IPFS`
@@ -46,31 +46,31 @@ npm run test:integration
 
 ## Authentication
 
-`vitalam-api` uses an [Auth0](https://auth0.com/) Machine to Machine API to issue a JSON Web Token for authentication on its endpoints. You will need to create your own Auth0 API, which can be done for free, and set the appropriate [environment variables](#configuration) (those prefixed with `AUTH`). Follow the start of this [tutorial](https://auth0.com/docs/quickstart/backend/nodejs#configure-auth0-apis) to create an API. Go [here](app/routes/auth.js) and [here](app/auth.js) to see where the environment variables are used.
+`dscp-api` uses an [Auth0](https://auth0.com/) Machine to Machine API to issue a JSON Web Token for authentication on its endpoints. You will need to create your own Auth0 API, which can be done for free, and set the appropriate [environment variables](#configuration) (those prefixed with `AUTH`). Follow the start of this [tutorial](https://auth0.com/docs/quickstart/backend/nodejs#configure-auth0-apis) to create an API. Go [here](app/routes/auth.js) and [here](app/auth.js) to see where the environment variables are used.
 
 ## Configuration
 
-The following environment variables are used by `vitalam-api` and can be configured. Entries marked as `required` are needed when running `vitalam-api` in production mode.
+The following environment variables are used by `dscp-api` and can be configured. Entries marked as `required` are needed when running `dscp-api` in production mode.
 
-| variable                      | required |                       default                       | description                                                                                     |
-| :---------------------------- | :------: | :-------------------------------------------------: | :---------------------------------------------------------------------------------------------- |
-| PORT                          |    N     |                       `3001`                        | The port for the API to listen on                                                               |
-| API_HOST                      |    Y     |                          -                          | The hostname of the `vitalam-node` the API should connect to                                    |
-| API_PORT                      |    N     |                       `9944`                        | The port of the `vitalam-node` the API should connect to                                        |
-| LOG_LEVEL                     |    N     |                       `info`                        | Logging level. Valid values are [`trace`, `debug`, `info`, `warn`, `error`, `fatal`]            |
-| USER_URI                      |    Y     |                          -                          | The Substrate `URI` representing the private key to use when making `vitalam-node` transactions |
-| IPFS_HOST                     |    Y     |                          -                          | Hostname of the `IPFS` node to use for metadata storage                                         |
-| IPFS_PORT                     |    N     |                       `15001`                       | Port of the `IPFS` node to use for metadata storage                                             |
-| AUTH_JWKS_URI                 |    N     | `https://inteli.eu.auth0.com/.well-known/jwks.json` | JSON Web Key Set containing public keys used by the Auth0 API                                   |
-| AUTH_AUDIENCE                 |    N     |                    `inteli-dev`                     | Identifier of the Auth0 API                                                                     |
-| AUTH_ISSUER                   |    N     |           `https://inteli.eu.auth0.com/`            | Domain of the Auth0 API `                                                                       |
-| AUTH_TOKEN_URL                |    N     |      `https://inteli.eu.auth0.com/oauth/token`      | Auth0 API endpoint that issues an Authorisation (Bearer) access token                           |
-| METADATA_KEY_LENGTH           |    N     |                        `32`                         | Fixed length of metadata keys                                                                   |
-| METADATA_VALUE_LITERAL_LENGTH |    N     |                        `32`                         | Fixed length of metadata LITERAL values                                                         |
-| MAX_METADATA_COUNT            |    N     |                        `16`                         | Maximum number of metadata items allowed per token                                              |
-| API_VERSION                   |    N     |               `package.json version`                | API version                                                                                     |
-| API_MAJOR_VERSION             |    N     |                        `v3`                         | API major version                                                                               |
-| FILE_UPLOAD_MAX_SIZE          |    N     |                 `200 * 1024 * 1024`                 | The Maximum file upload size (bytes)                                                            |
+| variable                      | required |                       default                       | description                                                                                  |
+| :---------------------------- | :------: | :-------------------------------------------------: | :------------------------------------------------------------------------------------------- |
+| PORT                          |    N     |                       `3001`                        | The port for the API to listen on                                                            |
+| API_HOST                      |    Y     |                          -                          | The hostname of the `dscp-node` the API should connect to                                    |
+| API_PORT                      |    N     |                       `9944`                        | The port of the `dscp-node` the API should connect to                                        |
+| LOG_LEVEL                     |    N     |                       `info`                        | Logging level. Valid values are [`trace`, `debug`, `info`, `warn`, `error`, `fatal`]         |
+| USER_URI                      |    Y     |                          -                          | The Substrate `URI` representing the private key to use when making `dscp-node` transactions |
+| IPFS_HOST                     |    Y     |                          -                          | Hostname of the `IPFS` node to use for metadata storage                                      |
+| IPFS_PORT                     |    N     |                       `15001`                       | Port of the `IPFS` node to use for metadata storage                                          |
+| AUTH_JWKS_URI                 |    N     | `https://inteli.eu.auth0.com/.well-known/jwks.json` | JSON Web Key Set containing public keys used by the Auth0 API                                |
+| AUTH_AUDIENCE                 |    N     |                    `inteli-dev`                     | Identifier of the Auth0 API                                                                  |
+| AUTH_ISSUER                   |    N     |           `https://inteli.eu.auth0.com/`            | Domain of the Auth0 API `                                                                    |
+| AUTH_TOKEN_URL                |    N     |      `https://inteli.eu.auth0.com/oauth/token`      | Auth0 API endpoint that issues an Authorisation (Bearer) access token                        |
+| METADATA_KEY_LENGTH           |    N     |                        `32`                         | Fixed length of metadata keys                                                                |
+| METADATA_VALUE_LITERAL_LENGTH |    N     |                        `32`                         | Fixed length of metadata LITERAL values                                                      |
+| MAX_METADATA_COUNT            |    N     |                        `16`                         | Maximum number of metadata items allowed per token                                           |
+| API_VERSION                   |    N     |               `package.json version`                | API version                                                                                  |
+| API_MAJOR_VERSION             |    N     |                        `v3`                         | API major version                                                                            |
+| FILE_UPLOAD_MAX_SIZE          |    N     |                 `200 * 1024 * 1024`                 | The Maximum file upload size (bytes)                                                         |
 
 ## Running the API
 
@@ -107,7 +107,7 @@ This will return a JSON response (`Content-Type` `application/json`) of the form
 
 ### Authenticated endpoints
 
-The rest of the endpoints in `vitalam-api` require authentication in the form of a header `'Authorization: Bearer YOUR_ACCESS_TOKEN'`:
+The rest of the endpoints in `dscp-api` require authentication in the form of a header `'Authorization: Bearer YOUR_ACCESS_TOKEN'`:
 
 1. [GET /item/:id](#get-/item/:id)
 2. [GET /item/:id/metadata/:metadataKey](#get-/item/:id/metadata/:metadataKey)

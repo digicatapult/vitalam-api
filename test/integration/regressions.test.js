@@ -16,7 +16,7 @@ const { API_MAJOR_VERSION, AUTH_ISSUER, AUTH_AUDIENCE } = require('../../app/env
 const defaultRole = { [rolesEnum[0]]: USER_ALICE_TOKEN }
 
 describe('Bug regression tests', function () {
-  describe('API run-process is broken with file uploads (https://github.com/digicatapult/vitalam-api/issues/17)', function () {
+  describe('API run-process is broken with file uploads (https://github.com/digicatapult/dscp-api/issues/17)', function () {
     let app
     let jwksMock
     let authToken

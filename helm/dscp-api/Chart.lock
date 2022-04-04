@@ -1,9 +1,9 @@
 dependencies:
-- name: vitalam-node
-  repository: https://digicatapult.github.io/vitalam-node/
+- name: dscp-node
+  repository: https://digicatapult.github.io/dscp-node/
   version: 0.24.1
-- name: vitalam-ipfs
-  repository: https://digicatapult.github.io/vitalam-ipfs/
+- name: dscp-ipfs
+  repository: https://digicatapult.github.io/dscp-ipfs/
   version: 1.2.11
 digest: sha256:3fe224a5fa7a545a41c350f321ab50654a7e061d3e1add3dc465ae79843a0fae
 generated: "2022-02-25T15:28:49.451887Z"

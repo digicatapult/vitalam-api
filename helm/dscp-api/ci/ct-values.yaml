@@ -1,14 +1,14 @@
 image:
-  repository: 'vitalam-api'
+  repository: 'dscp-api'
   tag: 'latest'
   PullPolicy: Never
 
-vitalamNode:
+dscpNode:
   enabled: false
 
-vitalamIpfs:
+dscpIpfs:
   enabled: true
-  vitalamNode:
+  dscpNode:
     enabled: true
     node:
       chain: dev

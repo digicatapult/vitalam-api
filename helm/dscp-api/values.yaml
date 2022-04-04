@@ -1,11 +1,11 @@
 # fullNameOverride:
 config:
   port: 80
-  # externalNodeHost: "" # This overrides vitalamNode.enabled when setting the API_HOST envar
+  # externalNodeHost: "" # This overrides dscpNode.enabled when setting the API_HOST envar
   logLevel: info
   accountKey: //Alice
-  # externalIpfsHost: "" # This overrides vitalamIpfs.enabled when setting the IPFS_HOST envar
-  # externalIpfsPort: 5001 # This overrides vitalamIpfs.enabled when setting the IPFS_PORT envar
+  # externalIpfsHost: "" # This overrides dscpIpfs.enabled when setting the IPFS_HOST envar
+  # externalIpfsPort: 5001 # This overrides dscpIpfs.enabled when setting the IPFS_PORT envar
   enableLivenessProbe: true
   auth:
     jwksUri: https://inteli.eu.auth0.com/.well-known/jwks.json
@@ -22,14 +22,14 @@ ingress:
 replicaCount: 1
 
 image:
-  repository: ghcr.io/digicatapult/vitalam-api
+  repository: ghcr.io/digicatapult/dscp-api
   pullPolicy: IfNotPresent
-  tag: 'v3.0.1'
+  tag: 'v4.0.0'
 
-vitalamNode:
+dscpNode:
   enabled: false
 
-vitalamIpfs:
+dscpIpfs:
   enabled: true
-  vitalamNode:
+  dscpNode:
     enabled: true

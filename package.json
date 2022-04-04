@@ -1,21 +1,21 @@
 {
-  "name": "vitalam-api",
-  "version": "3.0.1",
-  "description": "VITALam API",
+  "name": "dscp-api",
+  "version": "4.0.0",
+  "description": "DSCP API",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/digicatapult/vitalam-api.git"
+    "url": "git+https://github.com/digicatapult/dscp-api.git"
   },
   "author": "Digital Catapult",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/digicatapult/vitalam-api/issues"
+    "url": "https://github.com/digicatapult/dscp-api/issues"
   },
   "engines": {
     "node": "16.x.x",
     "npm": "8.x.x"
   },
-  "homepage": "https://github.com/digicatapult/vitalam-api#readme",
+  "homepage": "https://github.com/digicatapult/dscp-api#readme",
   "main": "./app/index.js",
   "scripts": {
     "test": "NODE_ENV=test mocha --config ./test/mocharc.js ./test",

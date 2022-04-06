@@ -1,9 +1,9 @@
 dependencies:
 - name: dscp-node
   repository: https://digicatapult.github.io/dscp-node/
-  version: 0.24.1
+  version: 3.0.0
 - name: dscp-ipfs
   repository: https://digicatapult.github.io/dscp-ipfs/
-  version: 1.2.11
-digest: sha256:3fe224a5fa7a545a41c350f321ab50654a7e061d3e1add3dc465ae79843a0fae
-generated: "2022-02-25T15:28:49.451887Z"
+  version: 2.0.0
+digest: sha256:d11684c194cb7dd05dfb36c196a28ab7ccdcd1cb6b1241891e930589248a305b
+generated: "2022-04-06T15:36:57.54609+01:00"

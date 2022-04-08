@@ -94,20 +94,52 @@ async function createHttpServer() {
     }
   })
 
-  return app
+  return { app, statusHandler }
 }
 
 async function startServer() {
-  const app = await createHttpServer()
+  try {
+    const { app, statusHandler } = await createHttpServer()
 
-  app.listen(PORT, (err) => {
-    if (err) {
-      logger.error('Error  starting app:', err)
-      throw err
-    } else {
-      logger.info(`Server is listening on port ${PORT}`)
+    const server = await new Promise((resolve, reject) => {
+      let resolved = false
+      const server = app.listen(PORT, (err) => {
+        if (err) {
+          if (!resolved) {
+            resolved = true
+            reject(err)
+          }
+        }
+        logger.info(`Listening on port ${PORT} `)
+        if (!resolved) {
+          resolved = true
+          resolve(server)
+        }
+      })
+      server.on('error', (err) => {
+        if (!resolved) {
+          resolved = true
+          reject(err)
+        }
+      })
+    })
+
+    const closeHandler = (exitCode) => async () => {
+      server.close(async () => {
+        await statusHandler.close()
+        process.exit(exitCode)
+      })
     }
-  })
+
+    const setupGracefulExit = ({ sigName, exitCode }) => {
+      process.on(sigName, closeHandler(exitCode))
+    }
+    setupGracefulExit({ sigName: 'SIGINT', server, exitCode: 0 })
+    setupGracefulExit({ sigName: 'SIGTERM', server, exitCode: 143 })
+  } catch (err) {
+    logger.fatal('Fatal error during initialisation: %s', err.message)
+    process.exit(1)
+  }
 }
 
 module.exports = { startServer, createHttpServer }

@@ -52,10 +52,16 @@ describe('routes', function () {
   })
 
   describe('health check', function () {
-    let app
+    let app, statusHandler
 
     before(async function () {
-      app = await createHttpServer()
+      const server = await createHttpServer()
+      app = server.app
+      statusHandler = server.statusHandler
+    })
+
+    after(function () {
+      statusHandler.close()
     })
 
     test('health check', async function () {
@@ -69,7 +75,7 @@ describe('routes', function () {
 
   describe('access token', async () => {
     // Inputs
-    let app
+    let app, statusHandler
     const tokenResponse = {
       data: {
         access_token: 'fake access token',
@@ -79,8 +85,14 @@ describe('routes', function () {
     }
 
     before(async () => {
-      app = await createHttpServer()
+      const server = await createHttpServer()
+      app = server.app
+      statusHandler = server.statusHandler
       nock(AUTH_TOKEN_URL).post(`/`).reply(200, tokenResponse)
+    })
+
+    after(function () {
+      statusHandler.close()
     })
 
     test('get access token', async () => {
@@ -96,12 +108,18 @@ describe('routes', function () {
 
   describe('invalid credentials', async () => {
     // Inputs
-    let app
+    let app, statusHandler
     const deniedResponse = { error: 'Unauthorised' }
 
     before(async () => {
-      app = await createHttpServer()
+      const server = await createHttpServer()
+      app = server.app
+      statusHandler = server.statusHandler
       nock(AUTH_TOKEN_URL).post(`/`).reply(401, deniedResponse)
+    })
+
+    after(function () {
+      statusHandler.close()
     })
 
     test('access denied to token', async () => {
@@ -122,10 +140,13 @@ describe('routes', function () {
     let app
     let jwksMock
     let authToken
+    let statusHandler
     const process = {}
 
     before(async function () {
-      app = await createHttpServer()
+      const server = await createHttpServer()
+      app = server.app
+      statusHandler = server.statusHandler
 
       jwksMock = createJWKSMock(AUTH_ISSUER)
       jwksMock.start()
@@ -137,6 +158,10 @@ describe('routes', function () {
 
     after(async function () {
       await jwksMock.stop()
+    })
+
+    after(function () {
+      statusHandler.close()
     })
 
     withNewTestProcess(process)

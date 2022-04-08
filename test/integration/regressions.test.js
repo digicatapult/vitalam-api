@@ -20,6 +20,7 @@ describe('Bug regression tests', function () {
     let app
     let jwksMock
     let authToken
+    let statusHandler
 
     before(async () => {
       nock.disableNetConnect()
@@ -32,7 +33,9 @@ describe('Bug regression tests', function () {
     })
 
     before(async function () {
-      app = await createHttpServer()
+      const server = await createHttpServer()
+      app = server.app
+      statusHandler = server.statusHandler
 
       jwksMock = createJWKSMock(AUTH_ISSUER)
       jwksMock.start()
@@ -44,6 +47,10 @@ describe('Bug regression tests', function () {
 
     after(async function () {
       await jwksMock.stop()
+    })
+
+    after(function () {
+      statusHandler.close()
     })
 
     test('add and get item - single metadata FILE', async function () {

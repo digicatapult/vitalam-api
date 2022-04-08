@@ -7,40 +7,39 @@ const stateSymbols = new Set(Object.values(serviceState))
 
 const delay = (delayMs, result) => new Promise((resolve) => setTimeout(resolve, delayMs, result))
 
-const startStatusHandler = async ({ pollingPeriodMs, serviceTimeoutMs, getStatus }) => {
-  let status = null
+const mkStatusGenerator = async function* ({ getStatus, serviceTimeoutMs }) {
+  while (true) {
+    try {
+      const newStatus = await Promise.race([
+        getStatus(),
+        delay(serviceTimeoutMs, { status: serviceState.ERROR, detail: null }),
+      ])
 
-  const updateStatus = async function* () {
-    while (true) {
-      try {
-        const newStatus = await Promise.race([
-          getStatus(),
-          delay(serviceTimeoutMs, { status: serviceState.ERROR, detail: null }),
-        ])
-
-        if (stateSymbols.has(newStatus.status)) {
-          yield {
-            status: newStatus.status,
-            detail: newStatus.detail === undefined ? null : newStatus.detail,
-          }
-          continue
-        }
-        throw new Error('Status is not a valid value')
-      } catch (err) {
+      if (stateSymbols.has(newStatus.status)) {
         yield {
-          status: serviceState.ERROR,
-          detail: null,
+          status: newStatus.status,
+          detail: newStatus.detail === undefined ? null : newStatus.detail,
         }
+        continue
+      }
+      throw new Error('Status is not a valid value')
+    } catch (err) {
+      yield {
+        status: serviceState.ERROR,
+        detail: null,
       }
     }
   }
+}
 
-  const statusGen = updateStatus()
-  status = (await statusGen.next()).value
+const startStatusHandler = async ({ pollingPeriodMs, serviceTimeoutMs, getStatus }) => {
+  let status = null
+  const statusGenerator = mkStatusGenerator({ getStatus, serviceTimeoutMs })
+  status = (await statusGenerator.next()).value
 
   const statusLoop = async function () {
     await delay(pollingPeriodMs)
-    for await (const newStatus of statusGen) {
+    for await (const newStatus of statusGenerator) {
       status = newStatus
       await delay(pollingPeriodMs)
     }
@@ -55,7 +54,7 @@ const startStatusHandler = async ({ pollingPeriodMs, serviceTimeoutMs, getStatus
       return status.detail
     },
     close: () => {
-      statusGen.return()
+      statusGenerator.return()
     },
   }
 }
@@ -84,7 +83,7 @@ const buildCombinedHandler = async (handlerMap) => {
       return Object.fromEntries([...handlerMap].map(([name, { detail }]) => [name, detail]))
     },
     close: () => {
-      for (const { handler } of handlerMap.values) {
+      for (const handler of handlerMap.values()) {
         handler.close()
       }
     },

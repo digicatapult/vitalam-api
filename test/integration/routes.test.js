@@ -65,7 +65,24 @@ describe('routes', function () {
     })
 
     test('health check', async function () {
-      const expectedResult = { status: 'ok', version: API_VERSION, detail: { api: {} } }
+      const expectedResult = {
+        status: 'ok',
+        version: API_VERSION,
+        detail: {
+          api: {
+            chain: 'Development',
+            runtime: {
+              name: 'dscp',
+              versions: {
+                authoring: 1,
+                impl: 1,
+                spec: 300,
+                transaction: 1,
+              },
+            },
+          },
+        },
+      }
 
       const actualResult = await healthCheck(app)
       expect(actualResult.status).to.equal(200)

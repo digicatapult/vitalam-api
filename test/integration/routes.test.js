@@ -68,16 +68,19 @@ describe('routes', function () {
       const expectedResult = {
         status: 'ok',
         version: API_VERSION,
-        detail: {
+        details: {
           api: {
-            chain: 'Development',
-            runtime: {
-              name: 'dscp',
-              versions: {
-                authoring: 1,
-                impl: 1,
-                spec: 300,
-                transaction: 1,
+            status: 'ok',
+            detail: {
+              chain: 'Development',
+              runtime: {
+                name: 'dscp',
+                versions: {
+                  authoring: 1,
+                  impl: 1,
+                  spec: 300,
+                  transaction: 1,
+                },
               },
             },
           },

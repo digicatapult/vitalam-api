@@ -80,6 +80,7 @@ const apiOptions = {
 }
 
 const api = new ApiPromise(apiOptions)
+api.isReadyOrError.catch(() => {})
 
 api.on('disconnected', () => {
   logger.warn(`Disconnected from substrate node at ${API_HOST}:${API_PORT}`)

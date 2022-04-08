@@ -169,7 +169,16 @@ describe('buildCombinedHandler', function () {
     ])
     const result = await buildCombinedHandler(handlersMap)
     expect(result.status).to.equal(serviceState.UP)
-    expect(result.detail).to.deep.equal({ a: 1, b: 2 })
+    expect(result.detail).to.deep.equal({
+      a: {
+        status: serviceState.UP,
+        detail: 1,
+      },
+      b: {
+        status: serviceState.UP,
+        detail: 2,
+      },
+    })
   })
 
   it('should combine UP and DOWN statuses to DOWN', async function () {
@@ -179,7 +188,16 @@ describe('buildCombinedHandler', function () {
     ])
     const result = await buildCombinedHandler(handlersMap)
     expect(result.status).to.equal(serviceState.DOWN)
-    expect(result.detail).to.deep.equal({ a: 1, b: 2 })
+    expect(result.detail).to.deep.equal({
+      a: {
+        status: serviceState.UP,
+        detail: 1,
+      },
+      b: {
+        status: serviceState.DOWN,
+        detail: 2,
+      },
+    })
   })
 
   it('should combine UP and ERROR statuses to ERROR', async function () {
@@ -189,7 +207,16 @@ describe('buildCombinedHandler', function () {
     ])
     const result = await buildCombinedHandler(handlersMap)
     expect(result.status).to.equal(serviceState.ERROR)
-    expect(result.detail).to.deep.equal({ a: 1, b: 2 })
+    expect(result.detail).to.deep.equal({
+      a: {
+        status: serviceState.UP,
+        detail: 1,
+      },
+      b: {
+        status: serviceState.ERROR,
+        detail: 2,
+      },
+    })
   })
 
   it('should combine DOWN and ERROR statuses to DOWN', async function () {
@@ -199,6 +226,15 @@ describe('buildCombinedHandler', function () {
     ])
     const result = await buildCombinedHandler(handlersMap)
     expect(result.status).to.equal(serviceState.DOWN)
-    expect(result.detail).to.deep.equal({ a: 1, b: 2 })
+    expect(result.detail).to.deep.equal({
+      a: {
+        status: serviceState.DOWN,
+        detail: 1,
+      },
+      b: {
+        status: serviceState.ERROR,
+        detail: 2,
+      },
+    })
   })
 })

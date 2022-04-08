@@ -31,9 +31,21 @@ async function createHttpServer() {
   }
   app.get('/health', async (req, res) => {
     const status = statusHandler.status
-    const detail = statusHandler.detail
+    const details = statusHandler.detail
     const code = status === serviceState.UP ? 200 : 503
-    res.status(code).send({ version: API_VERSION, status: serviceStatusStrings[status] || 'error', detail })
+    res.status(code).send({
+      version: API_VERSION,
+      status: serviceStatusStrings[status] || 'error',
+      details: Object.fromEntries(
+        Object.entries(details).map(([depName, { status, detail }]) => [
+          depName,
+          {
+            status: serviceStatusStrings[status] || 'error',
+            detail,
+          },
+        ])
+      ),
+    })
   })
 
   app.use((req, res, next) => {

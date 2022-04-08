@@ -80,7 +80,7 @@ const buildCombinedHandler = async (handlerMap) => {
       return getStatus()
     },
     get detail() {
-      return Object.fromEntries([...handlerMap].map(([name, { detail }]) => [name, detail]))
+      return Object.fromEntries([...handlerMap])
     },
     close: () => {
       for (const handler of handlerMap.values()) {

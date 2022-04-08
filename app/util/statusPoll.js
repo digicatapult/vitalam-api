@@ -3,48 +3,49 @@ const serviceState = {
   DOWN: Symbol('status-down'),
   ERROR: Symbol('status-error'),
 }
-const UNKNOWN = Symbol('status-unknown')
 const stateSymbols = new Set(Object.values(serviceState))
 
+const delay = (delayMs, result) => new Promise((resolve) => setTimeout(resolve, delayMs, result))
+
 const startStatusHandler = async ({ pollingPeriodMs, serviceTimeoutMs, getStatus }) => {
-  const status = {
-    status: UNKNOWN,
-    detail: null,
-  }
-  let timeoutHandle = null,
-    stop = false
+  let status = null
 
-  const resetStatus = () => {
-    status.status = serviceState.ERROR
-    status.detail = null
-  }
+  const updateStatus = async function* () {
+    while (true) {
+      try {
+        const newStatus = await Promise.race([
+          getStatus(),
+          delay(serviceTimeoutMs, { status: serviceState.ERROR, detail: null }),
+        ])
 
-  const updateStatus = async () => {
-    try {
-      const newStatus = await Promise.race([
-        getStatus(),
-        new Promise((resolve) => setTimeout(resolve, serviceTimeoutMs, { status: serviceState.ERROR, detail: null })),
-      ])
-
-      if (stateSymbols.has(newStatus.status)) {
-        status.status = newStatus.status
-        status.detail = newStatus.detail === undefined ? null : newStatus.detail
-      } else {
-        resetStatus()
+        if (stateSymbols.has(newStatus.status)) {
+          yield {
+            status: newStatus.status,
+            detail: newStatus.detail === undefined ? null : newStatus.detail,
+          }
+          continue
+        }
+        throw new Error('Status is not a valid value')
+      } catch (err) {
+        yield {
+          status: serviceState.ERROR,
+          detail: null,
+        }
       }
-    } catch (err) {
-      resetStatus()
     }
   }
 
-  const statusLoop = async () => {
-    await updateStatus()
-    if (!stop) {
-      timeoutHandle = setTimeout(statusLoop, pollingPeriodMs)
+  const statusGen = updateStatus()
+  status = (await statusGen.next()).value
+
+  const statusLoop = async function () {
+    await delay(pollingPeriodMs)
+    for await (const newStatus of statusGen) {
+      status = newStatus
+      await delay(pollingPeriodMs)
     }
   }
-
-  await statusLoop()
+  statusLoop()
 
   return {
     get status() {
@@ -54,8 +55,7 @@ const startStatusHandler = async ({ pollingPeriodMs, serviceTimeoutMs, getStatus
       return status.detail
     },
     close: () => {
-      stop = true
-      clearTimeout(timeoutHandle)
+      statusGen.return()
     },
   }
 }

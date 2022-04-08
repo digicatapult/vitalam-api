@@ -59,7 +59,7 @@ describe('routes', function () {
     })
 
     test('health check', async function () {
-      const expectedResult = { status: 'ok', version: API_VERSION }
+      const expectedResult = { status: 'ok', version: API_VERSION, detail: { api: {} } }
 
       const actualResult = await healthCheck(app)
       expect(actualResult.status).to.equal(200)

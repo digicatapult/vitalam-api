@@ -7,7 +7,7 @@ services:
       - 8080:8080
       - 5001:5001
   dscp-node:
-    image: ghcr.io/digicatapult/dscp-node:v3.0.0
+    image: ghcr.io/digicatapult/dscp-node:latest
     command:
       --base-path /data/
       --dev

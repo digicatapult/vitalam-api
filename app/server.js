@@ -11,19 +11,29 @@ const { PORT, API_VERSION, API_MAJOR_VERSION } = require('./env')
 const logger = require('./logger')
 const apiDoc = require('./api-v3/api-doc')
 const apiService = require('./api-v3/services/apiService')
+const { startStatusHandlers } = require('./serviceStatus')
+const { serviceState } = require('./util/statusPoll')
 const { verifyJwks } = require('./util/appUtil')
 
 async function createHttpServer() {
   const requestLogger = pinoHttp({ logger })
   const app = express()
+  const statusHandler = await startStatusHandlers()
 
   app.use(cors())
   app.use(compression())
   app.use(bodyParser.json())
 
+  const serviceStatusStrings = {
+    [serviceState.UP]: 'ok',
+    [serviceState.DOWN]: 'down',
+    [serviceState.ERROR]: 'error',
+  }
   app.get('/health', async (req, res) => {
-    res.status(200).send({ version: API_VERSION, status: 'ok' })
-    return
+    const status = statusHandler.status
+    const detail = statusHandler.detail
+    const code = status === serviceState.UP ? 200 : 503
+    res.status(code).send({ version: API_VERSION, status: serviceStatusStrings[status] || 'error', detail })
   })
 
   app.use((req, res, next) => {

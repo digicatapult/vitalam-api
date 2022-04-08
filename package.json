@@ -1,6 +1,6 @@
 {
   "name": "dscp-api",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "description": "DSCP API",
   "repository": {
     "type": "git",
@@ -19,6 +19,7 @@
   "main": "./app/index.js",
   "scripts": {
     "test": "NODE_ENV=test mocha --config ./test/mocharc.js ./test",
+    "test:unit": "NODE_ENV=test mocha --config ./test/mocharc.js ./test/unit",
     "test:integration": "NODE_ENV=test mocha --config ./test/mocharc.js ./test/integration",
     "lint": "eslint .",
     "start": "NODE_ENV=production node app/index.js",
@@ -59,6 +60,7 @@
     "nyc": "^15.1.0",
     "pino-colada": "^2.1.0",
     "prettier": "^2.3.1",
+    "sinon": "^13.0.1",
     "supertest": "^6.1.3"
   }
 }

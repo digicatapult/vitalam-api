@@ -62,18 +62,18 @@ const startStatusHandler = async ({ pollingPeriodMs, serviceTimeoutMs, getStatus
 
 const buildCombinedHandler = async (handlerMap) => {
   const getStatus = () =>
-    [...handlerMap].reduce((acc, [, h]) => {
-      const status = h.status
-      if (acc === serviceState.UP) {
-        return status
+    [...handlerMap].reduce((accStatus, [, h]) => {
+      const handlerStatus = h.status
+      if (accStatus === serviceState.UP) {
+        return handlerStatus
       }
-      if (acc === serviceState.DOWN) {
-        return acc
+      if (accStatus === serviceState.DOWN) {
+        return accStatus
       }
-      if (status === serviceState.DOWN) {
-        return status
+      if (handlerStatus === serviceState.DOWN) {
+        return handlerStatus
       }
-      return acc
+      return accStatus
     }, serviceState.UP)
 
   return {

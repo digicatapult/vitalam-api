@@ -26,14 +26,19 @@ const stopAfterEvery = function () {
   })
 }
 
-const period = 1000
+const pollingPeriodMs = 1000
+const serviceTimeoutMs = 100
 
 describe('startStatusHandler', function () {
   withFakeTimesForEvery()
   stopAfterEvery()
 
   it('should get the service status immediately', async function () {
-    this.handler = await startStatusHandler({ pollingPeriodMs: 1000, getStatus: sinon.stub().resolves(okStatus(0)) })
+    this.handler = await startStatusHandler({
+      pollingPeriodMs,
+      serviceTimeoutMs,
+      getStatus: sinon.stub().resolves(okStatus(0)),
+    })
     const status = this.handler.status
     const detail = this.handler.detail
     expect(status).to.deep.equal(serviceState.UP)
@@ -42,16 +47,17 @@ describe('startStatusHandler', function () {
 
   it('should poll status every period', async function () {
     this.handler = await startStatusHandler({
-      pollingPeriodMs: period,
+      pollingPeriodMs,
+      serviceTimeoutMs,
       getStatus: Array(10)
         .fill(null)
         .reduce((stub, _, i) => {
           return stub.onCall(i).resolves(okStatus(i))
         }, sinon.stub()),
     })
-    await this.clock.tickAsync(period / 2)
+    await this.clock.tickAsync(pollingPeriodMs / 2)
     for (let i = 0; i < 10; i++) {
-      await this.clock.tickAsync(period / 2)
+      await this.clock.tickAsync(pollingPeriodMs / 2)
       const status = this.handler.status
       const detail = this.handler.detail
       expect(status).to.deep.equal(serviceState.UP)
@@ -60,7 +66,11 @@ describe('startStatusHandler', function () {
   })
 
   it('should report status error if poll handler throws', async function () {
-    this.handler = await startStatusHandler({ pollingPeriodMs: 1000, getStatus: sinon.stub().rejects(new Error()) })
+    this.handler = await startStatusHandler({
+      pollingPeriodMs,
+      serviceTimeoutMs,
+      getStatus: sinon.stub().rejects(new Error()),
+    })
     const status = this.handler.status
     expect(status).to.deep.equal(serviceState.ERROR)
     const detail = this.handler.detail
@@ -68,7 +78,11 @@ describe('startStatusHandler', function () {
   })
 
   it('should report status error if poll handler returns jibberish', async function () {
-    this.handler = await startStatusHandler({ pollingPeriodMs: 1000, getStatus: sinon.stub().resolves('jibberish') })
+    this.handler = await startStatusHandler({
+      pollingPeriodMs,
+      serviceTimeoutMs,
+      getStatus: sinon.stub().resolves('jibberish'),
+    })
     const status = this.handler.status
     expect(status).to.deep.equal(serviceState.ERROR)
     const detail = this.handler.detail
@@ -77,7 +91,8 @@ describe('startStatusHandler', function () {
 
   it('should report status error if poll handler returns an invalid status', async function () {
     this.handler = await startStatusHandler({
-      pollingPeriodMs: 1000,
+      pollingPeriodMs,
+      serviceTimeoutMs,
       getStatus: sinon.stub().resolves({ status: 'invalid' }),
     })
     const status = this.handler.status
@@ -86,9 +101,29 @@ describe('startStatusHandler', function () {
     expect(detail).to.deep.equal(null)
   })
 
+  it('should report status error if poll handler times out', async function () {
+    this.handler = await startStatusHandler({
+      pollingPeriodMs,
+      serviceTimeoutMs,
+      getStatus: sinon
+        .stub()
+        .onFirstCall()
+        .resolves({ status: serviceState.UP })
+        .onSecondCall()
+        .returns(new Promise(() => {})),
+    })
+    await this.clock.tickAsync(pollingPeriodMs)
+    await this.clock.tickAsync(serviceTimeoutMs)
+    const status = this.handler.status
+    expect(status).to.deep.equal(serviceState.ERROR)
+    const detail = this.handler.detail
+    expect(detail).to.deep.equal(null)
+  })
+
   it('should not allow detail to be undefined', async function () {
     this.handler = await startStatusHandler({
-      pollingPeriodMs: 1000,
+      pollingPeriodMs,
+      serviceTimeoutMs,
       getStatus: sinon.stub().resolves({ status: serviceState.UP }),
     })
     const status = this.handler.status
@@ -99,16 +134,17 @@ describe('startStatusHandler', function () {
 
   it('should not poll after calling stop', async function () {
     this.handler = await startStatusHandler({
-      pollingPeriodMs: period,
+      pollingPeriodMs,
+      serviceTimeoutMs,
       getStatus: Array(10)
         .fill(null)
         .reduce((stub, _, i) => {
           return stub.onCall(i).resolves(okStatus(i))
         }, sinon.stub()),
     })
-    await this.clock.tickAsync(period / 2)
+    await this.clock.tickAsync(pollingPeriodMs / 2)
     for (let i = 0; i < 5; i++) {
-      await this.clock.tickAsync(period / 2)
+      await this.clock.tickAsync(pollingPeriodMs / 2)
       const status = this.handler.status
       const detail = this.handler.detail
       expect(status).to.deep.equal(serviceState.UP)
@@ -116,7 +152,7 @@ describe('startStatusHandler', function () {
     }
     this.handler.close()
     for (let i = 5; i < 10; i++) {
-      await this.clock.tickAsync(period / 2)
+      await this.clock.tickAsync(pollingPeriodMs / 2)
       const status = this.handler.status
       const detail = this.handler.detail
       expect(status).to.deep.equal(serviceState.UP)

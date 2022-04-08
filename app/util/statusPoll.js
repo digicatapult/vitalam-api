@@ -6,7 +6,7 @@ const serviceState = {
 const UNKNOWN = Symbol('status-unknown')
 const stateSymbols = new Set(Object.values(serviceState))
 
-const startStatusHandler = async ({ pollingPeriodMs, getStatus }) => {
+const startStatusHandler = async ({ pollingPeriodMs, serviceTimeoutMs, getStatus }) => {
   const status = {
     status: UNKNOWN,
     detail: null,
@@ -21,7 +21,10 @@ const startStatusHandler = async ({ pollingPeriodMs, getStatus }) => {
 
   const updateStatus = async () => {
     try {
-      const newStatus = await getStatus()
+      const newStatus = await Promise.race([
+        getStatus(),
+        new Promise((resolve) => setTimeout(resolve, serviceTimeoutMs, { status: serviceState.ERROR, detail: null })),
+      ])
 
       if (stateSymbols.has(newStatus.status)) {
         status.status = newStatus.status
@@ -41,7 +44,7 @@ const startStatusHandler = async ({ pollingPeriodMs, getStatus }) => {
     }
   }
 
-  statusLoop()
+  await statusLoop()
 
   return {
     get status() {

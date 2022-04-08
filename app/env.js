@@ -29,6 +29,7 @@ const vars = envalid.cleanEnv(process.env, {
   API_MAJOR_VERSION: envalid.str({ default: 'v3' }),
   FILE_UPLOAD_MAX_SIZE: envalid.num({ default: 200 * 1024 * 1024 }),
   SUBSTRATE_STATUS_POLL_PERIOD_MS: envalid.num({ default: 30 * 1000 }),
+  SUBSTRATE_STATUS_TIMEOUT_MS: envalid.num({ default: 2 * 1000 }),
 })
 
 module.exports = {

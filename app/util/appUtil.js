@@ -9,6 +9,10 @@ const jwksRsa = require('jwks-rsa')
 const { Keyring } = require('@polkadot/api')
 const jwt = require('jsonwebtoken')
 const {
+  Role: { _enum: rolesEnum },
+} = require('@digicatapult/dscp-node')
+
+const {
   USER_URI,
   IPFS_HOST,
   IPFS_PORT,
@@ -21,12 +25,7 @@ const {
   PROCESS_IDENTIFIER_LENGTH,
 } = require('../env')
 const logger = require('../logger')
-const {
-  substrateApi: api,
-  types: {
-    Role: { _enum: rolesEnum },
-  },
-} = require('./substrateApi')
+const { substrateApi: api } = require('./substrateApi')
 
 async function addFile(file) {
   logger.debug('Uploading file %s', file.originalname)

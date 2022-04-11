@@ -27,7 +27,7 @@
     "coverage": "LOG_LEVEL=fatal NODE_ENV=development nyc mocha --recursive ./test/integration --timeout 60000 --slow 20000 --exit"
   },
   "dependencies": {
-    "@digicatapult/dscp-node": "^3.0.1",
+    "@digicatapult/dscp-node": "latest",
     "@polkadot/api": "^5.9.1",
     "base-x": "^3.0.8",
     "body-parser": "^1.19.0",

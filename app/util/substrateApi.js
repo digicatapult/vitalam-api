@@ -9,7 +9,7 @@ const apiOptions = {
   provider,
   types,
 }
-console.log(apiOptions)
+
 const api = new ApiPromise(apiOptions)
 api.isReadyOrError.catch(() => {})
 

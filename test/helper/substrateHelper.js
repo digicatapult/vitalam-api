@@ -1,6 +1,5 @@
 const { before, after } = require('mocha')
-const { Keyring } = require('@polkadot/api')
-const { substrateApi: api } = require('../../app/util/substrateApi')
+const { substrateApi: api, keyring } = require('../../app/util/substrateApi')
 
 const { PROCESS_IDENTIFIER_LENGTH } = require('../../app/env')
 
@@ -13,7 +12,6 @@ const withNewTestProcess = (process) => {
   before(async function () {
     // setup process
     await api.isReady
-    const keyring = new Keyring({ type: 'sr25519' })
     const sudo = keyring.addFromUri('//Alice')
 
     const newProcess = await new Promise((resolve) => {
@@ -45,7 +43,6 @@ const withNewTestProcess = (process) => {
   after(async function () {
     // disable process
     await api.isReady
-    const keyring = new Keyring({ type: 'sr25519' })
     const sudo = keyring.addFromUri('//Alice')
 
     await new Promise((resolve) => {

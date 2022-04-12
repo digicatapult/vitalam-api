@@ -6,11 +6,12 @@ const bs58 = require('base-x')(BASE58)
 const fetch = require('node-fetch')
 const FormData = require('form-data')
 const jwksRsa = require('jwks-rsa')
-const { Keyring } = require('@polkadot/api')
 const jwt = require('jsonwebtoken')
 const {
-  Role: { _enum: rolesEnum },
-} = require('@digicatapult/dscp-node')
+  types: {
+    Role: { _enum: rolesEnum },
+  },
+} = require('../util/substrateApi')
 
 const {
   USER_URI,
@@ -25,7 +26,7 @@ const {
   PROCESS_IDENTIFIER_LENGTH,
 } = require('../env')
 const logger = require('../logger')
-const { substrateApi: api } = require('./substrateApi')
+const { substrateApi: api, keyring } = require('./substrateApi')
 
 async function addFile(file) {
   logger.debug('Uploading file %s', file.originalname)
@@ -239,7 +240,6 @@ async function getMembers() {
 async function runProcess(process, inputs, outputs) {
   if (inputs && outputs) {
     await api.isReady
-    const keyring = new Keyring({ type: 'sr25519' })
     const alice = keyring.addFromUri(USER_URI)
 
     const relevantOutputs = outputs.map(({ roles, metadata, parent_index }) => [roles, metadata, parent_index])
@@ -351,7 +351,6 @@ const getReadableMetadataKeys = (metadata) => {
 
 const validateInputIds = async (accountIds) => {
   await api.isReady
-  const keyring = new Keyring({ type: 'sr25519' })
   const userId = keyring.addFromUri(USER_URI).address
 
   return await accountIds.reduce(async (acc, id) => {

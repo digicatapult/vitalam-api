@@ -33,9 +33,10 @@ const {
   METADATA_KEY_LENGTH,
   METADATA_VALUE_LITERAL_LENGTH,
   MAX_METADATA_COUNT,
-  API_VERSION,
   PROCESS_IDENTIFIER_LENGTH,
 } = require('../../app/env')
+
+const { responses: healthcheckResponses } = require('../helper/healthcheckFixtures')
 
 const { substrateApi } = require('../../app/util/substrateApi')
 
@@ -69,31 +70,10 @@ describe('routes', function () {
       })
 
       test('health check', async function () {
-        const expectedResult = {
-          status: 'ok',
-          version: API_VERSION,
-          details: {
-            api: {
-              status: 'ok',
-              detail: {
-                chain: 'Development',
-                runtime: {
-                  name: 'dscp',
-                  versions: {
-                    authoring: 1,
-                    impl: 1,
-                    spec: 300,
-                    transaction: 1,
-                  },
-                },
-              },
-            },
-          },
-        }
-
+        const response = healthcheckResponses.ok
         const actualResult = await healthCheck(app)
-        expect(actualResult.status).to.equal(200)
-        expect(actualResult.body).to.deep.equal(expectedResult)
+        expect(actualResult.status).to.equal(response.code)
+        expect(actualResult.body).to.deep.equal(response.body)
       })
     })
 
@@ -124,22 +104,10 @@ describe('routes', function () {
       })
 
       test('service down', async function () {
-        const expectedResult = {
-          status: 'down',
-          version: API_VERSION,
-          details: {
-            api: {
-              status: 'down',
-              detail: {
-                message: 'Cannot connect to substrate node',
-              },
-            },
-          },
-        }
-
+        const response = healthcheckResponses.down
         const actualResult = await healthCheck(app)
-        expect(actualResult.status).to.equal(503)
-        expect(actualResult.body).to.deep.equal(expectedResult)
+        expect(actualResult.status).to.equal(response.code)
+        expect(actualResult.body).to.deep.equal(response.body)
       })
     })
 
@@ -177,32 +145,10 @@ describe('routes', function () {
       })
 
       test('service up', async function () {
-        const expectedResult = {
-          status: 'ok',
-          version: API_VERSION,
-          details: {
-            api: {
-              status: 'ok',
-              detail: {
-                chain: 'Development',
-                runtime: {
-                  name: 'dscp',
-                  versions: {
-                    authoring: 1,
-                    impl: 1,
-                    spec: 300,
-                    transaction: 1,
-                  },
-                },
-              },
-            },
-          },
-        }
-
-        await this.clock.tickAsync(10000)
+        const response = healthcheckResponses.ok
         const actualResult = await healthCheck(app)
-        expect(actualResult.status).to.equal(200)
-        expect(actualResult.body).to.deep.equal(expectedResult)
+        expect(actualResult.status).to.equal(response.code)
+        expect(actualResult.body).to.deep.equal(response.body)
       })
     })
   })

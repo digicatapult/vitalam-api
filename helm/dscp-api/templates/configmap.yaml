@@ -22,5 +22,5 @@ data:
   authAudience: {{ .Values.config.auth.audience }}
   authIssuer: {{ .Values.config.auth.issuer }}
   authTokenUrl: {{ .Values.config.auth.tokenUrl }}
-  substrateStatusPollPeriodMs: {{ .Values.config.substrateStatusPollPeriodMs }}
-  substrateStatusTimeoutMs: {{ .Values.config.substrateStatusTimeoutMs }}
+  substrateStatusPollPeriodMs: {{ .Values.config.substrateStatusPollPeriodMs | quote }}
+  substrateStatusTimeoutMs: {{ .Values.config.substrateStatusTimeoutMs | quote }}

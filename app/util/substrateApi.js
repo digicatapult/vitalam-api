@@ -9,23 +9,30 @@ const {
 } = require('../env')
 const logger = require('../logger')
 
-const {
-  api: substrateApi,
-  types,
-  keyring,
-} = buildApi({
+const { api, types, keyring } = buildApi({
   options: {
     apiHost: API_HOST,
     apiPort: API_PORT,
     metadataKeyLength: METADATA_KEY_LENGTH,
     metadataValueLiteralLength: METADATA_VALUE_LITERAL_LENGTH,
     processorIdentifierLength: PROCESS_IDENTIFIER_LENGTH,
-    logger,
   },
 })
 
+api.on('disconnected', () => {
+  logger.warn(`Disconnected from substrate node at ${API_HOST}:${API_PORT}`)
+})
+
+api.on('connected', () => {
+  logger.info(`Connected to substrate node at ${API_HOST}:${API_PORT}`)
+})
+
+api.on('error', (err) => {
+  logger.error(`Error from substrate node connection. Error was ${err.message || JSON.stringify(err)}`)
+})
+
 module.exports = {
-  substrateApi,
+  substrateApi: api,
   types,
   keyring,
 }

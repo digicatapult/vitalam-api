@@ -3,6 +3,7 @@ const { describe, test, before, after, afterEach } = require('mocha')
 const { expect } = require('chai')
 const nock = require('nock')
 const moment = require('moment')
+const sinon = require('sinon')
 
 const { createHttpServer } = require('../../app/server')
 const {
@@ -36,6 +37,8 @@ const {
   PROCESS_IDENTIFIER_LENGTH,
 } = require('../../app/env')
 
+const { substrateApi } = require('../../app/util/substrateApi')
+
 const BASE58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
 const bs58 = require('base-x')(BASE58)
 const defaultRole = { [rolesEnum[0]]: USER_ALICE_TOKEN }
@@ -52,44 +55,155 @@ describe('routes', function () {
   })
 
   describe('health check', function () {
-    let app, statusHandler
+    describe('happy path', function () {
+      let app, statusHandler
 
-    before(async function () {
-      const server = await createHttpServer()
-      app = server.app
-      statusHandler = server.statusHandler
-    })
+      before(async function () {
+        const server = await createHttpServer()
+        app = server.app
+        statusHandler = server.statusHandler
+      })
 
-    after(function () {
-      statusHandler.close()
-    })
+      after(function () {
+        statusHandler.close()
+      })
 
-    test('health check', async function () {
-      const expectedResult = {
-        status: 'ok',
-        version: API_VERSION,
-        details: {
-          api: {
-            status: 'ok',
-            detail: {
-              chain: 'Development',
-              runtime: {
-                name: 'dscp',
-                versions: {
-                  authoring: 1,
-                  impl: 1,
-                  spec: 300,
-                  transaction: 1,
+      test('health check', async function () {
+        const expectedResult = {
+          status: 'ok',
+          version: API_VERSION,
+          details: {
+            api: {
+              status: 'ok',
+              detail: {
+                chain: 'Development',
+                runtime: {
+                  name: 'dscp',
+                  versions: {
+                    authoring: 1,
+                    impl: 1,
+                    spec: 300,
+                    transaction: 1,
+                  },
                 },
               },
             },
           },
-        },
-      }
+        }
 
-      const actualResult = await healthCheck(app)
-      expect(actualResult.status).to.equal(200)
-      expect(actualResult.body).to.deep.equal(expectedResult)
+        const actualResult = await healthCheck(app)
+        expect(actualResult.status).to.equal(200)
+        expect(actualResult.body).to.deep.equal(expectedResult)
+      })
+    })
+
+    describe('service down', function () {
+      let app, statusHandler
+
+      before(function () {
+        this.stubs = [
+          sinon.stub(substrateApi, 'isReadyOrError').get(() => Promise.reject()),
+          sinon.stub(substrateApi, 'isConnected').get(() => false),
+        ]
+      })
+
+      after(function () {
+        for (const stub of this.stubs) {
+          stub.restore()
+        }
+      })
+
+      before(async function () {
+        const server = await createHttpServer()
+        app = server.app
+        statusHandler = server.statusHandler
+      })
+
+      after(function () {
+        statusHandler.close()
+      })
+
+      test('service down', async function () {
+        const expectedResult = {
+          status: 'down',
+          version: API_VERSION,
+          details: {
+            api: {
+              status: 'down',
+              detail: {
+                message: 'Cannot connect to substrate node',
+              },
+            },
+          },
+        }
+
+        const actualResult = await healthCheck(app)
+        expect(actualResult.status).to.equal(503)
+        expect(actualResult.body).to.deep.equal(expectedResult)
+      })
+    })
+
+    describe('service down then up', function () {
+      let app, statusHandler
+
+      before(function () {
+        this.clock = sinon.useFakeTimers()
+        this.stubs = [
+          sinon.stub(substrateApi, 'isReadyOrError').get(() => Promise.reject()),
+          sinon
+            .stub(substrateApi, 'isConnected')
+            .onFirstCall()
+            .get(() => false)
+            .onSecondCall()
+            .get(() => true),
+        ]
+      })
+
+      after(function () {
+        for (const stub of this.stubs) {
+          stub.restore()
+        }
+        this.clock.restore()
+      })
+
+      before(async function () {
+        const server = await createHttpServer()
+        app = server.app
+        statusHandler = server.statusHandler
+      })
+
+      after(function () {
+        statusHandler.close()
+      })
+
+      test('service up', async function () {
+        const expectedResult = {
+          status: 'ok',
+          version: API_VERSION,
+          details: {
+            api: {
+              status: 'ok',
+              detail: {
+                chain: 'Development',
+                runtime: {
+                  name: 'dscp',
+                  versions: {
+                    authoring: 1,
+                    impl: 1,
+                    spec: 300,
+                    transaction: 1,
+                  },
+                },
+              },
+            },
+          },
+        }
+
+        await this.clock.tickAsync(10000)
+        const actualResult = await healthCheck(app)
+        expect(actualResult.status).to.equal(200)
+        expect(actualResult.body).to.deep.equal(expectedResult)
+      })
     })
   })
 

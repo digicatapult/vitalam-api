@@ -7,6 +7,8 @@ config:
   # externalIpfsHost: "" # This overrides dscpIpfs.enabled when setting the IPFS_HOST envar
   # externalIpfsPort: 5001 # This overrides dscpIpfs.enabled when setting the IPFS_PORT envar
   enableLivenessProbe: true
+  substrateStatusPollPeriodMs: 10000
+  substrateStatusTimeoutMs: 2000
   auth:
     jwksUri: https://inteli.eu.auth0.com/.well-known/jwks.json
     audience: inteli-dev

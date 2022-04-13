@@ -52,25 +52,27 @@ npm run test:integration
 
 The following environment variables are used by `dscp-api` and can be configured. Entries marked as `required` are needed when running `dscp-api` in production mode.
 
-| variable                      | required |                       default                       | description                                                                                  |
-| :---------------------------- | :------: | :-------------------------------------------------: | :------------------------------------------------------------------------------------------- |
-| PORT                          |    N     |                       `3001`                        | The port for the API to listen on                                                            |
-| API_HOST                      |    Y     |                          -                          | The hostname of the `dscp-node` the API should connect to                                    |
-| API_PORT                      |    N     |                       `9944`                        | The port of the `dscp-node` the API should connect to                                        |
-| LOG_LEVEL                     |    N     |                       `info`                        | Logging level. Valid values are [`trace`, `debug`, `info`, `warn`, `error`, `fatal`]         |
-| USER_URI                      |    Y     |                          -                          | The Substrate `URI` representing the private key to use when making `dscp-node` transactions |
-| IPFS_HOST                     |    Y     |                          -                          | Hostname of the `IPFS` node to use for metadata storage                                      |
-| IPFS_PORT                     |    N     |                       `15001`                       | Port of the `IPFS` node to use for metadata storage                                          |
-| AUTH_JWKS_URI                 |    N     | `https://inteli.eu.auth0.com/.well-known/jwks.json` | JSON Web Key Set containing public keys used by the Auth0 API                                |
-| AUTH_AUDIENCE                 |    N     |                    `inteli-dev`                     | Identifier of the Auth0 API                                                                  |
-| AUTH_ISSUER                   |    N     |           `https://inteli.eu.auth0.com/`            | Domain of the Auth0 API `                                                                    |
-| AUTH_TOKEN_URL                |    N     |      `https://inteli.eu.auth0.com/oauth/token`      | Auth0 API endpoint that issues an Authorisation (Bearer) access token                        |
-| METADATA_KEY_LENGTH           |    N     |                        `32`                         | Fixed length of metadata keys                                                                |
-| METADATA_VALUE_LITERAL_LENGTH |    N     |                        `32`                         | Fixed length of metadata LITERAL values                                                      |
-| MAX_METADATA_COUNT            |    N     |                        `16`                         | Maximum number of metadata items allowed per token                                           |
-| API_VERSION                   |    N     |               `package.json version`                | API version                                                                                  |
-| API_MAJOR_VERSION             |    N     |                        `v3`                         | API major version                                                                            |
-| FILE_UPLOAD_MAX_SIZE          |    N     |                 `200 * 1024 * 1024`                 | The Maximum file upload size (bytes)                                                         |
+| variable                        | required |                       default                       | description                                                                                  |
+| :------------------------------ | :------: | :-------------------------------------------------: | :------------------------------------------------------------------------------------------- |
+| PORT                            |    N     |                       `3001`                        | The port for the API to listen on                                                            |
+| API_HOST                        |    Y     |                          -                          | The hostname of the `dscp-node` the API should connect to                                    |
+| API_PORT                        |    N     |                       `9944`                        | The port of the `dscp-node` the API should connect to                                        |
+| LOG_LEVEL                       |    N     |                       `info`                        | Logging level. Valid values are [`trace`, `debug`, `info`, `warn`, `error`, `fatal`]         |
+| USER_URI                        |    Y     |                          -                          | The Substrate `URI` representing the private key to use when making `dscp-node` transactions |
+| IPFS_HOST                       |    Y     |                          -                          | Hostname of the `IPFS` node to use for metadata storage                                      |
+| IPFS_PORT                       |    N     |                       `15001`                       | Port of the `IPFS` node to use for metadata storage                                          |
+| AUTH_JWKS_URI                   |    N     | `https://inteli.eu.auth0.com/.well-known/jwks.json` | JSON Web Key Set containing public keys used by the Auth0 API                                |
+| AUTH_AUDIENCE                   |    N     |                    `inteli-dev`                     | Identifier of the Auth0 API                                                                  |
+| AUTH_ISSUER                     |    N     |           `https://inteli.eu.auth0.com/`            | Domain of the Auth0 API `                                                                    |
+| AUTH_TOKEN_URL                  |    N     |      `https://inteli.eu.auth0.com/oauth/token`      | Auth0 API endpoint that issues an Authorisation (Bearer) access token                        |
+| METADATA_KEY_LENGTH             |    N     |                        `32`                         | Fixed length of metadata keys                                                                |
+| METADATA_VALUE_LITERAL_LENGTH   |    N     |                        `32`                         | Fixed length of metadata LITERAL values                                                      |
+| MAX_METADATA_COUNT              |    N     |                        `16`                         | Maximum number of metadata items allowed per token                                           |
+| API_VERSION                     |    N     |               `package.json version`                | API version                                                                                  |
+| API_MAJOR_VERSION               |    N     |                        `v3`                         | API major version                                                                            |
+| FILE_UPLOAD_MAX_SIZE            |    N     |                 `200 * 1024 * 1024`                 | The Maximum file upload size (bytes)                                                         |
+| SUBSTRATE_STATUS_POLL_PERIOD_MS |    N     |                     `10 * 1000`                     | Number of ms between calls to check dscp-node status                                         |
+| SUBSTRATE_STATUS_TIMEOUT_MS     |    N     |                     `2 * 1000`                      | Number of ms to wait for response to dscp-node health requests                               |
 
 ## Running the API
 

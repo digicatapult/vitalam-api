@@ -3,6 +3,7 @@ const { substrateApi } = require('../util/substrateApi')
 const { SUBSTRATE_STATUS_POLL_PERIOD_MS, SUBSTRATE_STATUS_TIMEOUT_MS } = require('../env')
 
 const getStatus = async () => {
+  await substrateApi.isReadyOrError.catch(() => {})
   if (!substrateApi.isConnected) {
     return {
       status: serviceState.DOWN,

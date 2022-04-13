@@ -51,7 +51,7 @@ describe('routes', function () {
     nock.cleanAll()
   })
 
-  describe('health check', function () {
+  describe.only('health check', function () {
     let app, statusHandler
 
     before(async function () {

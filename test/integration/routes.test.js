@@ -3,6 +3,7 @@ const { describe, test, before, after, afterEach } = require('mocha')
 const { expect } = require('chai')
 const nock = require('nock')
 const moment = require('moment')
+const sinon = require('sinon')
 
 const { createHttpServer } = require('../../app/server')
 const {
@@ -32,9 +33,12 @@ const {
   METADATA_KEY_LENGTH,
   METADATA_VALUE_LITERAL_LENGTH,
   MAX_METADATA_COUNT,
-  API_VERSION,
   PROCESS_IDENTIFIER_LENGTH,
 } = require('../../app/env')
+
+const { responses: healthcheckResponses } = require('../helper/healthcheckFixtures')
+
+const { substrateApi } = require('../../app/util/substrateApi')
 
 const BASE58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
 const bs58 = require('base-x')(BASE58)
@@ -52,44 +56,100 @@ describe('routes', function () {
   })
 
   describe('health check', function () {
-    let app, statusHandler
+    describe('happy path', function () {
+      let app, statusHandler
 
-    before(async function () {
-      const server = await createHttpServer()
-      app = server.app
-      statusHandler = server.statusHandler
+      before(async function () {
+        const server = await createHttpServer()
+        app = server.app
+        statusHandler = server.statusHandler
+      })
+
+      after(function () {
+        statusHandler.close()
+      })
+
+      test('health check', async function () {
+        const response = healthcheckResponses.ok
+        const actualResult = await healthCheck(app)
+        expect(actualResult.status).to.equal(response.code)
+        expect(actualResult.body).to.deep.equal(response.body)
+      })
     })
 
-    after(function () {
-      statusHandler.close()
+    describe('service down', function () {
+      let app, statusHandler
+
+      before(function () {
+        this.stubs = [
+          sinon.stub(substrateApi, 'isReadyOrError').get(() => Promise.reject()),
+          sinon.stub(substrateApi, 'isConnected').get(() => false),
+        ]
+      })
+
+      after(function () {
+        for (const stub of this.stubs) {
+          stub.restore()
+        }
+      })
+
+      before(async function () {
+        const server = await createHttpServer()
+        app = server.app
+        statusHandler = server.statusHandler
+      })
+
+      after(function () {
+        statusHandler.close()
+      })
+
+      test('service down', async function () {
+        const response = healthcheckResponses.down
+        const actualResult = await healthCheck(app)
+        expect(actualResult.status).to.equal(response.code)
+        expect(actualResult.body).to.deep.equal(response.body)
+      })
     })
 
-    test('health check', async function () {
-      const expectedResult = {
-        status: 'ok',
-        version: API_VERSION,
-        details: {
-          api: {
-            status: 'ok',
-            detail: {
-              chain: 'Development',
-              runtime: {
-                name: 'dscp',
-                versions: {
-                  authoring: 1,
-                  impl: 1,
-                  spec: 300,
-                  transaction: 1,
-                },
-              },
-            },
-          },
-        },
-      }
+    describe('service down then up', function () {
+      let app, statusHandler
 
-      const actualResult = await healthCheck(app)
-      expect(actualResult.status).to.equal(200)
-      expect(actualResult.body).to.deep.equal(expectedResult)
+      before(function () {
+        this.clock = sinon.useFakeTimers()
+        this.stubs = [
+          sinon.stub(substrateApi, 'isReadyOrError').get(() => Promise.reject()),
+          sinon
+            .stub(substrateApi, 'isConnected')
+            .onFirstCall()
+            .get(() => false)
+            .onSecondCall()
+            .get(() => true),
+        ]
+      })
+
+      after(function () {
+        for (const stub of this.stubs) {
+          stub.restore()
+        }
+        this.clock.restore()
+      })
+
+      before(async function () {
+        const server = await createHttpServer()
+        app = server.app
+        statusHandler = server.statusHandler
+      })
+
+      after(function () {
+        statusHandler.close()
+      })
+
+      test('service up', async function () {
+        const response = healthcheckResponses.ok
+        const actualResult = await healthCheck(app)
+        expect(actualResult.status).to.equal(response.code)
+        expect(actualResult.body).to.deep.equal(response.body)
+      })
     })
   })
 

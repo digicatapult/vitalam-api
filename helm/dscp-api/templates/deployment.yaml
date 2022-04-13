@@ -70,6 +70,16 @@ spec:
                 configMapKeyRef:
                   name: {{ include "dscp-api.fullname" . }}-config
                   key: authTokenUrl
+            - name: SUBSTRATE_STATUS_POLL_PERIOD_MS
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "dscp-api.fullname" . }}-config
+                  key: substrateStatusPollPeriodMs
+            - name: SUBSTRATE_STATUS_TIMEOUT_MS
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "dscp-api.fullname" . }}-config
+                  key: substrateStatusTimeoutMs
             - name: USER_URI
               valueFrom:
                 secretKeyRef:

@@ -1,8 +1,8 @@
 apiVersion: v2
 name: dscp-api
-appVersion: '4.0.4'
+appVersion: '4.0.5'
 description: A Helm chart for dscp-api
-version: '4.0.4'
+version: '4.0.5'
 type: application
 dependencies:
   - name: dscp-node

@@ -69,7 +69,7 @@ const responses = {
               versions: {
                 authoring: 1,
                 impl: 1,
-                spec: 300,
+                spec: 310,
                 transaction: 1,
               },
             },
@@ -99,7 +99,7 @@ const responses = {
               versions: {
                 authoring: 1,
                 impl: 1,
-                spec: 300,
+                spec: 310,
                 transaction: 1,
               },
             },
@@ -129,7 +129,7 @@ const responses = {
               versions: {
                 authoring: 1,
                 impl: 1,
-                spec: 300,
+                spec: 310,
                 transaction: 1,
               },
             },

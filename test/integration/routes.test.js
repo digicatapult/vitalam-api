@@ -34,6 +34,8 @@ const {
   METADATA_VALUE_LITERAL_LENGTH,
   MAX_METADATA_COUNT,
   PROCESS_IDENTIFIER_LENGTH,
+  IPFS_HOST,
+  IPFS_PORT,
 } = require('../../app/env')
 
 const { responses: healthcheckResponses } = require('../helper/healthcheckFixtures')
@@ -77,7 +79,7 @@ describe('routes', function () {
       })
     })
 
-    describe('service down', function () {
+    describe('substrate service down', function () {
       let app, statusHandler
 
       before(function () {
@@ -104,14 +106,14 @@ describe('routes', function () {
       })
 
       test('service down', async function () {
-        const response = healthcheckResponses.down
+        const response = healthcheckResponses.substrateDown
         const actualResult = await healthCheck(app)
         expect(actualResult.status).to.equal(response.code)
         expect(actualResult.body).to.deep.equal(response.body)
       })
     })
 
-    describe('service down then up', function () {
+    describe('substrate service down then up', function () {
       let app, statusHandler
 
       before(function () {
@@ -146,6 +148,106 @@ describe('routes', function () {
 
       test('service up', async function () {
         const response = healthcheckResponses.ok
+        const actualResult = await healthCheck(app)
+        expect(actualResult.status).to.equal(response.code)
+        expect(actualResult.body).to.deep.equal(response.body)
+      })
+    })
+
+    describe('ipfs service down', function () {
+      let app, statusHandler
+
+      before(function () {
+        nock.disableNetConnect()
+        nock.enableNetConnect((host) => {
+          return host !== `${IPFS_HOST}:${IPFS_PORT}`
+        })
+      })
+
+      after(function () {
+        nock.cleanAll()
+        nock.enableNetConnect()
+      })
+
+      before(async function () {
+        const server = await createHttpServer()
+        app = server.app
+        statusHandler = server.statusHandler
+      })
+
+      after(function () {
+        statusHandler.close()
+      })
+
+      test('service down', async function () {
+        const response = healthcheckResponses.ipfsDown
+        const actualResult = await healthCheck(app)
+        expect(actualResult.status).to.equal(response.code)
+        expect(actualResult.body).to.deep.equal(response.body)
+      })
+    })
+
+    describe('ipfs service no peers', function () {
+      let app, statusHandler
+
+      before(function () {
+        nock(`http://${IPFS_HOST}:${IPFS_PORT}`)
+          .post('/api/v0/version')
+          .reply(200, { Version: '0.12.2' })
+          .post('/api/v0/swarm/peers')
+          .reply(200, { Peers: null })
+      })
+
+      after(function () {
+        nock.cleanAll()
+      })
+
+      before(async function () {
+        const server = await createHttpServer()
+        app = server.app
+        statusHandler = server.statusHandler
+      })
+
+      after(function () {
+        statusHandler.close()
+      })
+
+      test('service down', async function () {
+        const response = healthcheckResponses.ipfsDownNoPeers
+        const actualResult = await healthCheck(app)
+        expect(actualResult.status).to.equal(response.code)
+        expect(actualResult.body).to.deep.equal(response.body)
+      })
+    })
+
+    describe('ipfs service slow response', function () {
+      let app, statusHandler
+
+      before(function () {
+        nock(`http://${IPFS_HOST}:${IPFS_PORT}`)
+          .post('/api/v0/version')
+          .delayBody(2000) // 2 seconds
+          .reply(200, { Version: '0.12.2' })
+          .post('/api/v0/swarm/peers')
+          .reply(200, { Peers: [{ Peer: '1' }] })
+      })
+
+      after(function () {
+        nock.cleanAll()
+      })
+
+      before(async function () {
+        const server = await createHttpServer()
+        app = server.app
+        statusHandler = server.statusHandler
+      })
+
+      after(function () {
+        statusHandler.close()
+      })
+
+      test('service down', async function () {
+        const response = healthcheckResponses.ipfsDownTimeout
         const actualResult = await healthCheck(app)
         expect(actualResult.status).to.equal(response.code)
         expect(actualResult.body).to.deep.equal(response.body)

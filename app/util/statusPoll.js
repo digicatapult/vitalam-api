@@ -12,7 +12,12 @@ const mkStatusGenerator = async function* ({ getStatus, serviceTimeoutMs }) {
     try {
       const newStatus = await Promise.race([
         getStatus(),
-        delay(serviceTimeoutMs, { status: serviceState.ERROR, detail: null }),
+        delay(serviceTimeoutMs, {
+          status: serviceState.DOWN,
+          detail: {
+            message: 'Timeout fetching status',
+          },
+        }),
       ])
 
       if (stateSymbols.has(newStatus.status)) {

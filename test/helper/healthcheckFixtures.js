@@ -22,10 +22,17 @@ const responses = {
             },
           },
         },
+        ipfs: {
+          status: 'ok',
+          detail: {
+            version: '0.12.2',
+            peerCount: 1,
+          },
+        },
       },
     },
   },
-  down: {
+  substrateDown: {
     code: 503,
     body: {
       status: 'down',
@@ -35,6 +42,104 @@ const responses = {
           status: 'down',
           detail: {
             message: 'Cannot connect to substrate node',
+          },
+        },
+        ipfs: {
+          status: 'ok',
+          detail: {
+            version: '0.12.2',
+            peerCount: 1,
+          },
+        },
+      },
+    },
+  },
+  ipfsDown: {
+    code: 503,
+    body: {
+      status: 'down',
+      version: API_VERSION,
+      details: {
+        api: {
+          status: 'ok',
+          detail: {
+            chain: 'Development',
+            runtime: {
+              name: 'dscp',
+              versions: {
+                authoring: 1,
+                impl: 1,
+                spec: 300,
+                transaction: 1,
+              },
+            },
+          },
+        },
+        ipfs: {
+          status: 'down',
+          detail: {
+            message: 'Error getting status from IPFS node',
+          },
+        },
+      },
+    },
+  },
+  ipfsDownTimeout: {
+    code: 503,
+    body: {
+      status: 'down',
+      version: API_VERSION,
+      details: {
+        api: {
+          status: 'ok',
+          detail: {
+            chain: 'Development',
+            runtime: {
+              name: 'dscp',
+              versions: {
+                authoring: 1,
+                impl: 1,
+                spec: 300,
+                transaction: 1,
+              },
+            },
+          },
+        },
+        ipfs: {
+          status: 'down',
+          detail: {
+            message: 'Timeout fetching status',
+          },
+        },
+      },
+    },
+  },
+  ipfsDownNoPeers: {
+    code: 503,
+    body: {
+      status: 'down',
+      version: API_VERSION,
+      details: {
+        api: {
+          status: 'ok',
+          detail: {
+            chain: 'Development',
+            runtime: {
+              name: 'dscp',
+              versions: {
+                authoring: 1,
+                impl: 1,
+                spec: 300,
+                transaction: 1,
+              },
+            },
+          },
+        },
+        ipfs: {
+          status: 'down',
+          detail: {
+            version: '0.12.2',
+            peerCount: 0,
           },
         },
       },

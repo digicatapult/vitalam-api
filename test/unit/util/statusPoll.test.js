@@ -117,7 +117,9 @@ describe('startStatusHandler', function () {
     const status = this.handler.status
     expect(status).to.deep.equal(serviceState.DOWN)
     const detail = this.handler.detail
-    expect(detail).to.deep.equal('Timeout fetching status')
+    expect(detail).to.deep.equal({
+      message: 'Timeout fetching status',
+    })
   })
 
   it('should not allow detail to be undefined', async function () {

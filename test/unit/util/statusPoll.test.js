@@ -115,7 +115,7 @@ describe('startStatusHandler', function () {
     await this.clock.tickAsync(pollingPeriodMs)
     await this.clock.tickAsync(serviceTimeoutMs)
     const status = this.handler.status
-    expect(status).to.deep.equal(serviceState.ERROR)
+    expect(status).to.deep.equal(serviceState.DOWN)
     const detail = this.handler.detail
     expect(detail).to.deep.equal(null)
   })

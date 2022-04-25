@@ -73,6 +73,8 @@ The following environment variables are used by `dscp-api` and can be configured
 | FILE_UPLOAD_MAX_SIZE            |    N     |                 `200 * 1024 * 1024`                 | The Maximum file upload size (bytes)                                                         |
 | SUBSTRATE_STATUS_POLL_PERIOD_MS |    N     |                     `10 * 1000`                     | Number of ms between calls to check dscp-node status                                         |
 | SUBSTRATE_STATUS_TIMEOUT_MS     |    N     |                     `2 * 1000`                      | Number of ms to wait for response to dscp-node health requests                               |
+| IPFS_STATUS_POLL_PERIOD_MS      |    N     |                     `10 * 1000`                     | Number of ms between calls to check ipfs status                                         |
+| IPFS_STATUS_TIMEOUT_MS          |    N     |                     `2 * 1000`                      | Number of ms to wait for response to ipfs health requests                               |
 
 ## Running the API
 

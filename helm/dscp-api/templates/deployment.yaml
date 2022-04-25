@@ -85,7 +85,7 @@ spec:
                 configMapKeyRef:
                   name: {{ include "dscp-api.fullname" . }}-config
                   key: ipfsStatusPollPeriodMs
-            - name:   IPFS_STATUS_TIMEOUT_MS
+            - name: IPFS_STATUS_TIMEOUT_MS
               valueFrom:
                 configMapKeyRef:
                   name: {{ include "dscp-api.fullname" . }}-config

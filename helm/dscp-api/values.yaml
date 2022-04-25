@@ -9,6 +9,8 @@ config:
   enableLivenessProbe: true
   substrateStatusPollPeriodMs: 10000
   substrateStatusTimeoutMs: 2000
+  ipfsStatusPollPeriodMs: 10000
+  ipfsStatusTimeoutMs: 2000
   auth:
     jwksUri: https://inteli.eu.auth0.com/.well-known/jwks.json
     audience: inteli-dev
@@ -26,7 +28,7 @@ replicaCount: 1
 image:
   repository: ghcr.io/digicatapult/dscp-api
   pullPolicy: IfNotPresent
-  tag: 'v4.0.5'
+  tag: 'v4.1.0'
 
 dscpNode:
   enabled: false

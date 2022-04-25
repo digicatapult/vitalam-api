@@ -1,13 +1,13 @@
 {
   "name": "dscp-api",
-  "version": "4.0.5",
+  "version": "4.1.0",
   "description": "DSCP API",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/digicatapult/dscp-api.git"
   },
   "author": "Digital Catapult",
-  "license": "ISC",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/digicatapult/dscp-api/issues"
   },

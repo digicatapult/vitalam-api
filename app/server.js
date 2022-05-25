@@ -13,7 +13,7 @@ const apiDoc = require('./api-v3/api-doc')
 const apiService = require('./api-v3/services/apiService')
 const { startStatusHandlers } = require('./serviceStatus')
 const { serviceState } = require('./util/statusPoll')
-const { verifyJwks } = require('./util/appUtil')
+const { verifyJwks } = require('./util/auth')
 
 async function createHttpServer() {
   const requestLogger = pinoHttp({ logger })

@@ -1,4 +1,5 @@
 const { getMetadataResponse } = require('../../../../../util/appUtil')
+const { openApiSecurity } = require('../../../../../util/auth')
 
 module.exports = function () {
   const doc = {
@@ -61,7 +62,7 @@ module.exports = function () {
         },
       },
     },
-    security: [{ bearerAuth: [] }],
+    security: openApiSecurity(),
     tags: ['item'],
   }
 

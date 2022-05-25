@@ -26,3 +26,4 @@ data:
   substrateStatusTimeoutMs: {{ .Values.config.substrateStatusTimeoutMs | quote }}
   ipfsStatusPollPeriodMs: {{ .Values.config.ipfsStatusPollPeriodMs | quote }}
   ipfsStatusTimeoutMs: {{ .Values.config.ipfsStatusTimeoutMs | quote }}
+  authType: {{ .Values.config.authType }}

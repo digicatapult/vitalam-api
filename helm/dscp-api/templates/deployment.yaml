@@ -90,6 +90,11 @@ spec:
                 configMapKeyRef:
                   name: {{ include "dscp-api.fullname" . }}-config
                   key: ipfsStatusTimeoutMs
+            - name: AUTH_TYPE
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "dscp-api.fullname" . }}-config
+                  key: authType
             - name: USER_URI
               valueFrom:
                 secretKeyRef:

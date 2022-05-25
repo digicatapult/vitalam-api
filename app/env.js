@@ -32,6 +32,10 @@ const vars = envalid.cleanEnv(process.env, {
   SUBSTRATE_STATUS_TIMEOUT_MS: envalid.num({ default: 2 * 1000 }),
   IPFS_STATUS_POLL_PERIOD_MS: envalid.num({ default: 10 * 1000 }),
   IPFS_STATUS_TIMEOUT_MS: envalid.num({ default: 2 * 1000 }),
+  AUTH_TYPE: envalid.str({
+    default: 'NONE',
+    choices: ['NONE', 'JWT'],
+  }),
 })
 
 module.exports = {

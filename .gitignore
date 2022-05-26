@@ -6,6 +6,7 @@ node_modules/
 # Test coverage
 coverage
 .nyc_output
+coverage.json
 
 # Logs
 npm-debug.log*

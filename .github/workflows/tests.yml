@@ -122,6 +122,9 @@ jobs:
         run: npm run lint
 
   tests:
+    strategy:
+      matrix:
+        auth: [NONE, JWT]
     name: Run tests
     runs-on: ubuntu-latest
     steps:
@@ -151,6 +154,9 @@ jobs:
           time: '30s'
       - name: Run tests
         run: npm run test
+        env:
+          AUTH_TYPE: ${{ matrix.auth }}
+      
 
   check-version:
     name: 'Check version'

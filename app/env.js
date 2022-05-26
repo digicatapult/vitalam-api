@@ -9,7 +9,22 @@ if (process.env.NODE_ENV === 'test') {
   dotenv.config({ path: '.env' })
 }
 
+const AUTH_ENVS = {
+  NONE: {},
+  JWT: {
+    AUTH_JWKS_URI: envalid.url({ devDefault: 'https://inteli.eu.auth0.com/.well-known/jwks.json' }),
+    AUTH_AUDIENCE: envalid.str({ devDefault: 'inteli-dev' }),
+    AUTH_ISSUER: envalid.url({ devDefault: 'https://inteli.eu.auth0.com/' }),
+    AUTH_TOKEN_URL: envalid.url({ devDefault: 'https://inteli.eu.auth0.com/oauth/token' }),
+  },
+}
+
+const { AUTH_TYPE } = envalid.cleanEnv(process.env, {
+  AUTH_TYPE: envalid.str({ default: 'NONE', choices: ['NONE', 'JWT'] }),
+})
+
 const vars = envalid.cleanEnv(process.env, {
+  ...AUTH_ENVS[AUTH_TYPE],
   PORT: envalid.port({ default: 3001 }),
   API_HOST: envalid.host({ devDefault: 'localhost' }),
   API_PORT: envalid.port({ default: 9944 }),
@@ -17,10 +32,6 @@ const vars = envalid.cleanEnv(process.env, {
   USER_URI: envalid.str({ devDefault: '//Alice' }),
   IPFS_HOST: envalid.host({ devDefault: 'localhost' }),
   IPFS_PORT: envalid.port({ devDefault: 5001, default: 15001 }),
-  AUTH_JWKS_URI: envalid.url({ devDefault: 'https://inteli.eu.auth0.com/.well-known/jwks.json' }),
-  AUTH_AUDIENCE: envalid.str({ devDefault: 'inteli-dev' }),
-  AUTH_ISSUER: envalid.url({ devDefault: 'https://inteli.eu.auth0.com/' }),
-  AUTH_TOKEN_URL: envalid.url({ devDefault: 'https://inteli.eu.auth0.com/oauth/token' }),
   METADATA_KEY_LENGTH: envalid.num({ default: 32 }),
   METADATA_VALUE_LITERAL_LENGTH: envalid.num({ default: 32 }),
   PROCESS_IDENTIFIER_LENGTH: envalid.num({ default: 32 }),
@@ -32,12 +43,9 @@ const vars = envalid.cleanEnv(process.env, {
   SUBSTRATE_STATUS_TIMEOUT_MS: envalid.num({ default: 2 * 1000 }),
   IPFS_STATUS_POLL_PERIOD_MS: envalid.num({ default: 10 * 1000 }),
   IPFS_STATUS_TIMEOUT_MS: envalid.num({ default: 2 * 1000 }),
-  AUTH_TYPE: envalid.str({
-    default: 'NONE',
-    choices: ['NONE', 'JWT'],
-  }),
 })
 
 module.exports = {
   ...vars,
+  AUTH_TYPE,
 }

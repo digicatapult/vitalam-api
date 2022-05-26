@@ -1,5 +1,5 @@
 const logger = require('../../logger')
-const { openApiSecurity } = require('../../util/auth')
+const { getDefaultSecurity } = require('../../util/auth')
 
 module.exports = function (apiService) {
   const doc = {
@@ -52,7 +52,7 @@ module.exports = function (apiService) {
         },
       },
     },
-    security: openApiSecurity(),
+    security: getDefaultSecurity(),
     tags: ['system'],
   }
 

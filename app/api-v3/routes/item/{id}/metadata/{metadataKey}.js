@@ -1,5 +1,5 @@
 const { getMetadataResponse } = require('../../../../../util/appUtil')
-const { openApiSecurity } = require('../../../../../util/auth')
+const { getDefaultSecurity } = require('../../../../../util/auth')
 
 module.exports = function () {
   const doc = {
@@ -62,7 +62,7 @@ module.exports = function () {
         },
       },
     },
-    security: openApiSecurity(),
+    security: getDefaultSecurity(),
     tags: ['item'],
   }
 

@@ -7,7 +7,7 @@ const multer = require('multer')
 const path = require('path')
 const bodyParser = require('body-parser')
 const compression = require('compression')
-const { PORT, API_VERSION, API_MAJOR_VERSION } = require('./env')
+const { PORT, API_VERSION, API_MAJOR_VERSION, AUTH_TYPE } = require('./env')
 const logger = require('./logger')
 const apiDoc = require('./api-v3/api-doc')
 const apiService = require('./api-v3/services/apiService')
@@ -57,6 +57,15 @@ async function createHttpServer() {
   })
 
   const multerStorage = multer.diskStorage({})
+  const securityHandlers =
+    AUTH_TYPE === 'JWT'
+      ? {
+          bearerAuth: (req) => {
+            return verifyJwks(req.headers['authorization'])
+          },
+        }
+      : {}
+
   initialize({
     app,
     apiDoc: apiDoc,
@@ -68,11 +77,7 @@ async function createHttpServer() {
         })
       },
     },
-    securityHandlers: {
-      bearerAuth: (req) => {
-        return verifyJwks(req.headers['authorization'])
-      },
-    },
+    securityHandlers: securityHandlers,
     dependencies: {
       apiService: apiService,
     },

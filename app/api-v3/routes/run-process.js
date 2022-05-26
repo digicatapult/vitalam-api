@@ -1,6 +1,6 @@
 const logger = require('../../logger')
 const { validateInputIds, processRoles, processMetadata, validateProcess } = require('../../util/appUtil')
-const { openApiSecurity } = require('../../util/auth')
+const { getDefaultSecurity } = require('../../util/auth')
 const { PROCESS_IDENTIFIER_LENGTH } = require('../../env')
 
 module.exports = function (apiService) {
@@ -170,7 +170,7 @@ module.exports = function (apiService) {
         },
       },
     },
-    security: openApiSecurity(),
+    security: getDefaultSecurity(),
     tags: ['system'],
   }
 

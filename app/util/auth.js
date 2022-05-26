@@ -47,7 +47,7 @@ const verifyJwks = async (authHeader) => {
   })
 }
 
-const openApiSecurity = () => {
+const getDefaultSecurity = () => {
   switch (AUTH_TYPE) {
     case 'NONE':
       return []
@@ -60,5 +60,5 @@ const openApiSecurity = () => {
 
 module.exports = {
   verifyJwks,
-  openApiSecurity,
+  getDefaultSecurity,
 }

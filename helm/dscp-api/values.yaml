@@ -29,7 +29,7 @@ replicaCount: 1
 image:
   repository: ghcr.io/digicatapult/dscp-api
   pullPolicy: IfNotPresent
-  tag: 'v4.2.0'
+  tag: 'v4.2.1'
 
 dscpNode:
   enabled: false

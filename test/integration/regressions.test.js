@@ -11,11 +11,12 @@ const { createHttpServer } = require('../../app/server')
 const { getItemRoute, getLastTokenIdRoute } = require('../helper/routeHelper')
 const USER_ALICE_TOKEN = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY'
 const { rolesEnum } = require('../../app/util/appUtil')
-const { API_MAJOR_VERSION, AUTH_ISSUER, AUTH_AUDIENCE } = require('../../app/env')
+const { API_MAJOR_VERSION, AUTH_ISSUER, AUTH_AUDIENCE, AUTH_TYPE } = require('../../app/env')
 
 const defaultRole = { [rolesEnum[0]]: USER_ALICE_TOKEN }
+const describeAuthOnly = AUTH_TYPE === 'JWT' ? describe : describe.skip
 
-describe('Bug regression tests', function () {
+describeAuthOnly('Bug regression tests', function () {
   describe('API run-process is broken with file uploads (https://github.com/digicatapult/dscp-api/issues/17)', function () {
     let app
     let jwksMock

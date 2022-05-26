@@ -13,6 +13,7 @@ config:
   ipfsStatusTimeoutMs: 2000
   authType: NONE
   auth:
+    type: NONE
     jwksUri: https://inteli.eu.auth0.com/.well-known/jwks.json
     audience: inteli-dev
     issuer: https://inteli.eu.auth0.com/

@@ -50,26 +50,6 @@ spec:
                 configMapKeyRef:
                   name: {{ include "dscp-api.fullname" . }}-config
                   key: ipfsPort
-            - name: AUTH_JWKS_URI
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "dscp-api.fullname" . }}-config
-                  key: authJwksUri
-            - name: AUTH_AUDIENCE
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "dscp-api.fullname" . }}-config
-                  key: authAudience
-            - name: AUTH_ISSUER
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "dscp-api.fullname" . }}-config
-                  key: authIssuer
-            - name: AUTH_TOKEN_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "dscp-api.fullname" . }}-config
-                  key: authTokenUrl
             - name: SUBSTRATE_STATUS_POLL_PERIOD_MS
               valueFrom:
                 configMapKeyRef:
@@ -100,6 +80,28 @@ spec:
                 secretKeyRef:
                   name: {{ include "dscp-api.fullname" . }}-secret
                   key: accountKey
+            {{- if eq .Values.config.auth.type "JWT" }}
+            - name: AUTH_JWKS_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "dscp-api.fullname" . }}-config
+                  key: authJwksUri
+            - name: AUTH_AUDIENCE
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "dscp-api.fullname" . }}-config
+                  key: authAudience
+            - name: AUTH_ISSUER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "dscp-api.fullname" . }}-config
+                  key: authIssuer
+            - name: AUTH_TOKEN_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "dscp-api.fullname" . }}-config
+                  key: authTokenUrl
+            {{- end }}
           ports:
             - containerPort: {{ .Values.config.port }}
               name: http

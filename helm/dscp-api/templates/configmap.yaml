@@ -18,12 +18,14 @@ data:
   {{- else if .Values.dscpIpfs.enabled }}
   ipfsPort: {{ template "dscp-ipfs.ipfsApiPort" .Subcharts.dscpIpfs }}
   {{- end }}
+  {{- if eq .Values.config.auth.type "JWT" }}
   authJwksUri: {{ .Values.config.auth.jwksUri }}
   authAudience: {{ .Values.config.auth.audience }}
   authIssuer: {{ .Values.config.auth.issuer }}
   authTokenUrl: {{ .Values.config.auth.tokenUrl }}
+  {{- end }}
   substrateStatusPollPeriodMs: {{ .Values.config.substrateStatusPollPeriodMs | quote }}
   substrateStatusTimeoutMs: {{ .Values.config.substrateStatusTimeoutMs | quote }}
   ipfsStatusPollPeriodMs: {{ .Values.config.ipfsStatusPollPeriodMs | quote }}
   ipfsStatusTimeoutMs: {{ .Values.config.ipfsStatusTimeoutMs | quote }}
-  authType: {{ .Values.config.authType }}
+  authType: {{ .Values.config.auth.type }}

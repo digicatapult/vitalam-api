@@ -25,7 +25,8 @@
     "lint": "eslint .",
     "start": "NODE_ENV=production node app/index.js",
     "dev": "NODE_ENV=development nodemon app/index.js | pino-colada",
-    "coverage": "LOG_LEVEL=fatal NODE_ENV=development nyc mocha --recursive ./test/integration --timeout 60000 --slow 20000 --exit"
+    "coverage": "LOG_LEVEL=fatal NODE_ENV=development nyc mocha --recursive ./test/integration --timeout 60000 --slow 20000 --exit",
+    "coverage:merge": "LOG_LEVEL=fatal NODE_ENV=development npm run test && npm run test:jwt && nyc merge coverage.json --timeout 60000 --slow 20000 --exit"
   },
   "dependencies": {
     "@digicatapult/dscp-node": "^3.6.0",

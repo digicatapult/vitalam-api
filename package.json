@@ -26,7 +26,6 @@
     "start": "NODE_ENV=production node app/index.js",
     "dev": "NODE_ENV=development nodemon app/index.js | pino-colada",
     "coverage": "LOG_LEVEL=fatal NODE_ENV=development nyc mocha --recursive ./test/integration --timeout 60000 --slow 20000 --exit",
-    "coverage:jwt": "LOG_LEVEL=fatal NODE_ENV=development AUTH_TYPE=JWT nyc mocha --recursive ./test/integration --timeout 60000 --slow 20000 --exit",
     "coverage:merge": "LOG_LEVEL=fatal NODE_ENV=development nyc --no-clean npm run test && nyc --no-clean npm run test:jwt && nyc merge .nyc_output --timeout 60000 --slow 20000 --exit"
   },
   "dependencies": {

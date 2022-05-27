@@ -11,7 +11,6 @@ config:
   substrateStatusTimeoutMs: 2000
   ipfsStatusPollPeriodMs: 10000
   ipfsStatusTimeoutMs: 2000
-  authType: NONE
   auth:
     type: NONE
     jwksUri: https://inteli.eu.auth0.com/.well-known/jwks.json

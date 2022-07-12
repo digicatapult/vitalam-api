@@ -16,20 +16,19 @@ module.exports = function (apiService) {
 
       try {
         const result = await apiService.findItemById(id)
+        if (!result) {
+          res.status(404).json({
+            message: `Id not found: ${id}`,
+          })
+        }
         const { metadata, ...rest } = result
         const response = {
           ...rest,
           metadata_keys: getReadableMetadataKeys(metadata),
         }
 
-        if (result.id === id) {
-          res.status(200).json(response)
-          return
-        } else {
-          res.status(404).json({
-            message: `Id not found: ${id}`,
-          })
-        }
+        res.status(200).json(response)
+        return
       } catch (err) {
         logger.error(`Error token. Error was ${err.message || JSON.stringify(err)}`)
         if (!res.headersSent) {

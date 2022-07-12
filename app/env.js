@@ -34,7 +34,6 @@ const vars = envalid.cleanEnv(process.env, {
   METADATA_KEY_LENGTH: envalid.num({ default: 32 }),
   METADATA_VALUE_LITERAL_LENGTH: envalid.num({ default: 32 }),
   PROCESS_IDENTIFIER_LENGTH: envalid.num({ default: 32 }),
-  MAX_METADATA_COUNT: envalid.num({ default: 16 }),
   API_VERSION: envalid.str({ default: version }),
   API_MAJOR_VERSION: envalid.str({ default: 'v3' }),
   FILE_UPLOAD_MAX_SIZE: envalid.num({ default: 200 * 1024 * 1024 }),

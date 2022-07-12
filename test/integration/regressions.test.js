@@ -10,10 +10,9 @@ const request = require('supertest')
 const { createHttpServer } = require('../../app/server')
 const { getItemRoute, getLastTokenIdRoute } = require('../helper/routeHelper')
 const USER_ALICE_TOKEN = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY'
-const { rolesEnum } = require('../../app/util/appUtil')
+const { indexToRole } = require('../../app/util/appUtil')
 const { API_MAJOR_VERSION, AUTH_ISSUER, AUTH_AUDIENCE, AUTH_TYPE } = require('../../app/env')
 
-const defaultRole = { [rolesEnum[0]]: USER_ALICE_TOKEN }
 const describeAuthOnly = AUTH_TYPE === 'JWT' ? describe : describe.skip
 
 describeAuthOnly('Bug regression tests', function () {
@@ -55,6 +54,7 @@ describeAuthOnly('Bug regression tests', function () {
     })
 
     test('add and get item - single metadata FILE', async function () {
+      const defaultRole = { [await indexToRole(0)]: USER_ALICE_TOKEN }
       const outputs = [{ roles: defaultRole, metadata: { testFile: { type: 'FILE', value: 'test_file_01.txt' } } }]
 
       let req = request(app)

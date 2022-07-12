@@ -7,18 +7,11 @@ const fetch = require('node-fetch')
 const FormData = require('form-data')
 
 const {
-  types: {
-    Role: { _enum: rolesEnum },
-  },
-} = require('../util/substrateApi')
-
-const {
   USER_URI,
   IPFS_HOST,
   IPFS_PORT,
   METADATA_KEY_LENGTH,
   METADATA_VALUE_LITERAL_LENGTH,
-  MAX_METADATA_COUNT,
   PROCESS_IDENTIFIER_LENGTH,
 } = require('../env')
 const logger = require('../logger')
@@ -57,7 +50,7 @@ function formatHash(filestoreResponse) {
 }
 
 const processRoles = async (roles) => {
-  const defaultRole = rolesEnum[0]
+  const defaultRole = await indexToRole(0)
   if (!roles[defaultRole]) {
     throw new Error(`Roles must include default ${defaultRole} role. Roles: ${JSON.stringify(roles)}`)
   }
@@ -67,17 +60,25 @@ const processRoles = async (roles) => {
   }
 
   return new Map(
-    Object.entries(roles).map(([key, v]) => {
-      return [roleEnumAsIndex(key), v]
-    })
+    await Promise.all(
+      Object.entries(roles).map(async ([key, v]) => {
+        return [await roleToIndex(key), v]
+      })
+    )
   )
+}
+
+async function getMaxMetadataCount() {
+  await api.isReady
+  return api.consts.simpleNFT.maxMetadataCount.toNumber()
 }
 
 const validMetadataValueTypes = new Set(['LITERAL', 'TOKEN_ID', 'FILE', 'NONE'])
 async function processMetadata(metadata, files) {
+  const maxMetadataCount = await getMaxMetadataCount()
   const metadataItems = Object.entries(metadata)
-  if (metadataItems.length > MAX_METADATA_COUNT)
-    throw new Error(`Metadata has too many items: ${metadataItems.length}. Max item count: ${MAX_METADATA_COUNT}`)
+  if (metadataItems.length > maxMetadataCount)
+    throw new Error(`Metadata has too many items: ${metadataItems.length}. Max item count: ${maxMetadataCount}`)
 
   return new Map(
     await Promise.all(
@@ -201,7 +202,7 @@ const downloadFile = async (dirHash) => {
 
 async function getLastTokenId() {
   await api.isReady
-  const lastTokenId = await api.query.simpleNftModule.lastToken()
+  const lastTokenId = await api.query.simpleNFT.lastToken()
 
   return lastTokenId ? parseInt(lastTokenId, 10) : 0
 }
@@ -213,8 +214,8 @@ async function containsInvalidMembershipRoles(roles) {
   const validMembers = accountIds.reduce((acc, accountId) => {
     if (membershipMembers.includes(accountId)) {
       acc.push(accountId)
-      return acc
     }
+    return acc
   }, [])
 
   return !validMembers || validMembers.length === 0 || validMembers.length !== accountIds.length
@@ -229,8 +230,8 @@ function membershipReducer(members) {
 
 async function getMembers() {
   await api.isReady
-
-  return api.query.membership.members()
+  const membersRaw = await api.query.membership.members()
+  return membersRaw.map((m) => m.toString())
 }
 
 async function runProcess(process, inputs, outputs) {
@@ -242,7 +243,7 @@ async function runProcess(process, inputs, outputs) {
     logger.debug('Running Transaction inputs: %j outputs: %j', inputs, relevantOutputs)
     return new Promise((resolve, reject) => {
       let unsub = null
-      api.tx.simpleNftModule
+      api.tx.simpleNFT
         .runProcess(process, inputs, relevantOutputs)
         .signAndSend(alice, (result) => {
           logger.debug('result.status %s', JSON.stringify(result.status))
@@ -253,7 +254,7 @@ async function runProcess(process, inputs, outputs) {
               .map(({ event: { data } }) => data[0])
 
             if (errors.length > 0) {
-              reject('ExtrinsicFailed error in simpleNftModule')
+              reject('ExtrinsicFailed error in simpleNFT')
             }
 
             const tokens = result.events
@@ -289,18 +290,27 @@ const getItemMetadataSingle = async (tokenId, metadataKey) => {
   return metadataValue
 }
 
+function transformItem({ originalId, createdAt, destroyedAt, ...rest }) {
+  return {
+    original_id: originalId,
+    created_at: createdAt,
+    destroyed_at: destroyedAt,
+    ...rest,
+  }
+}
+
 async function getItem(tokenId) {
-  let response = {}
+  await api.isReady
+  const itemRaw = (await api.query.simpleNFT.tokensById(tokenId)).toJSON()
 
-  if (tokenId) {
-    await api.isReady
-    const item = (await api.query.simpleNftModule.tokensById(tokenId)).toJSON()
-    const timestamp = await getTimestamp(item.created_at)
-
-    response = { ...item, timestamp }
+  if (!itemRaw) {
+    return null
   }
 
-  return response
+  const item = transformItem(itemRaw)
+  const timestamp = await getTimestamp(item.created_at)
+
+  return { ...item, timestamp }
 }
 
 async function getTimestamp(blockNumber) {
@@ -317,7 +327,7 @@ async function getTimestamp(blockNumber) {
     method: { args: rawTimestamp },
   } = timestampEx
 
-  const unix = parseInt(rawTimestamp[0].replace(/,/g, '')) // convert from e.g. [ '1,644,402,612,003' ]
+  const unix = parseInt(rawTimestamp.now.replace(/,/g, '')) // convert from e.g. { now: '1,644,402,612,003' }
   const timestamp = new Date(unix).toISOString()
 
   return timestamp
@@ -354,7 +364,7 @@ const validateInputIds = async (accountIds) => {
     if (!uptoNow || !id || !Number.isInteger(id)) return false
 
     const { roles, id: echoId, children } = await getItem(id)
-    const defaultRole = rolesEnum[0]
+    const defaultRole = await indexToRole(0)
     if (roles[defaultRole] !== userId) return false
 
     return children === null && echoId === id
@@ -375,14 +385,36 @@ const validateTokenId = (tokenId) => {
   return id
 }
 
-const roleEnumAsIndex = (role) => {
-  const index = rolesEnum.indexOf(role)
+const roleToIndex = async (role) => {
+  await api.isReady
+  const registry = api.registry
+  const lookup = registry.lookup
+  const lookupId = registry.getDefinition('DscpNodeRuntimeRole')
+  const rolesEnum = lookup.getTypeDef(lookupId).sub
 
-  if (index === -1) {
+  const entry = rolesEnum.find((e) => e.name === role)
+
+  if (!entry) {
     throw new Error(`Invalid role: ${role}`)
   }
 
-  return index
+  return entry.index
+}
+
+const indexToRole = async (index) => {
+  await api.isReady
+  const registry = api.registry
+  const lookup = registry.lookup
+  const lookupId = registry.getDefinition('DscpNodeRuntimeRole')
+  const rolesEnum = lookup.getTypeDef(lookupId).sub
+
+  const entry = rolesEnum.find((e) => e.index === index)
+
+  if (!entry) {
+    throw new Error(`Invalid role index: ${index}`)
+  }
+
+  return entry.name
 }
 
 const getMetadataResponse = async (tokenId, metadataKey, res) => {
@@ -464,10 +496,12 @@ module.exports = {
   validateInputIds,
   validateTokenId,
   getReadableMetadataKeys,
+  getMaxMetadataCount,
   hexToUtf8,
   utf8ToUint8Array,
   membershipReducer,
-  rolesEnum,
+  roleToIndex,
+  indexToRole,
   containsInvalidMembershipRoles,
   getMetadataResponse,
   validateProcess,

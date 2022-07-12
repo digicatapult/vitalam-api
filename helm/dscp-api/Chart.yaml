@@ -1,18 +1,18 @@
 apiVersion: v2
 name: dscp-api
-appVersion: '4.3.0'
+appVersion: '4.4.0'
 description: A Helm chart for dscp-api
-version: '4.3.0'
+version: '4.4.0'
 type: application
 dependencies:
   - name: dscp-node
-    version: '3.0.1'
+    version: '3.8.0'
     repository: https://digicatapult.github.io/dscp-node/
     condition: dscpNode.enabled
     alias: dscpNode
 
   - name: dscp-ipfs
-    version: '2.0.1'
+    version: '2.2.0'
     repository: https://digicatapult.github.io/dscp-ipfs/
     condition: dscpIpfs.enabled
     alias: dscpIpfs

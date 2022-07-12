@@ -1,6 +1,6 @@
 {
   "name": "dscp-api",
-  "version": "4.3.0",
+  "version": "4.4.0",
   "description": "DSCP API",
   "repository": {
     "type": "git",
@@ -29,7 +29,7 @@
     "coverage:merge": "LOG_LEVEL=fatal NODE_ENV=development nyc --no-clean npm run test && nyc --no-clean npm run test:jwt && nyc merge .nyc_output --timeout 60000 --slow 20000 --exit"
   },
   "dependencies": {
-    "@digicatapult/dscp-node": "^3.6.0",
+    "@digicatapult/dscp-node": "^3.8.0",
     "base-x": "^3.0.8",
     "body-parser": "^1.19.0",
     "compression": "^1.7.4",
@@ -41,7 +41,7 @@
     "form-data": "^4.0.0",
     "jsonwebtoken": "^8.5.1",
     "jwks-rsa": "^2.0.3",
-    "multer": "^1.4.4",
+    "multer": "^1.4.5-lts.1",
     "node-fetch": "^2.6.7",
     "pino": "^6.11.3",
     "pino-http": "^5.5.0",
@@ -55,9 +55,9 @@
     "eslint-plugin-prettier": "^3.4.0",
     "mocha": "^9.2.0",
     "mock-jwks": "^1.0.3",
-    "moment": "^2.29.1",
+    "moment": "^2.29.4",
     "nock": "^13.1.0",
-    "nodemon": "^2.0.7",
+    "nodemon": "^2.0.19",
     "nyc": "^15.1.0",
     "pino-colada": "^2.1.0",
     "prettier": "^2.3.1",

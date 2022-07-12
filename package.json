@@ -29,7 +29,7 @@
     "coverage:merge": "LOG_LEVEL=fatal NODE_ENV=development nyc --no-clean npm run test && nyc --no-clean npm run test:jwt && nyc merge .nyc_output --timeout 60000 --slow 20000 --exit"
   },
   "dependencies": {
-    "@digicatapult/dscp-node": "^3.8.0",
+    "@digicatapult/dscp-node": "^4.0.0",
     "base-x": "^3.0.8",
     "body-parser": "^1.19.0",
     "compression": "^1.7.4",

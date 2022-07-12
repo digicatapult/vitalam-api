@@ -12,7 +12,7 @@ dependencies:
     alias: dscpNode
 
   - name: dscp-ipfs
-    version: '2.2.0'
+    version: '2.3.0'
     repository: https://digicatapult.github.io/dscp-ipfs/
     condition: dscpIpfs.enabled
     alias: dscpIpfs

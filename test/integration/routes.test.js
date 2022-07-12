@@ -19,9 +19,7 @@ const {
 } = require('../helper/routeHelper')
 const { withNewTestProcess } = require('../helper/substrateHelper')
 const USER_ALICE_TOKEN = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY'
-const ALICE_STASH = '5GNJqTPyNqANBkUVMN1LPPrxXnFouWXoe2wNSmmEoLctxiZY'
 const USER_BOB_TOKEN = '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'
-const BOB_STASH = '5HpG9w8EBLe5XCrbczpwq5TSXvedjrBGCwqxK1iQ7qUsSWFc'
 const USER_CHARLIE_TOKEN = '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y'
 const { assertItem } = require('../helper/appHelper')
 const { runProcess, utf8ToUint8Array, rolesEnum } = require('../../app/util/appUtil')
@@ -637,9 +635,8 @@ describe('routes', function () {
       test('return membership members', async function () {
         let expectedResult = [
           { address: USER_BOB_TOKEN },
-          { address: ALICE_STASH },
+          { address: USER_CHARLIE_TOKEN },
           { address: USER_ALICE_TOKEN },
-          { address: BOB_STASH },
         ]
 
         const res = await getMembersRoute(app, authToken)
@@ -1204,9 +1201,8 @@ describe('routes', function () {
       test('return membership members', async function () {
         let expectedResult = [
           { address: USER_BOB_TOKEN },
-          { address: ALICE_STASH },
+          { address: USER_CHARLIE_TOKEN },
           { address: USER_ALICE_TOKEN },
-          { address: BOB_STASH },
         ]
 
         const res = await getMembersRoute(app, null)

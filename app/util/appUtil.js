@@ -223,7 +223,6 @@ async function getMembers() {
 }
 
 async function runProcess(process, inputs, outputs) {
-  console.log(outputs[0].metadata)
   if (inputs && outputs) {
     await api.isReady
     const alice = keyring.addFromUri(USER_URI)

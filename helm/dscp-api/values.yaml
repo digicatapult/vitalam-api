@@ -18,18 +18,26 @@ config:
     issuer: https://inteli.eu.auth0.com/
     tokenUrl: https://inteli.eu.auth0.com/oauth/token
 
+deployment:
+  annotations: {}
+  replicaCount: 1
+
 ingress:
-  # annotations: {}
+  annotations: {}
   # className: ""
+  enabled: true
   paths:
     - /v3
 
-replicaCount: 1
+service:
+  annotations: {}
+  enabled: true
+  port: 80
 
 image:
   repository: ghcr.io/digicatapult/dscp-api
   pullPolicy: IfNotPresent
-  tag: 'v4.3.0'
+  tag: 'v4.4.0'
 
 dscpNode:
   enabled: false

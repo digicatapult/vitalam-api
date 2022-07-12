@@ -8,12 +8,15 @@ spec:
   selector:
     matchLabels:
       name: {{ include "dscp-api.fullname" . }}
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.deployment.replicaCount }}
   template:
     metadata:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
         checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        {{- with .Values.deployment.annotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       labels:
         name: {{ include "dscp-api.fullname" . }}
     spec:

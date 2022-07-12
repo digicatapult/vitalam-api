@@ -21,7 +21,7 @@ const { withNewTestProcess } = require('../helper/substrateHelper')
 const USER_ALICE_TOKEN = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY'
 const USER_BOB_TOKEN = '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'
 const USER_CHARLIE_TOKEN = '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y'
-const INVALID_MEMBER_TOKEN = '5GNJqTPyNqANBkUVMN1LPPrxXnFouWXoe2wNSmmEoLctxiZY'
+const NON_MEMBER_TOKEN = '5GNJqTPyNqANBkUVMN1LPPrxXnFouWXoe2wNSmmEoLctxiZY'
 const { assertItem } = require('../helper/appHelper')
 const { runProcess, utf8ToUint8Array, indexToRole, getMaxMetadataCount } = require('../../app/util/appUtil')
 const {
@@ -901,7 +901,7 @@ describe('routes', function () {
           [],
           [
             {
-              roles: { [await indexToRole(0)]: INVALID_MEMBER_TOKEN },
+              roles: { [await indexToRole(0)]: NON_MEMBER_TOKEN },
               metadata: { testFile: { type: 'FILE', value: './test/data/test_file_01.txt' } },
             },
           ]
@@ -929,7 +929,7 @@ describe('routes', function () {
         )
         const outputs = [
           {
-            roles: { [await indexToRole(0)]: INVALID_MEMBER_TOKEN },
+            roles: { [await indexToRole(0)]: NON_MEMBER_TOKEN },
             metadata: { testFile: { type: 'FILE', value: './test/data/test_file_04.txt' } },
           },
         ]

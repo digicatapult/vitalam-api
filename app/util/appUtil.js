@@ -83,7 +83,7 @@ async function processMetadata(metadata, files) {
   return new Map(
     await Promise.all(
       metadataItems.map(async ([key, value]) => {
-        const keyAsUint8Array = utf8ToUint8Array(key, METADATA_KEY_LENGTH)
+        const keyAsUint8Array = utf8ToHex(key, METADATA_KEY_LENGTH)
 
         if (typeof value !== 'object' || value === null || !validMetadataValueTypes.has(value.type)) {
           throw new Error(
@@ -119,7 +119,7 @@ const processLiteral = (value) => {
   const literalValue = value.value
   if (!literalValue) throw new Error(`Literal metadata requires a value field`)
 
-  const valueAsUint8Array = utf8ToUint8Array(literalValue, METADATA_VALUE_LITERAL_LENGTH)
+  const valueAsUint8Array = utf8ToHex(literalValue, METADATA_VALUE_LITERAL_LENGTH)
   return { Literal: valueAsUint8Array }
 }
 
@@ -163,18 +163,6 @@ const validateProcess = async (id, version) => {
     id: processId,
     version,
   }
-}
-
-const utf8ToUint8Array = (str, len) => {
-  const arr = new Uint8Array(len)
-  try {
-    arr.set(Buffer.from(str, 'utf8'))
-  } catch (err) {
-    if (err instanceof RangeError) {
-      throw new Error(`${str} is too long. Max length: ${len} bytes`)
-    } else throw err
-  }
-  return arr
 }
 
 const downloadFile = async (dirHash) => {
@@ -235,6 +223,7 @@ async function getMembers() {
 }
 
 async function runProcess(process, inputs, outputs) {
+  console.log(outputs[0].metadata)
   if (inputs && outputs) {
     await api.isReady
     const alice = keyring.addFromUri(USER_URI)
@@ -498,7 +487,7 @@ module.exports = {
   getReadableMetadataKeys,
   getMaxMetadataCount,
   hexToUtf8,
-  utf8ToUint8Array,
+  utf8ToHex,
   membershipReducer,
   roleToIndex,
   indexToRole,

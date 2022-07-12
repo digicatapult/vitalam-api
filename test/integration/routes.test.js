@@ -23,7 +23,7 @@ const USER_BOB_TOKEN = '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'
 const USER_CHARLIE_TOKEN = '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y'
 const NON_MEMBER_TOKEN = '5GNJqTPyNqANBkUVMN1LPPrxXnFouWXoe2wNSmmEoLctxiZY'
 const { assertItem } = require('../helper/appHelper')
-const { runProcess, utf8ToUint8Array, indexToRole, getMaxMetadataCount } = require('../../app/util/appUtil')
+const { runProcess, utf8ToHex, indexToRole, getMaxMetadataCount } = require('../../app/util/appUtil')
 const {
   AUTH_ISSUER,
   AUTH_AUDIENCE,
@@ -533,7 +533,7 @@ describe('routes', function () {
 
         const base64Metadata = `0x${bs58.decode(base58Metadata).toString('hex').slice(4)}`
 
-        const key = utf8ToUint8Array('testFile', METADATA_KEY_LENGTH)
+        const key = utf8ToHex('testFile', METADATA_KEY_LENGTH)
         const output = { roles: new Map([[0, USER_ALICE_TOKEN]]), metadata: new Map([[key, { File: base64Metadata }]]) }
 
         await runProcess(null, [], [output])

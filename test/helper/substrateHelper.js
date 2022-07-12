@@ -1,12 +1,9 @@
 const { before, after } = require('mocha')
 const { substrateApi: api, keyring } = require('../../app/util/substrateApi')
 
-const { PROCESS_IDENTIFIER_LENGTH } = require('../../app/env')
-
 const withNewTestProcess = (process) => {
   const processStr = 'test-process'
-  const buffer = Buffer.alloc(PROCESS_IDENTIFIER_LENGTH)
-  buffer.write(processStr)
+  const buffer = Buffer.from(processStr, 'utf8')
   const processId = `0x${buffer.toString('hex')}`
   let processVersion
   before(async function () {

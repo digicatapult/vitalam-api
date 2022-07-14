@@ -83,8 +83,6 @@ jobs:
           context: .
           load: true
           file: ./Dockerfile
-          secrets: |
-            github=${{ secrets.GITHUB_TOKEN }}
           tags: |
             ${{ needs.repo_ids.outputs.repo_name }}:latest
           labels: |
@@ -116,8 +114,6 @@ jobs:
             ${{ runner.OS }}-
       - name: Install Packages
         run: npm ci
-        env:
-          GITHUB_PACKAGE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Lint
         run: npm run lint
 
@@ -144,8 +140,6 @@ jobs:
             ${{ runner.OS }}-
       - name: Install Packages
         run: npm ci
-        env:
-          GITHUB_PACKAGE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Setup dependencies
         run: docker-compose up -d
       - name: Sleep
@@ -156,7 +150,7 @@ jobs:
         run: npm run test
         env:
           AUTH_TYPE: ${{ matrix.auth }}
-      
+
 
   check-version:
     name: 'Check version'

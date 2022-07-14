@@ -89,8 +89,6 @@ jobs:
           context: .
           load: true
           file: ./Dockerfile
-          secrets: |
-            github=${{ secrets.GITHUB_TOKEN }}
           tags: |
             ${{ needs.preconditions.outputs.repo_name }}:latest
           labels: |
@@ -123,8 +121,6 @@ jobs:
             ${{ runner.OS }}-
       - name: Install Packages
         run: npm ci
-        env:
-          GITHUB_PACKAGE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Lint
         run: npm run lint
 
@@ -152,8 +148,6 @@ jobs:
             ${{ runner.OS }}-
       - name: Install Packages
         run: npm ci
-        env:
-          GITHUB_PACKAGE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Setup dependencies
         run: docker-compose up -d
       - name: Sleep
@@ -164,7 +158,7 @@ jobs:
         run: npm run test
         env:
           AUTH_TYPE: ${{ matrix.auth }}
-          
+
   check-version:
     name: 'Check version'
     runs-on: ubuntu-latest
@@ -227,8 +221,6 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
           file: ./Dockerfile
-          secrets: |
-            github=${{ secrets.GITHUB_TOKEN }}
           platforms: linux/amd64
           tags: |
             ghcr.io/${{ needs.preconditions.outputs.org_name }}/${{ needs.preconditions.outputs.repo_name }}:${{ needs.check-version.outputs.version }}

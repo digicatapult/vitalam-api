@@ -25,7 +25,7 @@ const responses = {
         ipfs: {
           status: 'ok',
           detail: {
-            version: '0.12.2',
+            version: '0.13.1',
             peerCount: 1,
           },
         },
@@ -47,7 +47,7 @@ const responses = {
         ipfs: {
           status: 'ok',
           detail: {
-            version: '0.12.2',
+            version: '0.13.1',
             peerCount: 1,
           },
         },
@@ -138,7 +138,7 @@ const responses = {
         ipfs: {
           status: 'down',
           detail: {
-            version: '0.12.2',
+            version: '0.13.1',
             peerCount: 0,
           },
         },

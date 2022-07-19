@@ -197,7 +197,7 @@ describe('routes', function () {
       before(function () {
         nock(`http://${IPFS_HOST}:${IPFS_PORT}`)
           .post('/api/v0/version')
-          .reply(200, { Version: '0.12.2' })
+          .reply(200, { Version: '0.13.1' })
           .post('/api/v0/swarm/peers')
           .reply(200, { Peers: null })
       })
@@ -231,7 +231,7 @@ describe('routes', function () {
         nock(`http://${IPFS_HOST}:${IPFS_PORT}`)
           .post('/api/v0/version')
           .delayBody(2000) // 2 seconds
-          .reply(200, { Version: '0.12.2' })
+          .reply(200, { Version: '0.13.1' })
           .post('/api/v0/swarm/peers')
           .reply(200, { Peers: [{ Peer: '1' }] })
       })

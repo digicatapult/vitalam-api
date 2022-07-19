@@ -35,9 +35,9 @@ service:
   port: 80
 
 image:
-  repository: ghcr.io/digicatapult/dscp-api
+  repository: digicatapult/dscp-api
   pullPolicy: IfNotPresent
-  tag: 'v4.5.1'
+  tag: 'v4.6.0'
 
 dscpNode:
   enabled: false

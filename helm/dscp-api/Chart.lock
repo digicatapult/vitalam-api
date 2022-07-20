@@ -4,6 +4,6 @@ dependencies:
   version: 4.2.1
 - name: dscp-ipfs
   repository: https://digicatapult.github.io/dscp-ipfs/
-  version: 2.5.0
-digest: sha256:d2838bcc48ef98304743ee4d2b80ddfeeb36d2251d76a075c6734003b5634faf
-generated: "2022-07-19T10:57:19.904109+01:00"
+  version: 2.6.0
+digest: sha256:53b074312ab82855024446e24d9e526ca4d2fa5371088b7f878bf69dff8a544c
+generated: "2022-07-20T11:41:11.74048+01:00"

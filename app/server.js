@@ -69,7 +69,6 @@ async function createHttpServer() {
   initialize({
     app,
     apiDoc: apiDoc,
-    docsPath: '/v3/api-docs',
     consumesMiddleware: {
       'multipart/form-data': function (req, res, next) {
         multer({ storage: multerStorage }).any()(req, res, function (err) {
@@ -110,6 +109,12 @@ async function createHttpServer() {
       logger.error('Fallback Error %j', err.stack)
       res.status(500).send('Fatal error!')
     }
+  })
+
+  logger.trace('Registered Express routes: %s', {
+    toString: () => {
+      return JSON.stringify(app._router.stack.map(({ route }) => route && route.path).filter((p) => !!p))
+    },
   })
 
   return { app, statusHandler }

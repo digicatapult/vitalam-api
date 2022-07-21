@@ -1,4 +1,4 @@
-const { PORT, API_VERSION, API_MAJOR_VERSION } = require('../env')
+const { PORT, API_VERSION, API_MAJOR_VERSION, EXTERNAL_URL } = require('../env')
 
 const apiDoc = {
   openapi: '3.0.3',
@@ -8,7 +8,7 @@ const apiDoc = {
   },
   servers: [
     {
-      url: `http://localhost:${PORT}/${API_MAJOR_VERSION}`,
+      url: EXTERNAL_URL || `http://localhost:${PORT}/${API_MAJOR_VERSION}`,
     },
   ],
   components: {

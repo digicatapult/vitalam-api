@@ -1,7 +1,7 @@
 # fullNameOverride:
 config:
   port: 80
-  # externalNodeHost: "" # This overrides dscpNode.enabled when setting the API_HOST envar
+  # externalUrl: "http://localhost:3000/v3" # Overrides the server url in the openapi spec
   logLevel: info
   accountKey: //Alice
   # externalIpfsHost: "" # This overrides dscpIpfs.enabled when setting the IPFS_HOST envar
@@ -37,7 +37,7 @@ service:
 image:
   repository: digicatapult/dscp-api
   pullPolicy: IfNotPresent
-  tag: 'v4.6.2'
+  tag: 'v4.6.3'
 
 dscpNode:
   enabled: false

@@ -88,7 +88,7 @@ async function createHttpServer() {
     swaggerOptions: {
       urls: [
         {
-          url: `http://localhost:${PORT}/${API_MAJOR_VERSION}/api-docs`,
+          url: `../api-docs`,
           name: 'ApiService',
         },
       ],

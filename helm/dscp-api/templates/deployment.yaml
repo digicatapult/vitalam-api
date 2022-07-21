@@ -83,6 +83,13 @@ spec:
                 secretKeyRef:
                   name: {{ include "dscp-api.fullname" . }}-secret
                   key: accountKey
+            {{- if .Values.config.externalUrl }}
+            - name: EXTERNAL_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "dscp-api.fullname" . }}-config
+                  key: externalUrl
+            {{- end }}
             {{- if eq .Values.config.auth.type "JWT" }}
             - name: AUTH_JWKS_URI
               valueFrom:

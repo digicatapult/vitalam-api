@@ -7,7 +7,7 @@ const multer = require('multer')
 const path = require('path')
 const bodyParser = require('body-parser')
 const compression = require('compression')
-const { PORT, API_VERSION, API_MAJOR_VERSION, AUTH_TYPE } = require('./env')
+const { PORT, API_VERSION, API_MAJOR_VERSION, AUTH_TYPE, EXTERNAL_URL } = require('./env')
 const logger = require('./logger')
 const apiDoc = require('./api-v3/api-doc')
 const apiService = require('./api-v3/services/apiService')
@@ -88,7 +88,7 @@ async function createHttpServer() {
     swaggerOptions: {
       urls: [
         {
-          url: `../api-docs`,
+          url: EXTERNAL_URL ? `${EXTERNAL_URL}/api-docs` : `../api-docs`,
           name: 'ApiService',
         },
       ],

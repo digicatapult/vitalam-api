@@ -96,7 +96,7 @@ async function createHttpServer() {
   }
 
   app.use(
-    EXTERNAL_PATH_PREFIX ? `${EXTERNAL_PATH_PREFIX}/${API_MAJOR_VERSION}/swagger` : `/${API_MAJOR_VERSION}/swagger`,
+    EXTERNAL_PATH_PREFIX ? `/${EXTERNAL_PATH_PREFIX}/${API_MAJOR_VERSION}/swagger` : `/${API_MAJOR_VERSION}/swagger`,
     swaggerUi.serve,
     swaggerUi.setup(null, options)
   )

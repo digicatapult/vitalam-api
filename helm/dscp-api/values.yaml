@@ -38,7 +38,7 @@ service:
 image:
   repository: digicatapult/dscp-api
   pullPolicy: IfNotPresent
-  tag: 'v4.6.6'
+  tag: 'v4.6.7'
 
 dscpNode:
   enabled: false

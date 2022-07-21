@@ -41,7 +41,8 @@ const vars = envalid.cleanEnv(process.env, {
   SUBSTRATE_STATUS_TIMEOUT_MS: envalid.num({ default: 2 * 1000 }),
   IPFS_STATUS_POLL_PERIOD_MS: envalid.num({ default: 10 * 1000 }),
   IPFS_STATUS_TIMEOUT_MS: envalid.num({ default: 2 * 1000 }),
-  EXTERNAL_URL: envalid.str({ default: '' }),
+  EXTERNAL_ORIGIN: envalid.str({ default: '' }),
+  EXTERNAL_PATH_PREFIX: envalid.str({ default: '' }),
 })
 
 module.exports = {

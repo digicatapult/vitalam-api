@@ -7,7 +7,7 @@ const multer = require('multer')
 const path = require('path')
 const bodyParser = require('body-parser')
 const compression = require('compression')
-const { PORT, API_VERSION, API_MAJOR_VERSION, AUTH_TYPE, EXTERNAL_URL } = require('./env')
+const { PORT, API_VERSION, API_MAJOR_VERSION, AUTH_TYPE, EXTERNAL_PATH_PREFIX } = require('./env')
 const logger = require('./logger')
 const apiDoc = require('./api-v3/api-doc')
 const apiService = require('./api-v3/services/apiService')
@@ -88,14 +88,18 @@ async function createHttpServer() {
     swaggerOptions: {
       urls: [
         {
-          url: EXTERNAL_URL ? `${EXTERNAL_URL}/api-docs` : `../api-docs`,
+          url: `${apiDoc.servers[0].url}/api-docs`,
           name: 'ApiService',
         },
       ],
     },
   }
 
-  app.use(`/${API_MAJOR_VERSION}/swagger`, swaggerUi.serve, swaggerUi.setup(null, options))
+  app.use(
+    EXTERNAL_PATH_PREFIX ? `${EXTERNAL_PATH_PREFIX}/${API_MAJOR_VERSION}/swagger` : `/${API_MAJOR_VERSION}/swagger`,
+    swaggerUi.serve,
+    swaggerUi.setup(null, options)
+  )
 
   // Sorry - app.use checks arity
   // eslint-disable-next-line no-unused-vars

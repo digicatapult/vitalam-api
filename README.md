@@ -55,7 +55,8 @@ The following environment variables are used by `dscp-api` and can be configured
 | variable                        | required |        default         | description                                                                                  |
 | :------------------------------ | :------: | :--------------------: | :------------------------------------------------------------------------------------------- |
 | PORT                            |    N     |         `3001`         | The port for the API to listen on                                                            |
-| EXTERNAL_URL                    |    N     |                        | The url from which the OpenAPI service is accessible. If not provided the value will default to `http://localhost:${PORT}/${API_MAJOR_VERSION}` |
+| EXTERNAL_ORIGIN                    |    N     |                        | The origin from which the OpenAPI service is accessible. If not provided the value will default to `http://localhost:${PORT}` |
+| EXTERNAL_PATH_PREFIX                    |    N     |                        | A path prefix from which this service is served |
 | API_HOST                        |    Y     |           -            | The hostname of the `dscp-node` the API should connect to                                    |
 | API_PORT                        |    N     |         `9944`         | The port of the `dscp-node` the API should connect to                                        |
 | LOG_LEVEL                       |    N     |         `info`         | Logging level. Valid values are [`trace`, `debug`, `info`, `warn`, `error`, `fatal`]         |

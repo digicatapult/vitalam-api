@@ -69,6 +69,7 @@ async function createHttpServer() {
   initialize({
     app,
     apiDoc: apiDoc,
+    docsPath: '/v3/api-docs',
     consumesMiddleware: {
       'multipart/form-data': function (req, res, next) {
         multer({ storage: multerStorage }).any()(req, res, function (err) {

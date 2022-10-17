@@ -1,8 +1,7 @@
 import envalid from 'envalid'
 import dotenv from 'dotenv'
 
-import packageJson from '../package.json' assert { type: 'json' }
-const { version } = packageJson
+import version from './version.js'
 
 if (process.env.NODE_ENV === 'test') {
   dotenv.config({ path: 'test/test.env' })

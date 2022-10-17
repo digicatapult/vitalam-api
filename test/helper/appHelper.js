@@ -1,7 +1,7 @@
-const { expect } = require('chai')
+import { expect } from 'chai'
 
 // TODO compare block_number...
-function assertItem(actualResult, expectedResult) {
+export function assertItem(actualResult, expectedResult) {
   expect(actualResult.id).to.equal(expectedResult.id)
   expect(actualResult).has.property('created_at')
   expect(actualResult.roles).to.deep.equal(expectedResult.roles)
@@ -14,8 +14,4 @@ function assertItem(actualResult, expectedResult) {
     expect(actualResult.destroyed_at).to.not.equal(null)
   }
   expect(actualResult.metadata_keys).to.deep.equal(expectedResult.metadata_keys)
-}
-
-module.exports = {
-  assertItem,
 }

@@ -1,12 +1,12 @@
-const createJWKSMock = require('mock-jwks').default
-const { describe, test, before, after, afterEach } = require('mocha')
-const { expect } = require('chai')
-const nock = require('nock')
-const moment = require('moment')
-const sinon = require('sinon')
+import mockJwks from 'mock-jwks'
+import { describe, test, before, after, afterEach } from 'mocha'
+import { expect } from 'chai'
+import nock from 'nock'
+import moment from 'moment'
+import sinon from 'sinon'
 
-const { createHttpServer } = require('../../app/server')
-const {
+import { createHttpServer } from '../../app/server.js'
+import {
   healthCheck,
   postRunProcess,
   postRunProcessWithProcess,
@@ -16,14 +16,25 @@ const {
   getLastTokenIdRoute,
   addFileRoute,
   getMembersRoute,
-} = require('../helper/routeHelper')
-const { withNewTestProcess } = require('../helper/substrateHelper')
+} from '../helper/routeHelper.js'
+import { withNewTestProcess } from '../helper/substrateHelper.js'
+import { assertItem } from '../helper/appHelper.js'
+import { runProcess, utf8ToHex, indexToRole, getMaxMetadataCount } from '../../app/util/appUtil.js'
+import env from '../../app/env.js'
+
+import { responses as healthcheckResponses } from '../helper/healthcheckFixtures.js'
+
+import { substrateApi } from '../../app/util/substrateApi.js'
+import basex from 'base-x'
+
 const USER_ALICE_TOKEN = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY'
 const USER_BOB_TOKEN = '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'
 const USER_CHARLIE_TOKEN = '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y'
 const NON_MEMBER_TOKEN = '5GNJqTPyNqANBkUVMN1LPPrxXnFouWXoe2wNSmmEoLctxiZY'
-const { assertItem } = require('../helper/appHelper')
-const { runProcess, utf8ToHex, indexToRole, getMaxMetadataCount } = require('../../app/util/appUtil')
+
+const BASE58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+const bs58 = basex(BASE58)
+
 const {
   AUTH_ISSUER,
   AUTH_AUDIENCE,
@@ -33,14 +44,11 @@ const {
   IPFS_HOST,
   IPFS_PORT,
   AUTH_TYPE,
-} = require('../../app/env')
+} = env
 
-const { responses: healthcheckResponses } = require('../helper/healthcheckFixtures')
-
-const { substrateApi } = require('../../app/util/substrateApi')
-
-const BASE58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
-const bs58 = require('base-x')(BASE58)
+// it's super weird that we have to do this. createJWKSMock is declared as the default
+// export of mock-jwks but module resolution isn't working. Issue in mocha?
+const createJWKSMock = mockJwks.default
 
 const describeAuthOnly = AUTH_TYPE === 'JWT' ? describe : describe.skip
 const describeNoAuthOnly = AUTH_TYPE === 'NONE' ? describe : describe.skip
@@ -531,7 +539,7 @@ describe('routes', function () {
         const dir = await addFileRoute('./test/data/test_file_01.txt')
         const { Hash: base58Metadata } = dir.find((r) => r.Name === '')
 
-        const base64Metadata = `0x${bs58.decode(base58Metadata).toString('hex').slice(4)}`
+        const base64Metadata = `0x${Buffer.from(bs58.decode(base58Metadata)).toString('hex').slice(4)}`
 
         const key = utf8ToHex('testFile', METADATA_KEY_LENGTH)
         const output = { roles: new Map([[0, USER_ALICE_TOKEN]]), metadata: new Map([[key, { File: base64Metadata }]]) }

@@ -1,8 +1,10 @@
-const jwksRsa = require('jwks-rsa')
-const jwt = require('jsonwebtoken')
+import jwksRsa from 'jwks-rsa'
+import jwt from 'jsonwebtoken'
 
-const { AUTH_JWKS_URI, AUTH_AUDIENCE, AUTH_ISSUER, AUTH_TYPE } = require('../env')
-const logger = require('../logger')
+import env from '../env.js'
+import logger from '../logger.js'
+
+const { AUTH_JWKS_URI, AUTH_AUDIENCE, AUTH_ISSUER, AUTH_TYPE } = env
 
 const client = jwksRsa({
   cache: true,
@@ -23,7 +25,7 @@ async function getKey(header, cb) {
   })
 }
 
-const verifyJwks = async (authHeader) => {
+export const verifyJwks = async (authHeader) => {
   const authToken = authHeader ? authHeader.replace('Bearer ', '') : ''
 
   const verifyOptions = {
@@ -47,7 +49,7 @@ const verifyJwks = async (authHeader) => {
   })
 }
 
-const getDefaultSecurity = () => {
+export const getDefaultSecurity = () => {
   switch (AUTH_TYPE) {
     case 'NONE':
       return []
@@ -56,9 +58,4 @@ const getDefaultSecurity = () => {
     default:
       return []
   }
-}
-
-module.exports = {
-  verifyJwks,
-  getDefaultSecurity,
 }

@@ -1,21 +1,28 @@
-const express = require('express')
-const cors = require('cors')
-const pinoHttp = require('pino-http')
-const { initialize } = require('express-openapi')
-const swaggerUi = require('swagger-ui-express')
-const multer = require('multer')
-const path = require('path')
-const bodyParser = require('body-parser')
-const compression = require('compression')
-const { PORT, API_VERSION, API_MAJOR_VERSION, AUTH_TYPE, EXTERNAL_PATH_PREFIX } = require('./env')
-const logger = require('./logger')
-const apiDoc = require('./api-v3/api-doc')
-const apiService = require('./api-v3/services/apiService')
-const { startStatusHandlers } = require('./serviceStatus')
-const { serviceState } = require('./util/statusPoll')
-const { verifyJwks } = require('./util/auth')
+import express from 'express'
+import cors from 'cors'
+import pinoHttp from 'pino-http'
+import { initialize } from 'express-openapi'
+import swaggerUi from 'swagger-ui-express'
+import multer from 'multer'
+import path from 'path'
+import bodyParser from 'body-parser'
+import compression from 'compression'
 
-async function createHttpServer() {
+import env from './env.js'
+import logger from './logger.js'
+import apiDoc from './api-v3/api-doc.js'
+import apiService from './api-v3/services/apiService.js'
+import { startStatusHandlers } from './serviceStatus/index.js'
+import { serviceState } from './util/statusPoll.js'
+import { verifyJwks } from './util/auth.js'
+
+import url from 'url'
+const __filename = url.fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+const { PORT, API_VERSION, API_MAJOR_VERSION, AUTH_TYPE, EXTERNAL_PATH_PREFIX } = env
+
+export async function createHttpServer() {
   const requestLogger = pinoHttp({ logger })
   const app = express()
   const statusHandler = await startStatusHandlers()
@@ -124,7 +131,7 @@ async function createHttpServer() {
   return { app, statusHandler }
 }
 
-async function startServer() {
+export async function startServer() {
   try {
     const { app, statusHandler } = await createHttpServer()
 
@@ -168,5 +175,3 @@ async function startServer() {
     process.exit(1)
   }
 }
-
-module.exports = { startServer, createHttpServer }

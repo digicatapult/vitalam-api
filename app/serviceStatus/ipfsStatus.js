@@ -1,6 +1,9 @@
-const { startStatusHandler, serviceState } = require('../util/statusPoll')
-const fetch = require('node-fetch')
-const { IPFS_STATUS_POLL_PERIOD_MS, IPFS_STATUS_TIMEOUT_MS, IPFS_HOST, IPFS_PORT } = require('../env')
+import fetch from 'node-fetch'
+
+import { startStatusHandler, serviceState } from '../util/statusPoll.js'
+import env from '../env.js'
+
+const { IPFS_STATUS_POLL_PERIOD_MS, IPFS_STATUS_TIMEOUT_MS, IPFS_HOST, IPFS_PORT } = env
 
 const versionURL = `http://${IPFS_HOST}:${IPFS_PORT}/api/v0/version`
 const peersURL = `http://${IPFS_HOST}:${IPFS_PORT}/api/v0/swarm/peers`
@@ -43,4 +46,4 @@ const startIpfsStatus = () =>
     serviceTimeoutMs: IPFS_STATUS_TIMEOUT_MS,
   })
 
-module.exports = startIpfsStatus
+export default startIpfsStatus

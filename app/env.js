@@ -1,7 +1,8 @@
-const envalid = require('envalid')
-const dotenv = require('dotenv')
+import envalid from 'envalid'
+import dotenv from 'dotenv'
 
-const { version } = require('../package.json')
+import packageJson from '../package.json' assert { type: 'json' }
+const { version } = packageJson
 
 if (process.env.NODE_ENV === 'test') {
   dotenv.config({ path: 'test/test.env' })
@@ -45,7 +46,7 @@ const vars = envalid.cleanEnv(process.env, {
   EXTERNAL_PATH_PREFIX: envalid.str({ default: '' }),
 })
 
-module.exports = {
+export default {
   ...vars,
   AUTH_TYPE,
 }

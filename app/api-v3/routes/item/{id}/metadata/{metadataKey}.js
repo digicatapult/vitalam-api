@@ -1,7 +1,7 @@
-const { getMetadataResponse } = require('../../../../../util/appUtil')
-const { getDefaultSecurity } = require('../../../../../util/auth')
+import { getMetadataResponse } from '../../../../../util/appUtil.js'
+import { getDefaultSecurity } from '../../../../../util/auth.js'
 
-module.exports = function () {
+export default function () {
   const doc = {
     GET: async function (req, res) {
       return getMetadataResponse(req.params.id, req.params.metadataKey, res)

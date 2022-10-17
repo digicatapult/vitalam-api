@@ -1,11 +1,15 @@
 /* eslint no-console: "off" */
-const fs = require('fs')
-const request = require('supertest')
-const fetch = require('node-fetch')
-const FormData = require('form-data')
-const { IPFS_HOST, IPFS_PORT, API_MAJOR_VERSION } = require('../../app/env')
+import request from 'supertest'
+import fetch from 'node-fetch'
 
-async function healthCheck(app) {
+import { fileFromPath } from 'formdata-node/file-from-path'
+import { FormData } from 'formdata-node'
+
+import env from '../../app/env.js'
+
+const { IPFS_HOST, IPFS_PORT, API_MAJOR_VERSION } = env
+
+export async function healthCheck(app) {
   return request(app)
     .get('/health')
     .set('Accept', 'application/json')
@@ -19,9 +23,9 @@ async function healthCheck(app) {
     })
 }
 
-async function addFileRoute(file) {
+export async function addFileRoute(file) {
   const form = new FormData()
-  form.append('file', fs.createReadStream(file))
+  form.append('file', await fileFromPath(file))
   const body = await fetch(`http://${IPFS_HOST}:${IPFS_PORT}/api/v0/add?cid-version=0&wrap-with-directory=true`, {
     method: 'POST',
     body: form,
@@ -35,11 +39,11 @@ async function addFileRoute(file) {
   return json
 }
 
-async function postRunProcess(app, authToken, inputs, outputs) {
+export async function postRunProcess(app, authToken, inputs, outputs) {
   return postRunProcessWithProcess(app, authToken, null, inputs, outputs)
 }
 
-async function postRunProcessWithProcess(app, authToken, process, inputs, outputs) {
+export async function postRunProcessWithProcess(app, authToken, process, inputs, outputs) {
   let req = request(app)
     .post(`/${API_MAJOR_VERSION}/run-process`)
     .set('Accept', 'application/json')
@@ -74,7 +78,7 @@ async function postRunProcessWithProcess(app, authToken, process, inputs, output
     })
 }
 
-async function postRunProcessNoFileAttach(app, authToken, inputs, outputs) {
+export async function postRunProcessNoFileAttach(app, authToken, inputs, outputs) {
   let req = request(app)
     .post(`/${API_MAJOR_VERSION}/run-process`)
     .set('Accept', 'application/json')
@@ -98,7 +102,7 @@ async function postRunProcessNoFileAttach(app, authToken, inputs, outputs) {
     })
 }
 
-async function getItemRoute(app, authToken, { id }) {
+export async function getItemRoute(app, authToken, { id }) {
   return request(app)
     .get(`/${API_MAJOR_VERSION}/item/${id}`)
     .set('Accept', 'application/json')
@@ -113,7 +117,7 @@ async function getItemRoute(app, authToken, { id }) {
     })
 }
 
-async function getItemMetadataRoute(app, authToken, { id, metadataKey }) {
+export async function getItemMetadataRoute(app, authToken, { id, metadataKey }) {
   return request(app)
     .get(`/${API_MAJOR_VERSION}/item/${id}/metadata/${metadataKey}`)
     .set('Accept', 'application/octet-stream')
@@ -128,7 +132,7 @@ async function getItemMetadataRoute(app, authToken, { id, metadataKey }) {
     })
 }
 
-async function getLastTokenIdRoute(app, authToken) {
+export async function getLastTokenIdRoute(app, authToken) {
   return request(app)
     .get(`/${API_MAJOR_VERSION}/last-token`)
     .set('Accept', 'application/json')
@@ -143,7 +147,7 @@ async function getLastTokenIdRoute(app, authToken) {
     })
 }
 
-async function getMembersRoute(app, authToken) {
+export async function getMembersRoute(app, authToken) {
   return request(app)
     .get(`/${API_MAJOR_VERSION}/members`)
     .set('Accept', 'application/json')
@@ -156,16 +160,4 @@ async function getMembersRoute(app, authToken) {
       console.error(`getMembersErr ${err}`)
       return err
     })
-}
-
-module.exports = {
-  healthCheck,
-  postRunProcess,
-  postRunProcessWithProcess,
-  postRunProcessNoFileAttach,
-  addFileRoute,
-  getItemRoute,
-  getItemMetadataRoute,
-  getLastTokenIdRoute,
-  getMembersRoute,
 }

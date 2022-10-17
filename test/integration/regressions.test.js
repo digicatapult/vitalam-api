@@ -1,19 +1,24 @@
-const createJWKSMock = require('mock-jwks').default
-const { describe, test, before, after } = require('mocha')
-const { expect } = require('chai')
-const nock = require('nock')
+import mockJwks from 'mock-jwks'
+import { describe, test, before, after } from 'mocha'
+import { expect } from 'chai'
+import nock from 'nock'
 
 /* eslint no-console: "off" */
 
-const request = require('supertest')
+import request from 'supertest'
 
-const { createHttpServer } = require('../../app/server')
-const { getItemRoute, getLastTokenIdRoute } = require('../helper/routeHelper')
+import { createHttpServer } from '../../app/server.js'
+import { getItemRoute, getLastTokenIdRoute } from '../helper/routeHelper.js'
 const USER_ALICE_TOKEN = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY'
-const { indexToRole } = require('../../app/util/appUtil')
-const { API_MAJOR_VERSION, AUTH_ISSUER, AUTH_AUDIENCE, AUTH_TYPE } = require('../../app/env')
+import { indexToRole } from '../../app/util/appUtil.js'
+import env from '../../app/env.js'
 
+const { API_MAJOR_VERSION, AUTH_ISSUER, AUTH_AUDIENCE, AUTH_TYPE } = env
 const describeAuthOnly = AUTH_TYPE === 'JWT' ? describe : describe.skip
+
+// it's super weird that we have to do this. createJWKSMock is declared as the default
+// export of mock-jwks but module resolution isn't working. Issue in mocha?
+const createJWKSMock = mockJwks.default
 
 describeAuthOnly('Bug regression tests', function () {
   describe('API run-process is broken with file uploads (https://github.com/digicatapult/dscp-api/issues/17)', function () {

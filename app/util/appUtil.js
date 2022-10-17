@@ -1,10 +1,17 @@
-const fs = require('fs')
-const path = require('path')
-const StreamValues = require('stream-json/streamers/StreamValues')
+import path from 'path'
+import StreamValues from 'stream-json/streamers/StreamValues.js'
+import basex from 'base-x'
+import fetch from 'node-fetch'
+
+import { fileFromPath } from 'formdata-node/file-from-path'
+import { FormData } from 'formdata-node'
+
 const BASE58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
-const bs58 = require('base-x')(BASE58)
-const fetch = require('node-fetch')
-const FormData = require('form-data')
+const bs58 = basex(BASE58)
+
+import env from '../env.js'
+import logger from '../logger.js'
+import { substrateApi as api, keyring } from './substrateApi.js'
 
 const {
   USER_URI,
@@ -13,15 +20,13 @@ const {
   METADATA_KEY_LENGTH,
   METADATA_VALUE_LITERAL_LENGTH,
   PROCESS_IDENTIFIER_LENGTH,
-} = require('../env')
-const logger = require('../logger')
-const { substrateApi: api, keyring } = require('./substrateApi')
+} = env
 
 async function addFile(file) {
   logger.debug('Uploading file %s', file.originalname)
   logger.trace('Temporary file is stored at path: %s', file.path)
   const form = new FormData()
-  form.append('file', fs.createReadStream(file.path), file.originalname)
+  form.append('file', await fileFromPath(file.path), file.originalname)
   const body = await fetch(`http://${IPFS_HOST}:${IPFS_PORT}/api/v0/add?cid-version=0&wrap-with-directory=true`, {
     method: 'POST',
     body: form,
@@ -36,7 +41,6 @@ async function addFile(file) {
 
   const hash = formatHash(json)
   logger.debug('Upload of file %s succeeded. Hash is %s', file.originalname, hash)
-
   return hash
 }
 
@@ -44,12 +48,12 @@ function formatHash(filestoreResponse) {
   // directory has no Name
   const dir = filestoreResponse.find((r) => r.Name === '')
   if (dir && dir.Hash && dir.Size) {
-    const decoded = bs58.decode(dir.Hash)
+    const decoded = Buffer.from(bs58.decode(dir.Hash))
     return `0x${decoded.toString('hex').slice(4)}`
   }
 }
 
-const processRoles = async (roles) => {
+export const processRoles = async (roles) => {
   const defaultRole = await indexToRole(0)
   if (!roles[defaultRole]) {
     throw new Error(`Roles must include default ${defaultRole} role. Roles: ${JSON.stringify(roles)}`)
@@ -68,13 +72,13 @@ const processRoles = async (roles) => {
   )
 }
 
-async function getMaxMetadataCount() {
+export async function getMaxMetadataCount() {
   await api.isReady
   return api.consts.simpleNFT.maxMetadataCount.toNumber()
 }
 
 const validMetadataValueTypes = new Set(['LITERAL', 'TOKEN_ID', 'FILE', 'NONE'])
-async function processMetadata(metadata, files) {
+export async function processMetadata(metadata, files) {
   const maxMetadataCount = await getMaxMetadataCount()
   const metadataItems = Object.entries(metadata)
   if (metadataItems.length > maxMetadataCount)
@@ -145,7 +149,7 @@ const processFile = async (value, files) => {
   return { File: filestoreResponse }
 }
 
-const validateProcess = async (id, version) => {
+export const validateProcess = async (id, version) => {
   await api.isReady
 
   const processId = utf8ToHex(id, PROCESS_IDENTIFIER_LENGTH)
@@ -188,14 +192,14 @@ const downloadFile = async (dirHash) => {
   return { file: fileRes.body, filename }
 }
 
-async function getLastTokenId() {
+export async function getLastTokenId() {
   await api.isReady
   const lastTokenId = await api.query.simpleNFT.lastToken()
 
   return lastTokenId ? parseInt(lastTokenId, 10) : 0
 }
 
-async function containsInvalidMembershipRoles(roles) {
+export async function containsInvalidMembershipRoles(roles) {
   const membershipMembers = await getMembers()
 
   const accountIds = Object.values(roles)
@@ -209,20 +213,20 @@ async function containsInvalidMembershipRoles(roles) {
   return !validMembers || validMembers.length === 0 || validMembers.length !== accountIds.length
 }
 
-function membershipReducer(members) {
+export function membershipReducer(members) {
   return members.reduce((acc, item) => {
     acc.push({ address: item })
     return acc
   }, [])
 }
 
-async function getMembers() {
+export async function getMembers() {
   await api.isReady
   const membersRaw = await api.query.membership.members()
   return membersRaw.map((m) => m.toString())
 }
 
-async function runProcess(process, inputs, outputs) {
+export async function runProcess(process, inputs, outputs) {
   if (inputs && outputs) {
     await api.isReady
     const alice = keyring.addFromUri(USER_URI)
@@ -236,6 +240,7 @@ async function runProcess(process, inputs, outputs) {
         .signAndSend(alice, (result) => {
           logger.debug('result.status %s', JSON.stringify(result.status))
           logger.debug('result.status.isInBlock', result.status.isInBlock)
+
           if (result.status.isInBlock) {
             const errors = result.events
               .filter(({ event: { method } }) => method === 'ExtrinsicFailed')
@@ -266,7 +271,7 @@ async function runProcess(process, inputs, outputs) {
   return new Error('An error occurred whilst adding an item.')
 }
 
-const getItemMetadataSingle = async (tokenId, metadataKey) => {
+export const getItemMetadataSingle = async (tokenId, metadataKey) => {
   const { metadata, id } = await getItem(tokenId)
   if (id !== tokenId) throw new Error(`Id not found: ${tokenId}`)
 
@@ -287,7 +292,7 @@ function transformItem({ originalId, createdAt, destroyedAt, ...rest }) {
   }
 }
 
-async function getItem(tokenId) {
+export async function getItem(tokenId) {
   await api.isReady
   const itemRaw = (await api.query.simpleNFT.tokensById(tokenId)).toJSON()
 
@@ -321,13 +326,13 @@ async function getTimestamp(blockNumber) {
   return timestamp
 }
 
-async function getFile(base64Hash) {
+export async function getFile(base64Hash) {
   // strip 0x and parse to base58
   const base58Hash = bs58.encode(Buffer.from(`1220${base64Hash.slice(2)}`, 'hex'))
   return downloadFile(base58Hash)
 }
 
-const utf8ToHex = (str, len) => {
+export const utf8ToHex = (str, len) => {
   const buffer = Buffer.from(str, 'utf8')
   const bufferHex = buffer.toString('hex')
   if (bufferHex.length > 2 * len) {
@@ -336,17 +341,17 @@ const utf8ToHex = (str, len) => {
   return `0x${bufferHex}`
 }
 
-const hexToUtf8 = (str) => {
+export const hexToUtf8 = (str) => {
   return Buffer.from(str.slice(2), 'hex').toString('utf8').replace(/\0/g, '') // remove padding
 }
 
-const getReadableMetadataKeys = (metadata) => {
+export const getReadableMetadataKeys = (metadata) => {
   return Object.keys(metadata).map((key) => {
     return hexToUtf8(key)
   })
 }
 
-const validateInputIds = async (accountIds) => {
+export const validateInputIds = async (accountIds) => {
   await api.isReady
   const userId = keyring.addFromUri(USER_URI).address
 
@@ -362,7 +367,7 @@ const validateInputIds = async (accountIds) => {
   }, Promise.resolve(true))
 }
 
-const validateTokenId = (tokenId) => {
+export const validateTokenId = (tokenId) => {
   let id
   try {
     id = parseInt(tokenId, 10)
@@ -376,7 +381,7 @@ const validateTokenId = (tokenId) => {
   return id
 }
 
-const roleToIndex = async (role) => {
+export const roleToIndex = async (role) => {
   await api.isReady
   const registry = api.registry
   const lookup = registry.lookup
@@ -392,7 +397,7 @@ const roleToIndex = async (role) => {
   return entry.index
 }
 
-const indexToRole = async (index) => {
+export const indexToRole = async (index) => {
   await api.isReady
   const registry = api.registry
   const lookup = registry.lookup
@@ -408,7 +413,7 @@ const indexToRole = async (index) => {
   return entry.name
 }
 
-const getMetadataResponse = async (tokenId, metadataKey, res) => {
+export const getMetadataResponse = async (tokenId, metadataKey, res) => {
   const id = validateTokenId(tokenId)
 
   if (!id) {
@@ -473,27 +478,4 @@ const getMetadataResponse = async (tokenId, metadataKey, res) => {
   logger.warn(`Error fetching metadata: ${metadataKey}:${metadataValue}`)
   res.status(500).send(`Error fetching metadata`)
   return
-}
-
-module.exports = {
-  runProcess,
-  getMembers,
-  getItemMetadataSingle,
-  getItem,
-  getLastTokenId,
-  processRoles,
-  processMetadata,
-  getFile,
-  validateInputIds,
-  validateTokenId,
-  getReadableMetadataKeys,
-  getMaxMetadataCount,
-  hexToUtf8,
-  utf8ToHex,
-  membershipReducer,
-  roleToIndex,
-  indexToRole,
-  containsInvalidMembershipRoles,
-  getMetadataResponse,
-  validateProcess,
 }

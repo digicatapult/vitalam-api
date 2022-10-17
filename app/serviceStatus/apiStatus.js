@@ -1,6 +1,8 @@
-const { startStatusHandler, serviceState } = require('../util/statusPoll')
-const { substrateApi } = require('../util/substrateApi')
-const { SUBSTRATE_STATUS_POLL_PERIOD_MS, SUBSTRATE_STATUS_TIMEOUT_MS } = require('../env')
+import { startStatusHandler, serviceState } from '../util/statusPoll.js'
+import { substrateApi } from '../util/substrateApi.js'
+import env from '../env.js'
+
+const { SUBSTRATE_STATUS_POLL_PERIOD_MS, SUBSTRATE_STATUS_TIMEOUT_MS } = env
 
 const getStatus = async () => {
   await substrateApi.isReadyOrError.catch(() => {})
@@ -37,4 +39,4 @@ const startApiStatus = () =>
     serviceTimeoutMs: SUBSTRATE_STATUS_TIMEOUT_MS,
   })
 
-module.exports = startApiStatus
+export default startApiStatus

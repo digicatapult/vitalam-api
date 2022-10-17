@@ -1,16 +1,12 @@
-const startApiStatus = require('./apiStatus')
-const startIpfsStatus = require('./ipfsStatus')
-const { buildCombinedHandler } = require('../util/statusPoll')
+import startApiStatus from './apiStatus.js'
+import startIpfsStatus from './ipfsStatus.js'
+import { buildCombinedHandler } from '../util/statusPoll.js'
 
-const startStatusHandlers = async () => {
+export const startStatusHandlers = async () => {
   const handlers = new Map()
   const [apiStatus, ipfsStatus] = await Promise.all([startApiStatus(), startIpfsStatus()])
   handlers.set('api', apiStatus)
   handlers.set('ipfs', ipfsStatus)
 
   return buildCombinedHandler(handlers)
-}
-
-module.exports = {
-  startStatusHandlers,
 }

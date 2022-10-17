@@ -1,6 +1,7 @@
-const { API_VERSION } = require('../../app/env')
+import env from '../../app/env.js'
+const { API_VERSION } = env
 
-const responses = {
+export const responses = {
   ok: {
     code: 200,
     body: {
@@ -16,7 +17,7 @@ const responses = {
               versions: {
                 authoring: 1,
                 impl: 1,
-                spec: 400,
+                spec: 431,
                 transaction: 1,
               },
             },
@@ -69,7 +70,7 @@ const responses = {
               versions: {
                 authoring: 1,
                 impl: 1,
-                spec: 400,
+                spec: 431,
                 transaction: 1,
               },
             },
@@ -99,7 +100,7 @@ const responses = {
               versions: {
                 authoring: 1,
                 impl: 1,
-                spec: 400,
+                spec: 431,
                 transaction: 1,
               },
             },
@@ -129,7 +130,7 @@ const responses = {
               versions: {
                 authoring: 1,
                 impl: 1,
-                spec: 400,
+                spec: 431,
                 transaction: 1,
               },
             },
@@ -145,8 +146,4 @@ const responses = {
       },
     },
   },
-}
-
-module.exports = {
-  responses,
 }

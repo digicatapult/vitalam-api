@@ -1,4 +1,6 @@
-const { PORT, API_VERSION, API_MAJOR_VERSION, EXTERNAL_ORIGIN, EXTERNAL_PATH_PREFIX } = require('../env')
+import env from '../env.js'
+
+const { PORT, API_VERSION, API_MAJOR_VERSION, EXTERNAL_ORIGIN, EXTERNAL_PATH_PREFIX } = env
 
 let url = EXTERNAL_ORIGIN || `http://localhost:${PORT}`
 if (EXTERNAL_PATH_PREFIX) {
@@ -218,4 +220,4 @@ const apiDoc = {
   paths: {},
 }
 
-module.exports = apiDoc
+export default apiDoc

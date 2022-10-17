@@ -1,9 +1,11 @@
-const { buildApi } = require('@digicatapult/dscp-node')
+import { buildApi } from '@digicatapult/dscp-node'
 
-const { API_HOST, API_PORT } = require('../env')
-const logger = require('../logger')
+import env from '../env.js'
+import logger from '../logger.js'
 
-const { api, keyring } = buildApi({
+const { API_HOST, API_PORT } = env
+
+const { api, keyring: kr } = buildApi({
   options: {
     apiHost: API_HOST,
     apiPort: API_PORT,
@@ -22,7 +24,5 @@ api.on('error', (err) => {
   logger.error(`Error from substrate node connection. Error was ${err.message || JSON.stringify(err)}`)
 })
 
-module.exports = {
-  substrateApi: api,
-  keyring,
-}
+export const substrateApi = api
+export const keyring = kr

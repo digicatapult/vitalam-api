@@ -1,27 +1,27 @@
-const {
+import {
   getItem,
-  runProcess: runProcessUtil,
-  getMembers: getMembersUtil,
-  getLastTokenId: getLastTokenIdUtil,
-} = require('../../util/appUtil')
+  runProcess as runProcessUtil,
+  getMembers as getMembersUtil,
+  getLastTokenId as getLastTokenIdUtil,
+} from '../../util/appUtil.js'
 
-async function findItemById(tokenId) {
+export async function findItemById(tokenId) {
   return getItem(tokenId)
 }
 
-async function findLastTokenId() {
+export async function findLastTokenId() {
   return getLastTokenIdUtil()
 }
 
-async function findMembers() {
+export async function findMembers() {
   return getMembersUtil()
 }
 
-async function runProcess(process, inputs, outputs) {
+export async function runProcess(process, inputs, outputs) {
   return runProcessUtil(process, inputs, outputs)
 }
 
-module.exports = {
+export default {
   findItemById,
   findLastTokenId,
   findMembers,

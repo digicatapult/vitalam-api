@@ -1,9 +1,9 @@
-const { validateTokenId } = require('../../../util/appUtil')
-const logger = require('../../../logger')
-const { getReadableMetadataKeys } = require('../../../util/appUtil')
-const { getDefaultSecurity } = require('../../../util/auth')
+import { validateTokenId } from '../../../util/appUtil.js'
+import logger from '../../../logger.js'
+import { getReadableMetadataKeys } from '../../../util/appUtil.js'
+import { getDefaultSecurity } from '../../../util/auth.js'
 
-module.exports = function (apiService) {
+export default function (apiService) {
   const doc = {
     GET: async function (req, res) {
       const id = validateTokenId(req.params.id)

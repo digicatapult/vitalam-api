@@ -1,7 +1,7 @@
-const { before, after } = require('mocha')
-const { substrateApi: api, keyring } = require('../../app/util/substrateApi')
+import { before, after } from 'mocha'
+import { substrateApi as api, keyring } from '../../app/util/substrateApi.js'
 
-const withNewTestProcess = (process) => {
+export const withNewTestProcess = (process) => {
   const processStr = 'test-process'
   const buffer = Buffer.from(processStr, 'utf8')
   const processId = `0x${buffer.toString('hex')}`
@@ -14,7 +14,13 @@ const withNewTestProcess = (process) => {
     const newProcess = await new Promise((resolve) => {
       let unsub = null
       api.tx.sudo
-        .sudo(api.tx.processValidation.createProcess(processId, []))
+        .sudo(
+          api.tx.processValidation.createProcess(processId, [
+            {
+              Restriction: 'None',
+            },
+          ])
+        )
         .signAndSend(sudo, (result) => {
           if (result.status.isInBlock) {
             const { event } = result.events.find(({ event: { method } }) => method === 'ProcessCreated')
@@ -57,8 +63,4 @@ const withNewTestProcess = (process) => {
         })
     })
   })
-}
-
-module.exports = {
-  withNewTestProcess,
 }

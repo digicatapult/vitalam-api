@@ -1,8 +1,8 @@
-const { describe, beforeEach, afterEach, it } = require('mocha')
-const sinon = require('sinon')
-const { expect } = require('chai')
+import { describe, beforeEach, afterEach, it } from 'mocha'
+import sinon from 'sinon'
+import { expect } from 'chai'
 
-const { serviceState, startStatusHandler, buildCombinedHandler } = require('../../../app/util/statusPoll')
+import { serviceState, startStatusHandler, buildCombinedHandler } from '../../../app/util/statusPoll.js'
 
 const okStatus = (i) => ({
   status: serviceState.UP,

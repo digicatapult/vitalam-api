@@ -1,9 +1,11 @@
-const logger = require('../../logger')
-const { validateInputIds, processRoles, processMetadata, validateProcess } = require('../../util/appUtil')
-const { getDefaultSecurity } = require('../../util/auth')
-const { PROCESS_IDENTIFIER_LENGTH } = require('../../env')
+import logger from '../../logger.js'
+import { validateInputIds, processRoles, processMetadata, validateProcess } from '../../util/appUtil.js'
+import { getDefaultSecurity } from '../../util/auth.js'
+import env from '../../env.js'
 
-module.exports = function (apiService) {
+const { PROCESS_IDENTIFIER_LENGTH } = env
+
+export default function (apiService) {
   const doc = {
     POST: async function (req, res) {
       let request = null

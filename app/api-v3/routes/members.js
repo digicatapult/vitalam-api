@@ -1,8 +1,8 @@
-const logger = require('../../logger')
-const { membershipReducer } = require('../../util/appUtil')
-const { getDefaultSecurity } = require('../../util/auth')
+import logger from '../../logger.js'
+import { membershipReducer } from '../../util/appUtil.js'
+import { getDefaultSecurity } from '../../util/auth.js'
 
-module.exports = function (apiService) {
+export default function (apiService) {
   const doc = {
     GET: async function (req, res) {
       try {

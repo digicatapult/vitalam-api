@@ -1,4 +1,4 @@
-const serviceState = {
+export const serviceState = {
   UP: Symbol('status-up'),
   DOWN: Symbol('status-down'),
   ERROR: Symbol('status-error'),
@@ -37,7 +37,7 @@ const mkStatusGenerator = async function* ({ getStatus, serviceTimeoutMs }) {
   }
 }
 
-const startStatusHandler = async ({ pollingPeriodMs, serviceTimeoutMs, getStatus }) => {
+export const startStatusHandler = async ({ pollingPeriodMs, serviceTimeoutMs, getStatus }) => {
   let status = null
   const statusGenerator = mkStatusGenerator({ getStatus, serviceTimeoutMs })
   status = (await statusGenerator.next()).value
@@ -64,7 +64,7 @@ const startStatusHandler = async ({ pollingPeriodMs, serviceTimeoutMs, getStatus
   }
 }
 
-const buildCombinedHandler = async (handlerMap) => {
+export const buildCombinedHandler = async (handlerMap) => {
   const getStatus = () =>
     [...handlerMap].reduce((accStatus, [, h]) => {
       const handlerStatus = h.status
@@ -93,10 +93,4 @@ const buildCombinedHandler = async (handlerMap) => {
       }
     },
   }
-}
-
-module.exports = {
-  serviceState,
-  startStatusHandler,
-  buildCombinedHandler,
 }

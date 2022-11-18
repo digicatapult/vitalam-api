@@ -76,13 +76,30 @@ jobs:
           kubernetes version: 'v1.19.2'
       - name: Login to minikube docker registry
         run: eval $(minikube -p minikube docker-env)
-      - name: Build and Publish image
+      - name: Build Multi-arch
+        uses: docker/build-push-action@v3
+        with:
+          builder: ${{ steps.buildx.outputs.name }}
+          context: .
+          load: false
+          file: ./Dockerfile
+          platforms: linux/amd64, linux/arm64
+          tags: |
+            ${{ needs.repo_ids.outputs.repo_name }}:latest
+          labels: |
+            org.opencontainers.image.title=${{ needs.repo_ids.outputs.repo_name }}
+            org.opencontainers.image.description=${{ github.event.repository.description }}
+            org.opencontainers.image.source=${{ github.event.repository.html_url }}
+            org.opencontainers.image.url=${{ github.event.repository.html_url }}
+            org.opencontainers.image.revision=${{ github.sha }}
+      - name: Load and push image for testing
         uses: docker/build-push-action@v3
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
           load: true
           file: ./Dockerfile
+          platforms: linux/amd64
           tags: |
             ${{ needs.repo_ids.outputs.repo_name }}:latest
           labels: |

@@ -1,7 +1,7 @@
 version: '3'
 services:
   ipfs:
-    image: ipfs/go-ipfs:v0.13.1
+    image: ipfs/go-ipfs:v0.16.0
     environment:
       - |
         IPFS_SWARM_KEY=/key/swarm/psk/1.0.0/
@@ -12,7 +12,7 @@ services:
       - 8080:8080
       - 5001:5001
   ipfs-2:
-    image: ipfs/go-ipfs:v0.13.1
+    image: ipfs/go-ipfs:v0.16.0
     environment:
       - |
         IPFS_SWARM_KEY=/key/swarm/psk/1.0.0/

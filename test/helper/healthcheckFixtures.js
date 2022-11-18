@@ -17,7 +17,7 @@ export const responses = {
               versions: {
                 authoring: 1,
                 impl: 1,
-                spec: 431,
+                spec: 446,
                 transaction: 1,
               },
             },
@@ -26,7 +26,7 @@ export const responses = {
         ipfs: {
           status: 'ok',
           detail: {
-            version: '0.13.1',
+            version: '0.16.0',
             peerCount: 1,
           },
         },
@@ -48,7 +48,7 @@ export const responses = {
         ipfs: {
           status: 'ok',
           detail: {
-            version: '0.13.1',
+            version: '0.16.0',
             peerCount: 1,
           },
         },
@@ -70,7 +70,7 @@ export const responses = {
               versions: {
                 authoring: 1,
                 impl: 1,
-                spec: 431,
+                spec: 446,
                 transaction: 1,
               },
             },
@@ -100,7 +100,7 @@ export const responses = {
               versions: {
                 authoring: 1,
                 impl: 1,
-                spec: 431,
+                spec: 446,
                 transaction: 1,
               },
             },
@@ -130,7 +130,7 @@ export const responses = {
               versions: {
                 authoring: 1,
                 impl: 1,
-                spec: 431,
+                spec: 446,
                 transaction: 1,
               },
             },
@@ -139,7 +139,7 @@ export const responses = {
         ipfs: {
           status: 'down',
           detail: {
-            version: '0.13.1',
+            version: '0.16.0',
             peerCount: 0,
           },
         },

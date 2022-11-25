@@ -1,8 +1,8 @@
-# DSCP API
+# Veritable API
 
 ## Description
 
-A `Node.js` API to support communication to the [Substrate-based](https://www.substrate.io/) [`dscp-node`](https://github.com/digicatapult/dscp-node) (via [`polkadot-js/api`](https://www.npmjs.com/package/@polkadot/api)) and an [`IPFS`](https://ipfs.io/) node.
+A `Node.js` API to support communication to the [Substrate-based](https://www.substrate.io/) [`veritable-node`](https://github.com/digicatapult/dscp-node) (via [`polkadot-js/api`](https://www.npmjs.com/package/@polkadot/api)) and an [`IPFS`](https://ipfs.io/) node.
 
 ## Getting started
 
@@ -12,12 +12,12 @@ First, ensure you're running the correct [version](.node-version) of `npm`, then
 npm install
 ```
 
-The API requires instances of [`dscp-node`](https://github.com/digicatapult/dscp-node) and [`IPFS`](https://ipfs.io/).
+The API requires instances of [`veritable-node`](https://github.com/digicatapult/dscp-node) and [`IPFS`](https://ipfs.io/).
 To bring them up locally:
 
-### `dscp-node`
+### `veritable-node`
 
-Clone [dscp-node](https://github.com/digicatapult/dscp-node) and follow the README to setup and build a local node. Then run the following in its root directory:
+Clone [veritable-node](https://github.com/digicatapult/dscp-node) and follow the README to setup and build a local node. Then run the following in its root directory:
 
 ```
 ./target/release/dscp-node --dev
@@ -46,11 +46,11 @@ npm run test:integration
 
 ## Authentication
 
-`dscp-api` uses an [Auth0](https://auth0.com/) Machine to Machine API to issue a JSON Web Token for authentication on its endpoints. You will need to create your own Auth0 API, which can be done for free, and set the appropriate [environment variables](#configuration) (those prefixed with `AUTH`). Follow the start of this [tutorial](https://auth0.com/docs/quickstart/backend/nodejs#configure-auth0-apis) to create an API. Go [here](app/routes/auth.js) and [here](app/auth.js) to see where the environment variables are used.
+`veritable-api` uses an [Auth0](https://auth0.com/) Machine to Machine API to issue a JSON Web Token for authentication on its endpoints. You will need to create your own Auth0 API, which can be done for free, and set the appropriate [environment variables](#configuration) (those prefixed with `AUTH`). Follow the start of this [tutorial](https://auth0.com/docs/quickstart/backend/nodejs#configure-auth0-apis) to create an API. Go [here](app/routes/auth.js) and [here](app/auth.js) to see where the environment variables are used.
 
 ## Configuration
 
-The following environment variables are used by `dscp-api` and can be configured. Entries marked as `required` are needed when running `dscp-api` in production mode.
+The following environment variables are used by `veritable-api` and can be configured. Entries marked as `required` are needed when running `veritable-api` in production mode.
 
 | variable                        | required |        default         | description                                                                                  |
 | :------------------------------ | :------: | :--------------------: | :------------------------------------------------------------------------------------------- |
@@ -97,7 +97,7 @@ npm start
 
 ### Authenticated endpoints
 
-If `AUTH_TYPE` env is set to `JWT`, the rest of the endpoints in `dscp-api` require authentication in the form of a header `'Authorization: Bearer YOUR_ACCESS_TOKEN'`:
+If `AUTH_TYPE` env is set to `JWT`, the rest of the endpoints in `veritable-api` require authentication in the form of a header `'Authorization: Bearer YOUR_ACCESS_TOKEN'`:
 
 1. [GET /item/:id](#get-/item/:id)
 2. [GET /item/:id/metadata/:metadataKey](#get-/item/:id/metadata/:metadataKey)

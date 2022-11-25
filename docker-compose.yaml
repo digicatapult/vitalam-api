@@ -23,7 +23,7 @@ services:
       - 8081:8080
       - 5002:5001
   dscp-node:
-    image: digicatapult/dscp-node:latest
+    image: digicatapult/dscp-node:v4.4.6
     command:
       --base-path /data/
       --dev

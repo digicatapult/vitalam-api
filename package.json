@@ -40,7 +40,6 @@
     "envalid": "^7.3.1",
     "express": "^4.18.2",
     "express-openapi": "^12.0.2",
-    "express-prom-bundle": "^6.5.0",
     "formdata-node": "^5.0.0",
     "jsonwebtoken": "^8.5.1",
     "jwks-rsa": "^2.1.5",
@@ -48,7 +47,6 @@
     "node-fetch": "^3.2.10",
     "pino": "^8.6.1",
     "pino-http": "^8.2.1",
-    "prom-client": "^14.1.0",
     "stream-json": "^1.7.4",
     "swagger-ui-express": "^4.5.0"
   },

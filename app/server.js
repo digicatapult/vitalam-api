@@ -15,6 +15,8 @@ import apiService from './api-v3/services/apiService.js'
 import { startStatusHandlers } from './serviceStatus/index.js'
 import { serviceState } from './util/statusPoll.js'
 import { verifyJwks } from './util/auth.js'
+import promBundle from 'express-prom-bundle'
+import client from 'prom-client'
 
 import url from 'url'
 const __filename = url.fileURLToPath(import.meta.url)
@@ -30,6 +32,18 @@ export async function createHttpServer() {
   app.use(cors())
   app.use(compression())
   app.use(bodyParser.json())
+
+  client.register.clear()
+  app.use(
+    promBundle({
+      includePath: true,
+      promClient: {
+        collectDefaultMetrics: {
+          prefix: 'dscp_api_',
+        },
+      },
+    })
+  )
 
   const serviceStatusStrings = {
     [serviceState.UP]: 'ok',

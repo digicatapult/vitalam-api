@@ -1,16 +1,14 @@
-import { buildApi } from '@digicatapult/dscp-node'
+import { ApiPromise, WsProvider, Keyring } from '@polkadot/api'
 
 import env from '../env.js'
 import logger from '../logger.js'
 
 const { API_HOST, API_PORT } = env
 
-const { api, keyring: kr } = buildApi({
-  options: {
-    apiHost: API_HOST,
-    apiPort: API_PORT,
-  },
-})
+const provider = new WsProvider(`ws://${API_HOST}:${API_PORT}`)
+const api = new ApiPromise({ provider })
+
+api.isReadyOrError.catch(() => {})
 
 api.on('disconnected', () => {
   logger.warn(`Disconnected from substrate node at ${API_HOST}:${API_PORT}`)
@@ -25,4 +23,4 @@ api.on('error', (err) => {
 })
 
 export const substrateApi = api
-export const keyring = kr
+export const keyring = new Keyring({ type: 'sr25519' })

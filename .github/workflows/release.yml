@@ -45,7 +45,7 @@ jobs:
         with:
           python-version: 3.7
       - name: Set up chart-testing
-        uses: helm/chart-testing-action@v2.0.1
+        uses: helm/chart-testing-action@v2.3.1
       - name: Run chart-testing (lint)
         run: ct lint --validate-maintainers false --charts helm/${{ needs.preconditions.outputs.repo_name }}/ --chart-repos dscp-node=https://digicatapult.github.io/dscp-node/,dscp-ipfs=https://digicatapult.github.io/dscp-ipfs/
 
@@ -74,9 +74,9 @@ jobs:
         with:
           python-version: 3.7
       - name: Set up chart-testing
-        uses: helm/chart-testing-action@v2.0.1
+        uses: helm/chart-testing-action@v2.3.1
       - name: Setup Minikube
-        uses: manusa/actions-setup-minikube@v2.7.1
+        uses: manusa/actions-setup-minikube@v2.7.2
         with:
           minikube version: 'v1.17.1'
           kubernetes version: 'v1.19.2'

@@ -1,6 +1,6 @@
 {
   "name": "dscp-api",
-  "version": "4.8.2",
+  "version": "4.8.3",
   "description": "DSCP API",
   "type": "module",
   "repository": {
@@ -42,7 +42,7 @@
     "express-openapi": "^12.0.2",
     "express-prom-bundle": "^6.5.0",
     "formdata-node": "^5.0.0",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "jwks-rsa": "^2.1.5",
     "multer": "^1.4.5-lts.1",
     "node-fetch": "^3.2.10",

@@ -1,6 +1,6 @@
 {
   "name": "dscp-api",
-  "version": "4.8.2",
+  "version": "4.8.3",
   "description": "DSCP API",
   "type": "module",
   "repository": {
@@ -68,7 +68,7 @@
     "nyc": "^15.1.0",
     "pino-colada": "^2.2.2",
     "prettier": "^2.7.1",
-    "sinon": "^14.0.1",
+    "sinon": "^15.0.0",
     "supertest": "^6.3.0"
   }
 }

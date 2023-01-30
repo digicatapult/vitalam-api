@@ -77,7 +77,7 @@ jobs:
       - name: Login to minikube docker registry
         run: eval $(minikube -p minikube docker-env)
       - name: Build Multi-arch
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
@@ -93,7 +93,7 @@ jobs:
             org.opencontainers.image.url=${{ github.event.repository.html_url }}
             org.opencontainers.image.revision=${{ github.sha }}
       - name: Load and push image for testing
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: .

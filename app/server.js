@@ -87,7 +87,7 @@ export async function createHttpServer() {
         }
       : {}
 
-  initialize({
+  await initialize({
     app,
     apiDoc: apiDoc,
     consumesMiddleware: {

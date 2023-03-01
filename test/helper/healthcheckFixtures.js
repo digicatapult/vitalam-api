@@ -1,6 +1,9 @@
 import env from '../../app/env.js'
 const { API_VERSION } = env
 
+const dscpRuntimeVersion = 451
+const ipfsVersion = '0.18.1'
+
 export const responses = {
   ok: {
     code: 200,
@@ -17,7 +20,7 @@ export const responses = {
               versions: {
                 authoring: 1,
                 impl: 1,
-                spec: 446,
+                spec: dscpRuntimeVersion,
                 transaction: 1,
               },
             },
@@ -26,7 +29,7 @@ export const responses = {
         ipfs: {
           status: 'ok',
           detail: {
-            version: '0.16.0',
+            version: ipfsVersion,
             peerCount: 1,
           },
         },
@@ -48,7 +51,7 @@ export const responses = {
         ipfs: {
           status: 'ok',
           detail: {
-            version: '0.16.0',
+            version: ipfsVersion,
             peerCount: 1,
           },
         },
@@ -70,7 +73,7 @@ export const responses = {
               versions: {
                 authoring: 1,
                 impl: 1,
-                spec: 446,
+                spec: dscpRuntimeVersion,
                 transaction: 1,
               },
             },
@@ -100,7 +103,7 @@ export const responses = {
               versions: {
                 authoring: 1,
                 impl: 1,
-                spec: 446,
+                spec: dscpRuntimeVersion,
                 transaction: 1,
               },
             },
@@ -130,7 +133,7 @@ export const responses = {
               versions: {
                 authoring: 1,
                 impl: 1,
-                spec: 446,
+                spec: dscpRuntimeVersion,
                 transaction: 1,
               },
             },
@@ -139,7 +142,7 @@ export const responses = {
         ipfs: {
           status: 'down',
           detail: {
-            version: '0.16.0',
+            version: ipfsVersion,
             peerCount: 0,
           },
         },

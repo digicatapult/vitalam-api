@@ -1,6 +1,6 @@
 {
   "name": "dscp-api",
-  "version": "4.8.3",
+  "version": "4.8.4",
   "description": "DSCP API",
   "type": "module",
   "repository": {
@@ -31,7 +31,7 @@
     "coverage:merge": "LOG_LEVEL=fatal NODE_ENV=development nyc --no-clean npm run test && nyc --no-clean npm run test:jwt && nyc merge .nyc_output --timeout 60000 --slow 20000 --exit"
   },
   "dependencies": {
-    "@polkadot/api": "^9.14.2",
+    "@polkadot/api": "^10.0.0",
     "base-x": "^4.0.0",
     "body-parser": "^1.20.2",
     "compression": "^1.7.4",

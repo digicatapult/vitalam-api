@@ -52,36 +52,35 @@ npm run test:integration
 
 The following environment variables are used by `veritable-api` and can be configured. Entries marked as `required` are needed when running `veritable-api` in production mode.
 
-| variable                        | required |        default         | description                                                                                  |
-| :------------------------------ | :------: | :--------------------: | :------------------------------------------------------------------------------------------- |
-| PORT                            |    N     |         `3001`         | The port for the API to listen on                                                            |
-| EXTERNAL_ORIGIN                    |    N     |                        | The origin from which the OpenAPI service is accessible. If not provided the value will default to `http://localhost:${PORT}` |
-| EXTERNAL_PATH_PREFIX                    |    N     |                        | A path prefix from which this service is served |
-| API_HOST                        |    Y     |           -            | The hostname of the `dscp-node` the API should connect to                                    |
-| API_PORT                        |    N     |         `9944`         | The port of the `dscp-node` the API should connect to                                        |
-| LOG_LEVEL                       |    N     |         `info`         | Logging level. Valid values are [`trace`, `debug`, `info`, `warn`, `error`, `fatal`]         |
-| USER_URI                        |    Y     |           -            | The Substrate `URI` representing the private key to use when making `dscp-node` transactions |
-| IPFS_HOST                       |    Y     |           -            | Hostname of the `IPFS` node to use for metadata storage                                      |
-| IPFS_PORT                       |    N     |        `15001`         | Port of the `IPFS` node to use for metadata storage                                          |
-| METADATA_KEY_LENGTH             |    N     |          `32`          | Fixed length of metadata keys                                                                |
-| METADATA_VALUE_LITERAL_LENGTH   |    N     |          `32`          | Fixed length of metadata LITERAL values                                                      |
-| API_VERSION                     |    N     | `package.json version` | API version                                                                                  |
-| API_MAJOR_VERSION               |    N     |          `v3`          | API major version                                                                            |
-| FILE_UPLOAD_MAX_SIZE            |    N     |  `200 * 1024 * 1024`   | The Maximum file upload size (bytes)                                                         |
-| SUBSTRATE_STATUS_POLL_PERIOD_MS |    N     |      `10 * 1000`       | Number of ms between calls to check dscp-node status                                         |
-| SUBSTRATE_STATUS_TIMEOUT_MS     |    N     |       `2 * 1000`       | Number of ms to wait for response to dscp-node health requests                               |
-| IPFS_STATUS_POLL_PERIOD_MS      |    N     |      `10 * 1000`       | Number of ms between calls to check ipfs status                                              |
-| IPFS_STATUS_TIMEOUT_MS          |    N     |       `2 * 1000`       | Number of ms to wait for response to ipfs health requests                                    |
-| AUTH_TYPE                       |    N     |         `NONE`         | Authentication type for routes on the service. Valid values: [`NONE`, `JWT`]                 |
+| variable                        | required |        default         | description                                                                                                                   |
+| :------------------------------ | :------: | :--------------------: | :---------------------------------------------------------------------------------------------------------------------------- |
+| PORT                            |    N     |         `3001`         | The port for the API to listen on                                                                                             |
+| EXTERNAL_ORIGIN                 |    N     |                        | The origin from which the OpenAPI service is accessible. If not provided the value will default to `http://localhost:${PORT}` |
+| EXTERNAL_PATH_PREFIX            |    N     |                        | A path prefix from which this service is served                                                                               |
+| API_HOST                        |    Y     |           -            | The hostname of the `dscp-node` the API should connect to                                                                     |
+| API_PORT                        |    N     |         `9944`         | The port of the `dscp-node` the API should connect to                                                                         |
+| LOG_LEVEL                       |    N     |         `info`         | Logging level. Valid values are [`trace`, `debug`, `info`, `warn`, `error`, `fatal`]                                          |
+| USER_URI                        |    Y     |           -            | The Substrate `URI` representing the private key to use when making `dscp-node` transactions                                  |
+| IPFS_HOST                       |    Y     |           -            | Hostname of the `IPFS` node to use for metadata storage                                                                       |
+| IPFS_PORT                       |    N     |        `15001`         | Port of the `IPFS` node to use for metadata storage                                                                           |
+| METADATA_KEY_LENGTH             |    N     |          `32`          | Fixed length of metadata keys                                                                                                 |
+| METADATA_VALUE_LITERAL_LENGTH   |    N     |          `32`          | Fixed length of metadata LITERAL values                                                                                       |
+| API_VERSION                     |    N     | `package.json version` | API version                                                                                                                   |
+| API_MAJOR_VERSION               |    N     |          `v3`          | API major version                                                                                                             |
+| FILE_UPLOAD_MAX_SIZE            |    N     |  `200 * 1024 * 1024`   | The Maximum file upload size (bytes)                                                                                          |
+| SUBSTRATE_STATUS_POLL_PERIOD_MS |    N     |      `10 * 1000`       | Number of ms between calls to check dscp-node status                                                                          |
+| SUBSTRATE_STATUS_TIMEOUT_MS     |    N     |       `2 * 1000`       | Number of ms to wait for response to dscp-node health requests                                                                |
+| IPFS_STATUS_POLL_PERIOD_MS      |    N     |      `10 * 1000`       | Number of ms between calls to check ipfs status                                                                               |
+| IPFS_STATUS_TIMEOUT_MS          |    N     |       `2 * 1000`       | Number of ms to wait for response to ipfs health requests                                                                     |
+| AUTH_TYPE                       |    N     |         `NONE`         | Authentication type for routes on the service. Valid values: [`NONE`, `JWT`, `EXTERNAL`]                                      |
 
 The following environment variables are additionally used when `AUTH_TYPE : 'JWT'`
 
-| variable       | required |                       default                       | description                                                           |
-| :------------- | :------: | :-------------------------------------------------: | :-------------------------------------------------------------------- |
-| AUTH_JWKS_URI  |    N     | `https://inteli.eu.auth0.com/.well-known/jwks.json` | JSON Web Key Set containing public keys used by the Auth0 API         |
-| AUTH_AUDIENCE  |    N     |                    `inteli-dev`                     | Identifier of the Auth0 API                                           |
-| AUTH_ISSUER    |    N     |           `https://inteli.eu.auth0.com/`            | Domain of the Auth0 API `                                             |
-
+| variable      | required |                       default                       | description                                                   |
+| :------------ | :------: | :-------------------------------------------------: | :------------------------------------------------------------ |
+| AUTH_JWKS_URI |    N     | `https://inteli.eu.auth0.com/.well-known/jwks.json` | JSON Web Key Set containing public keys used by the Auth0 API |
+| AUTH_AUDIENCE |    N     |                    `inteli-dev`                     | Identifier of the Auth0 API                                   |
+| AUTH_ISSUER   |    N     |           `https://inteli.eu.auth0.com/`            | Domain of the Auth0 API `                                     |
 
 ## Running the API
 

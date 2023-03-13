@@ -19,7 +19,7 @@ const AUTH_ENVS = {
 }
 
 const { AUTH_TYPE } = envalid.cleanEnv(process.env, {
-  AUTH_TYPE: envalid.str({ default: 'NONE', choices: ['NONE', 'JWT'] }),
+  AUTH_TYPE: envalid.str({ default: 'NONE', choices: ['NONE', 'JWT', 'EXTERNAL'] }),
 })
 
 const vars = envalid.cleanEnv(process.env, {

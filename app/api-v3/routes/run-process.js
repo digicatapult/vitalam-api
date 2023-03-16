@@ -30,7 +30,6 @@ export default function (apiService) {
         return
       }
 
-      const parentIndices = new Set()
       let outputs = null
       try {
         outputs = await Promise.all(
@@ -40,22 +39,9 @@ export default function (apiService) {
               throw new Error(`Request missing roles`)
             }
 
-            if (`parent_index` in output) {
-              if (output.parent_index < 0 || !(output.parent_index < request.inputs.length)) {
-                logger.trace(`Parent index out of range`)
-                throw new Error(`Parent index out of range`)
-              }
-              if (parentIndices.has(output.parent_index)) {
-                logger.trace(`Duplicate parent index used`)
-                throw new Error(`Duplicate parent index used`)
-              }
-              parentIndices.add(output.parent_index)
-            }
-
             return {
               roles: await processRoles(output.roles),
               metadata: await processMetadata(output.metadata, req.files),
-              parent_index: output.parent_index,
             }
           })
         )
@@ -66,31 +52,34 @@ export default function (apiService) {
       }
 
       let process = null
-      if (request.process) {
-        const asBuffer = Buffer.from(`${request.process.id}`, 'utf8')
-        if (asBuffer.length > PROCESS_IDENTIFIER_LENGTH) {
-          const message = `Invalid process id: ${request.process.id}`
-          logger.trace(message)
-          res.status(400).json({ message })
-          return
-        }
-        const version = request.process.version
-        const validVersion = Number.isSafeInteger(version) && version < Math.pow(2, 32) && version > 0
-        if (!validVersion) {
-          const message = `Invalid process version: ${request.process.version}`
-          logger.trace(message)
-          res.status(400).json({ message })
-          return
-        }
-
-        try {
-          process = await validateProcess(request.process.id, version)
-        } catch (err) {
-          res.status(400).json({ message: err.message })
-          return
-        }
+      if (!request.process) {
+        const message = 'Request missing required field `process`'
+        logger.trace(message)
+        res.status(400).json({ message })
+        return
+      }
+      const asBuffer = Buffer.from(`${request.process.id}`, 'utf8')
+      if (asBuffer.length > PROCESS_IDENTIFIER_LENGTH) {
+        const message = `Invalid process id: ${request.process.id}`
+        logger.trace(message)
+        res.status(400).json({ message })
+        return
+      }
+      const version = request.process.version
+      const validVersion = Number.isSafeInteger(version) && version < Math.pow(2, 32) && version > 0
+      if (!validVersion) {
+        const message = `Invalid process version: ${request.process.version}`
+        logger.trace(message)
+        res.status(400).json({ message })
+        return
       }
 
+      try {
+        process = await validateProcess(request.process.id, version)
+      } catch (err) {
+        res.status(400).json({ message: err.message })
+        return
+      }
       let result
       try {
         result = await apiService.runProcess(process, request.inputs, outputs)

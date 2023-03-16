@@ -1,11 +1,8 @@
 import env from '../../app/env.js'
 const { API_VERSION } = env
 
-const dscpRuntimeVersion = 451
-const ipfsVersion = '0.18.1'
-
 export const responses = {
-  ok: {
+  ok: (dscpRuntimeVersion, ipfsVersion) => ({
     code: 200,
     body: {
       status: 'ok',
@@ -35,8 +32,8 @@ export const responses = {
         },
       },
     },
-  },
-  substrateDown: {
+  }),
+  substrateDown: (ipfsVersion) => ({
     code: 503,
     body: {
       status: 'down',
@@ -57,8 +54,8 @@ export const responses = {
         },
       },
     },
-  },
-  ipfsDown: {
+  }),
+  ipfsDown: (dscpRuntimeVersion) => ({
     code: 503,
     body: {
       status: 'down',
@@ -87,8 +84,8 @@ export const responses = {
         },
       },
     },
-  },
-  ipfsDownTimeout: {
+  }),
+  ipfsDownTimeout: (dscpRuntimeVersion) => ({
     code: 503,
     body: {
       status: 'down',
@@ -117,8 +114,8 @@ export const responses = {
         },
       },
     },
-  },
-  ipfsDownNoPeers: {
+  }),
+  ipfsDownNoPeers: (dscpRuntimeVersion, ipfsVersion) => ({
     code: 503,
     body: {
       status: 'down',
@@ -148,5 +145,5 @@ export const responses = {
         },
       },
     },
-  },
+  }),
 }

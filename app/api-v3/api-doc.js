@@ -200,10 +200,6 @@ const apiDoc = {
           metadata: {
             $ref: '#/components/schemas/Metadata',
           },
-          parent_index: {
-            description: 'index of the inputs that this output will be uniquely assigned to',
-            type: 'number',
-          },
         },
         required: ['roles', 'metadata'],
       },

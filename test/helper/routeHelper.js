@@ -39,11 +39,7 @@ export async function addFileRoute(file) {
   return json
 }
 
-export async function postRunProcess(app, authToken, inputs, outputs) {
-  return postRunProcessWithProcess(app, authToken, null, inputs, outputs)
-}
-
-export async function postRunProcessWithProcess(app, authToken, process, inputs, outputs) {
+export async function postRunProcess(app, authToken, process, inputs, outputs) {
   let req = request(app)
     .post(`/${API_MAJOR_VERSION}/run-process`)
     .set('Accept', 'application/json')
@@ -78,7 +74,7 @@ export async function postRunProcessWithProcess(app, authToken, process, inputs,
     })
 }
 
-export async function postRunProcessNoFileAttach(app, authToken, inputs, outputs) {
+export async function postRunProcessNoFileAttach(app, authToken, process, inputs, outputs) {
   let req = request(app)
     .post(`/${API_MAJOR_VERSION}/run-process`)
     .set('Accept', 'application/json')
@@ -87,6 +83,7 @@ export async function postRunProcessNoFileAttach(app, authToken, inputs, outputs
     .field(
       'request',
       JSON.stringify({
+        process,
         inputs,
         outputs,
       })

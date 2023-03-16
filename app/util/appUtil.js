@@ -231,7 +231,7 @@ export async function runProcess(process, inputs, outputs) {
     await api.isReady
     const alice = keyring.addFromUri(USER_URI)
 
-    const relevantOutputs = outputs.map(({ roles, metadata, parent_index }) => [roles, metadata, parent_index])
+    const relevantOutputs = outputs.map(({ roles, metadata }) => [roles, metadata])
     logger.debug('Running Transaction inputs: %j outputs: %j', inputs, relevantOutputs)
     return new Promise((resolve, reject) => {
       let unsub = null

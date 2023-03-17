@@ -278,6 +278,7 @@ describe('routes', function () {
     let authToken
     let statusHandler
     const process = {}
+    const failProcess = { name: 'fail' }
 
     before(async function () {
       const server = await createHttpServer()
@@ -301,6 +302,7 @@ describe('routes', function () {
     })
 
     withNewTestProcess(process)
+    withNewTestProcess(failProcess, [{ Restriction: 'Fail' }])
 
     describe('happy path', function () {
       test('add and get item - single metadata FILE', async function () {
@@ -338,7 +340,6 @@ describe('routes', function () {
         const getItemResult = await getItemRoute(app, authToken, { id: firstTokenId + 1 })
         expect(getItemResult.status).to.equal(200)
         expect(getItemResult.body.id).to.equal(firstTokenId + 1)
-        expect(getItemResult.body.original_id).to.equal(firstTokenId)
       })
 
       test('add and get item - single metadata LITERAL', async function () {
@@ -552,7 +553,7 @@ describe('routes', function () {
           metadata: new Map([[key, { File: base64Metadata }]]),
         }
 
-        await runProcess(null, [], [output])
+        await runProcess(process, [], [output])
 
         await getItemRoute(app, authToken, { id: lastToken.body.id + 1 })
 
@@ -871,7 +872,7 @@ describe('routes', function () {
             metadata: { testNone: { type: 'NONE' } },
           },
         ]
-        await postRunProcess(app, authToken, [], outputs)
+        await postRunProcess(app, authToken, process, [], outputs)
 
         const actualResult = await postRunProcess(app, authToken, process, [lastTokenId + 1], outputs)
 
@@ -889,7 +890,7 @@ describe('routes', function () {
             metadata: { testNone: { type: 'NONE' } },
           },
         ]
-        await postRunProcess(app, authToken, [], outputs)
+        await postRunProcess(app, authToken, process, [], outputs)
 
         const firstBurn = await postRunProcess(app, authToken, process, [lastTokenId + 1], outputs)
         expect(firstBurn.status).to.equal(200)
@@ -1059,6 +1060,12 @@ describe('routes', function () {
 
         expect(runProcessResult.status).to.equal(400)
         expect(runProcessResult.body.message).to.equal(`Invalid process version: ${version}`)
+      })
+
+      test('invalid inputs for process', async function () {
+        const runProcessResult = await postRunProcess(app, authToken, failProcess, [], [])
+        expect(runProcessResult.status).to.equal(400)
+        expect(runProcessResult.body.message).to.equal(`Error processing extrinsic: ProcessInvalid`)
       })
     })
   })

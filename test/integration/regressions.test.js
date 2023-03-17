@@ -12,6 +12,7 @@ import { getItemRoute, getLastTokenIdRoute } from '../helper/routeHelper.js'
 const USER_ALICE_TOKEN = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY'
 import { indexToRole } from '../../app/util/appUtil.js'
 import env from '../../app/env.js'
+import { withNewTestProcess } from '../helper/substrateHelper.js'
 
 const { API_MAJOR_VERSION, AUTH_ISSUER, AUTH_AUDIENCE, AUTH_TYPE } = env
 const describeAuthOnly = AUTH_TYPE === 'JWT' ? describe : describe.skip
@@ -26,6 +27,7 @@ describeAuthOnly('Bug regression tests', function () {
     let jwksMock
     let authToken
     let statusHandler
+    let process = {}
 
     before(async () => {
       nock.disableNetConnect()
@@ -50,6 +52,8 @@ describeAuthOnly('Bug regression tests', function () {
       })
     })
 
+    withNewTestProcess(process)
+
     after(async function () {
       await jwksMock.stop()
     })
@@ -70,6 +74,7 @@ describeAuthOnly('Bug regression tests', function () {
         .field(
           'request',
           JSON.stringify({
+            process,
             inputs: [],
             outputs,
           })

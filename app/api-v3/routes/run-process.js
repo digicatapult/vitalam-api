@@ -87,7 +87,7 @@ export default function (apiService) {
       } catch (err) {
         if (err instanceof ExtrinsicError) {
           res.status(err.code).json({
-            mesage: err.message,
+            message: err.message,
           })
           return
         }

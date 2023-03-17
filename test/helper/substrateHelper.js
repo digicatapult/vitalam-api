@@ -1,8 +1,15 @@
 import { before, after } from 'mocha'
 import { substrateApi as api, keyring } from '../../app/util/substrateApi.js'
 
-export const withNewTestProcess = (process) => {
-  const processStr = 'test-process'
+export const withNewTestProcess = (
+  process,
+  restrictions = [
+    {
+      Restriction: 'None',
+    },
+  ]
+) => {
+  const processStr = process.name || 'test-process'
   const buffer = Buffer.from(processStr, 'utf8')
   const processId = `0x${buffer.toString('hex')}`
   let processVersion
@@ -14,13 +21,7 @@ export const withNewTestProcess = (process) => {
     const newProcess = await new Promise((resolve) => {
       let unsub = null
       api.tx.sudo
-        .sudo(
-          api.tx.processValidation.createProcess(processId, [
-            {
-              Restriction: 'None',
-            },
-          ])
-        )
+        .sudo(api.tx.processValidation.createProcess(processId, restrictions))
         .signAndSend(sudo, (result) => {
           if (result.status.isInBlock) {
             const { event } = result.events.find(({ event: { method } }) => method === 'ProcessCreated')

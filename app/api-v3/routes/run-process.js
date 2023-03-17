@@ -2,6 +2,7 @@ import logger from '../../logger.js'
 import { validateInputIds, processRoles, processMetadata, validateProcess } from '../../util/appUtil.js'
 import { getDefaultSecurity } from '../../util/auth.js'
 import env from '../../env.js'
+import { ExtrinsicError } from '../../util/errors.js'
 
 const { PROCESS_IDENTIFIER_LENGTH } = env
 
@@ -84,6 +85,13 @@ export default function (apiService) {
       try {
         result = await apiService.runProcess(process, request.inputs, outputs)
       } catch (err) {
+        if (err instanceof ExtrinsicError) {
+          res.status(err.code).json({
+            mesage: err.message,
+          })
+          return
+        }
+
         logger.error(`Unexpected error running process: ${err}`)
         res.status(500).json({
           message: `Unexpected error processing items`,

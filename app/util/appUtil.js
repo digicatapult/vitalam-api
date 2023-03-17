@@ -12,6 +12,7 @@ const bs58 = basex(BASE58)
 import env from '../env.js'
 import logger from '../logger.js'
 import { substrateApi as api, keyring } from './substrateApi.js'
+import { ExtrinsicError } from './errors.js'
 
 const {
   USER_URI,
@@ -226,6 +227,15 @@ export async function getMembers() {
   return membersRaw.map((m) => m.toString())
 }
 
+function ProcessExtrinsicError(error) {
+  if (!error.isModule) {
+    return new ExtrinsicError('Unknown', 500)
+  }
+
+  const decoded = api.registry.findMetaError(error.asModule)
+  return new ExtrinsicError(decoded.name, decoded.name === 'ProcessInvalid' ? 400 : 500)
+}
+
 export async function runProcess(process, inputs, outputs) {
   if (inputs && outputs) {
     await api.isReady
@@ -247,7 +257,7 @@ export async function runProcess(process, inputs, outputs) {
               .map(({ event: { data } }) => data[0])
 
             if (errors.length > 0) {
-              reject('ExtrinsicFailed error in simpleNFT')
+              reject(ProcessExtrinsicError(errors[0]))
             }
 
             const tokens = result.events

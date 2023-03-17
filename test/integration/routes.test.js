@@ -1080,7 +1080,7 @@ describe('routes', function () {
 
     withNewTestProcess(process)
 
-    describe.only('happy path', function () {
+    describe('happy path', function () {
       test('add and get item metadata - FILE + LITERAL + TOKEN_ID + NONE', async function () {
         const outputs = [
           {

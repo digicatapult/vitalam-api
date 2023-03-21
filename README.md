@@ -153,7 +153,7 @@ The `inputs` field is an array of token `id`s that identifies the tokens to be c
 The `outputs` field is an array of objects that describe tokens to be created by running this process. To destroy tokens without creating any new ones simply pass an empty array. Each output must reference a `roles` object containing a (key, value) pair for each role associated with the new token. The value is the `AccountId` for the role. At minimum, a token requires the default `Owner` role to be set. The following role keys are accepted:
 
 ```json
-["Owner", "Customer", "AdditiveManufacturer", "Laboratory", "Buyer", "Supplier", "Reviewer"]
+["Owner", "Customer", "AdditiveManufacturer", "Laboratory", "Buyer", "Supplier", "Reviewer", "Optimiser", "MemberA", "MemberB"]
 ```
 
 Each output must also reference a `metadata` object containing a (key, value) pair for each metadata item associated with the new token. The following metadata value types are accepted:

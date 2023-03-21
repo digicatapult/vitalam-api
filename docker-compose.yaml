@@ -1,7 +1,7 @@
 version: '3'
 services:
   ipfs:
-    image: ipfs/go-ipfs:v0.18.1
+    image: ipfs/go-ipfs:v0.19.0
     environment:
       - |
         IPFS_SWARM_KEY=/key/swarm/psk/1.0.0/
@@ -12,7 +12,7 @@ services:
       - 8080:8080
       - 5001:5001
   ipfs-2:
-    image: ipfs/go-ipfs:v0.18.1
+    image: ipfs/go-ipfs:v0.19.0
     environment:
       - |
         IPFS_SWARM_KEY=/key/swarm/psk/1.0.0/
@@ -23,7 +23,7 @@ services:
       - 8081:8080
       - 5002:5001
   dscp-node:
-    image: digicatapult/dscp-node:v5.0.0
+    image: digicatapult/dscp-node:v5.0.2
     command:
       --base-path /data/
       --dev

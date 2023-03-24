@@ -863,24 +863,6 @@ describe('routes', function () {
         expect(actualResult.body).to.deep.equal(expectedResult)
       })
 
-      test('failure to destroy token with member not having correct role', async function () {
-        const lastToken = await getLastTokenIdRoute(app, authToken)
-        const lastTokenId = lastToken.body.id
-        const outputs = [
-          {
-            roles: { [await indexToRole(0)]: USER_BOB_TOKEN, [await indexToRole(1)]: USER_ALICE_TOKEN },
-            metadata: { testNone: { type: 'NONE' } },
-          },
-        ]
-        await postRunProcess(app, authToken, process, [], outputs)
-
-        const actualResult = await postRunProcess(app, authToken, process, [lastTokenId + 1], outputs)
-
-        expect(actualResult.status).to.equal(400)
-        expect(actualResult.body).to.have.property('message')
-        expect(actualResult.body.message).to.contain(lastTokenId + 1)
-      })
-
       test('failure to burn a token twice', async function () {
         const lastToken = await getLastTokenIdRoute(app, authToken)
         const lastTokenId = lastToken.body.id
@@ -899,13 +881,6 @@ describe('routes', function () {
         expect(secondBurn.status).to.equal(400)
         expect(secondBurn.body).to.have.property('message')
         expect(secondBurn.body.message).to.contain(lastTokenId + 1)
-      })
-
-      test('add item - no roles', async function () {
-        const outputs = [{ metadata: { testNone: { type: 'NONE' } } }]
-        const runProcessResult = await postRunProcess(app, authToken, process, [], outputs)
-        expect(runProcessResult.status).to.equal(400)
-        expect(runProcessResult.body.message).to.contain('roles')
       })
 
       test('add item - no default role', async function () {

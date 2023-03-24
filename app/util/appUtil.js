@@ -55,11 +55,6 @@ function formatHash(filestoreResponse) {
 }
 
 export const processRoles = async (roles) => {
-  const defaultRole = await indexToRole(0)
-  if (!roles[defaultRole]) {
-    throw new Error(`Roles must include default ${defaultRole} role. Roles: ${JSON.stringify(roles)}`)
-  }
-
   if (await containsInvalidMembershipRoles(roles)) {
     throw new Error(`Request contains roles with account IDs not in the membership list`)
   }
@@ -363,15 +358,12 @@ export const getReadableMetadataKeys = (metadata) => {
 
 export const validateInputIds = async (accountIds) => {
   await api.isReady
-  const userId = keyring.addFromUri(USER_URI).address
 
   return await accountIds.reduce(async (acc, id) => {
     const uptoNow = await acc
     if (!uptoNow || !id || !Number.isInteger(id)) return false
 
-    const { roles, id: echoId, children } = await getItem(id)
-    const defaultRole = await indexToRole(0)
-    if (roles[defaultRole] !== userId) return false
+    const { id: echoId, children } = await getItem(id)
 
     return children === null && echoId === id
   }, Promise.resolve(true))

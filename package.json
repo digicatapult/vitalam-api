@@ -1,6 +1,6 @@
 {
   "name": "dscp-api",
-  "version": "5.0.4",
+  "version": "5.0.5",
   "description": "DSCP API",
   "type": "module",
   "repository": {
@@ -61,7 +61,7 @@
     "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-prettier": "^4.2.1",
     "mocha": "^10.2.0",
-    "mock-jwks": "^1.0.9",
+    "mock-jwks": "^2.0.0",
     "moment": "^2.29.4",
     "nock": "^13.3.0",
     "nodemon": "^2.0.20",

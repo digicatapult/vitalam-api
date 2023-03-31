@@ -1,4 +1,4 @@
-import mockJwks from 'mock-jwks'
+import createJWKSMock from 'mock-jwks'
 import { describe, test, before, after } from 'mocha'
 import { expect } from 'chai'
 import nock from 'nock'
@@ -16,10 +16,6 @@ import { withNewTestProcess } from '../helper/substrateHelper.js'
 
 const { API_MAJOR_VERSION, AUTH_ISSUER, AUTH_AUDIENCE, AUTH_TYPE } = env
 const describeAuthOnly = AUTH_TYPE === 'JWT' ? describe : describe.skip
-
-// it's super weird that we have to do this. createJWKSMock is declared as the default
-// export of mock-jwks but module resolution isn't working. Issue in mocha?
-const createJWKSMock = mockJwks.default
 
 describeAuthOnly('Bug regression tests', function () {
   describe('API run-process is broken with file uploads (https://github.com/digicatapult/dscp-api/issues/17)', function () {

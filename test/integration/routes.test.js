@@ -1,4 +1,4 @@
-import mockJwks from 'mock-jwks'
+import createJWKSMock from 'mock-jwks'
 import { describe, test, before, after, afterEach } from 'mocha'
 import { expect } from 'chai'
 import nock from 'nock'
@@ -44,10 +44,6 @@ const {
   IPFS_PORT,
   AUTH_TYPE,
 } = env
-
-// it's super weird that we have to do this. createJWKSMock is declared as the default
-// export of mock-jwks but module resolution isn't working. Issue in mocha?
-const createJWKSMock = mockJwks.default
 
 const describeAuthOnly = AUTH_TYPE === 'JWT' ? describe : describe.skip
 const describeNoAuthOnly = AUTH_TYPE === 'NONE' ? describe : describe.skip

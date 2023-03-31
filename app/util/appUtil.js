@@ -255,9 +255,8 @@ export async function runProcess(process, inputs, outputs) {
               reject(ProcessExtrinsicError(errors[0]))
             }
 
-            const tokens = result.events
-              .filter(({ event: { method } }) => method === 'Minted')
-              .map(({ event: { data } }) => data[0].toNumber())
+            const processRanEvent = result.events.find(({ event: { method } }) => method === 'ProcessRan')
+            const tokens = processRanEvent?.event?.data?.outputs?.map((x) => x.toNumber())
 
             unsub()
             resolve(tokens)

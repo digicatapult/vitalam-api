@@ -70,7 +70,7 @@ export const processRoles = async (roles) => {
 
 export async function getMaxMetadataCount() {
   await api.isReady
-  return api.consts.simpleNFT.maxMetadataCount.toNumber()
+  return api.consts.utxoNFT.maxMetadataCount.toNumber()
 }
 
 const validMetadataValueTypes = new Set(['LITERAL', 'TOKEN_ID', 'FILE', 'NONE'])
@@ -190,7 +190,7 @@ const downloadFile = async (dirHash) => {
 
 export async function getLastTokenId() {
   await api.isReady
-  const lastTokenId = await api.query.simpleNFT.lastToken()
+  const lastTokenId = await api.query.utxoNFT.lastToken()
 
   return lastTokenId ? parseInt(lastTokenId, 10) : 0
 }
@@ -240,7 +240,7 @@ export async function runProcess(process, inputs, outputs) {
     logger.debug('Running Transaction inputs: %j outputs: %j', inputs, relevantOutputs)
     return new Promise((resolve, reject) => {
       let unsub = null
-      api.tx.simpleNFT
+      api.tx.utxoNFT
         .runProcess(process, inputs, relevantOutputs)
         .signAndSend(alice, (result) => {
           logger.debug('result.status %s', JSON.stringify(result.status))
@@ -298,7 +298,7 @@ function transformItem({ originalId, createdAt, destroyedAt, ...rest }) {
 
 export async function getItem(tokenId) {
   await api.isReady
-  const itemRaw = (await api.query.simpleNFT.tokensById(tokenId)).toJSON()
+  const itemRaw = (await api.query.utxoNFT.tokensById(tokenId)).toJSON()
 
   if (!itemRaw) {
     return null

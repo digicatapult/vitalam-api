@@ -1,6 +1,6 @@
 {
   "name": "dscp-api",
-  "version": "5.0.6",
+  "version": "5.0.7",
   "description": "DSCP API",
   "type": "module",
   "repository": {
@@ -50,7 +50,7 @@
     "pino-http": "^8.3.3",
     "prom-client": "^14.1.1",
     "stream-json": "^1.7.5",
-    "swagger-ui-express": "^4.6.2"
+    "swagger-ui-express": "^5.0.0"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.19.1",

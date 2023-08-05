@@ -1,6 +1,6 @@
 {
   "name": "dscp-api",
-  "version": "5.0.6",
+  "version": "5.0.7",
   "description": "DSCP API",
   "type": "module",
   "repository": {
@@ -58,7 +58,7 @@
     "chai": "^4.3.7",
     "depcheck": "^1.4.3",
     "eslint": "^8.35.0",
-    "eslint-config-prettier": "^8.6.0",
+    "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^4.2.1",
     "mocha": "^10.2.0",
     "mock-jwks": "^2.0.0",

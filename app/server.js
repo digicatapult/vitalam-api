@@ -22,7 +22,7 @@ import url from 'url'
 const __filename = url.fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-const { PORT, API_VERSION, API_MAJOR_VERSION, AUTH_TYPE, EXTERNAL_PATH_PREFIX } = env
+const { PORT, API_VERSION, API_MAJOR_VERSION, AUTH_TYPE } = env
 
 export async function createHttpServer() {
   const requestLogger = pinoHttp({ logger })
@@ -116,11 +116,7 @@ export async function createHttpServer() {
     },
   }
 
-  app.use(
-    EXTERNAL_PATH_PREFIX ? `/${EXTERNAL_PATH_PREFIX}/${API_MAJOR_VERSION}/swagger` : `/${API_MAJOR_VERSION}/swagger`,
-    swaggerUi.serve,
-    swaggerUi.setup(null, options)
-  )
+  app.use(`/${API_MAJOR_VERSION}/swagger`, swaggerUi.serve, swaggerUi.setup(null, options))
 
   // Sorry - app.use checks arity
   // eslint-disable-next-line no-unused-vars

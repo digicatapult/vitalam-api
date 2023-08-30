@@ -1,6 +1,6 @@
 {
   "name": "dscp-api",
-  "version": "5.0.7",
+  "version": "5.0.8",
   "description": "NodeJS API service for DSCP",
   "type": "module",
   "repository": {

@@ -1,6 +1,6 @@
 {
   "name": "dscp-api",
-  "version": "5.0.9",
+  "version": "5.0.10",
   "description": "NodeJS API service for DSCP",
   "type": "module",
   "repository": {
@@ -36,7 +36,7 @@
     "compression": "^1.7.4",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
-    "envalid": "^7.3.1",
+    "envalid": "^8.0.0",
     "express": "^4.18.2",
     "express-openapi": "^12.1.3",
     "express-prom-bundle": "^6.6.0",

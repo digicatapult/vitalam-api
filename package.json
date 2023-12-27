@@ -1,6 +1,6 @@
 {
   "name": "dscp-api",
-  "version": "5.0.9",
+  "version": "5.0.10",
   "description": "NodeJS API service for DSCP",
   "type": "module",
   "repository": {
@@ -46,7 +46,7 @@
     "multer": "^1.4.5-lts.1",
     "node-fetch": "^3.3.2",
     "pino": "^8.15.0",
-    "pino-http": "^8.4.0",
+    "pino-http": "^9.0.0",
     "prom-client": "^14.2.0",
     "stream-json": "^1.8.0",
     "swagger-ui-express": "^5.0.0"

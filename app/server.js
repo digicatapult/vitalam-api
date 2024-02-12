@@ -39,7 +39,7 @@ export async function createHttpServer() {
       includePath: true,
       promClient: {
         collectDefaultMetrics: {
-          prefix: 'dscp_api_',
+          prefix: 'sqnc_api_',
         },
       },
     })

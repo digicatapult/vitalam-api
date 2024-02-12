@@ -1,22 +1,22 @@
 {
-  "name": "dscp-api",
+  "name": "sqnc-api",
   "version": "5.0.9",
-  "description": "NodeJS API service for DSCP",
+  "description": "NodeJS API service for SQNC",
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/digicatapult/dscp-api.git"
+    "url": "git+https://github.com/digicatapult/sqnc-api.git"
   },
   "author": "Digital Catapult",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/digicatapult/dscp-api/issues"
+    "url": "https://github.com/digicatapult/sqnc-api/issues"
   },
   "engines": {
     "node": ">=18.x.x",
     "npm": ">=8.x.x"
   },
-  "homepage": "https://github.com/digicatapult/dscp-api#readme",
+  "homepage": "https://github.com/digicatapult/sqnc-api#readme",
   "main": "./app/index.js",
   "scripts": {
     "test": "NODE_ENV=test mocha --config ./test/mocharc.cjs ./test",

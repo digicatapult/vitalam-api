@@ -22,8 +22,8 @@ services:
       - 4002:4001
       - 8081:8080
       - 5002:5001
-  dscp-node:
-    image: digicatapult/dscp-node:latest
+  sqnc-node:
+    image: digicatapult/sqnc-node:latest
     command: --base-path /data/
       --dev
       --unsafe-ws-external

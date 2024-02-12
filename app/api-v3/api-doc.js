@@ -5,7 +5,7 @@ const { PORT, API_VERSION, API_MAJOR_VERSION } = env
 const apiDoc = {
   openapi: '3.0.3',
   info: {
-    title: 'DSCP API',
+    title: 'SQNC API',
     version: API_VERSION,
   },
   servers: [

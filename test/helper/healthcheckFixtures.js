@@ -2,7 +2,7 @@ import env from '../../app/env.js'
 const { API_VERSION } = env
 
 export const responses = {
-  ok: (dscpRuntimeVersion, ipfsVersion) => ({
+  ok: (sqncRuntimeVersion, ipfsVersion) => ({
     code: 200,
     body: {
       status: 'ok',
@@ -13,11 +13,11 @@ export const responses = {
           detail: {
             chain: 'Development',
             runtime: {
-              name: 'dscp',
+              name: 'sqnc',
               versions: {
                 authoring: 1,
                 impl: 1,
-                spec: dscpRuntimeVersion,
+                spec: sqncRuntimeVersion,
                 transaction: 1,
               },
             },
@@ -55,7 +55,7 @@ export const responses = {
       },
     },
   }),
-  ipfsDown: (dscpRuntimeVersion) => ({
+  ipfsDown: (sqncRuntimeVersion) => ({
     code: 503,
     body: {
       status: 'down',
@@ -66,11 +66,11 @@ export const responses = {
           detail: {
             chain: 'Development',
             runtime: {
-              name: 'dscp',
+              name: 'sqnc',
               versions: {
                 authoring: 1,
                 impl: 1,
-                spec: dscpRuntimeVersion,
+                spec: sqncRuntimeVersion,
                 transaction: 1,
               },
             },
@@ -85,7 +85,7 @@ export const responses = {
       },
     },
   }),
-  ipfsDownTimeout: (dscpRuntimeVersion) => ({
+  ipfsDownTimeout: (sqncRuntimeVersion) => ({
     code: 503,
     body: {
       status: 'down',
@@ -96,11 +96,11 @@ export const responses = {
           detail: {
             chain: 'Development',
             runtime: {
-              name: 'dscp',
+              name: 'sqnc',
               versions: {
                 authoring: 1,
                 impl: 1,
-                spec: dscpRuntimeVersion,
+                spec: sqncRuntimeVersion,
                 transaction: 1,
               },
             },
@@ -115,7 +115,7 @@ export const responses = {
       },
     },
   }),
-  ipfsDownNoPeers: (dscpRuntimeVersion, ipfsVersion) => ({
+  ipfsDownNoPeers: (sqncRuntimeVersion, ipfsVersion) => ({
     code: 503,
     body: {
       status: 'down',
@@ -126,11 +126,11 @@ export const responses = {
           detail: {
             chain: 'Development',
             runtime: {
-              name: 'dscp',
+              name: 'sqnc',
               versions: {
                 authoring: 1,
                 impl: 1,
-                spec: dscpRuntimeVersion,
+                spec: sqncRuntimeVersion,
                 transaction: 1,
               },
             },

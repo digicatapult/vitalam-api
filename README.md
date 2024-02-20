@@ -1,5 +1,7 @@
 # DSCP API
 
+# DEPRECATED 20/02/24
+
 ## Description
 
 A `Node.js` API to support communication to the [Substrate-based](https://www.substrate.io/) [`dscp-node`](https://github.com/digicatapult/dscp-node) (via [`polkadot-js/api`](https://www.npmjs.com/package/@polkadot/api)) and an [`IPFS`](https://ipfs.io/) node.

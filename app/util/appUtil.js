@@ -386,7 +386,7 @@ export const roleToIndex = async (role) => {
   await api.isReady
   const registry = api.registry
   const lookup = registry.lookup
-  const lookupId = registry.getDefinition('DscpNodeRuntimeRole')
+  const lookupId = registry.getDefinition('SqncNodeRuntimeRole')
   const rolesEnum = lookup.getTypeDef(lookupId).sub
 
   const entry = rolesEnum.find((e) => e.name === role)
@@ -402,7 +402,7 @@ export const indexToRole = async (index) => {
   await api.isReady
   const registry = api.registry
   const lookup = registry.lookup
-  const lookupId = registry.getDefinition('DscpNodeRuntimeRole')
+  const lookupId = registry.getDefinition('SqncNodeRuntimeRole')
   const rolesEnum = lookup.getTypeDef(lookupId).sub
 
   const entry = rolesEnum.find((e) => e.index === index)

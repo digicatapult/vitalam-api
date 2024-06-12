@@ -18,7 +18,7 @@ const { API_MAJOR_VERSION, AUTH_ISSUER, AUTH_AUDIENCE, AUTH_TYPE } = env
 const describeAuthOnly = AUTH_TYPE === 'JWT' ? describe : describe.skip
 
 describeAuthOnly('Bug regression tests', function () {
-  describe('API run-process is broken with file uploads (https://github.com/digicatapult/dscp-api/issues/17)', function () {
+  describe('API run-process is broken with file uploads (https://github.com/digicatapult/sqnc-api/issues/17)', function () {
     let app
     let jwksMock
     let authToken
